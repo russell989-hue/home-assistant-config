@@ -1,0 +1,387 @@
+- id: '1775764304059'
+  alias: 5 min auto lock
+  description: ''
+  triggers:
+  - device_id: cd4ed681731aebf1948decd37efc02b4
+    domain: lock
+    entity_id: 430a192b46f72741058d64788ef8cd42
+    type: unlocked
+    trigger: device
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  conditions: []
+  actions:
+  - device_id: cd4ed681731aebf1948decd37efc02b4
+    domain: lock
+    entity_id: 430a192b46f72741058d64788ef8cd42
+    type: lock
+  mode: single
+- id: '1775893852917'
+  alias: 'Shadowfax: Climate Safety Timeout'
+  description: Turns off climate after 1 hour in Park if Pet Mode is off
+  triggers:
+  - entity_id: climate.shadowfax_cabin_climate
+    to: 'on'
+    for:
+      hours: 1
+    trigger: state
+  - entity_id: sensor.shadowfax_gear_selector
+    to: Park
+    for:
+      hours: 1
+    trigger: state
+  conditions:
+  - condition: state
+    entity_id: climate.shadowfax_cabin_climate
+    state: 'on'
+  - condition: state
+    entity_id: sensor.shadowfax_gear_selector
+    state: Park
+  - condition: state
+    entity_id: sensor.shadowfax_pet_mode
+    state: Not running
+  actions:
+  - action: script.all_seats_off
+  mode: restart
+- id: '1775969670747'
+  alias: Turn on Speakeasy TV When Computer On
+  description: ''
+  triggers: []
+  conditions: []
+  actions:
+  - action: androidtv.adb_command
+    metadata: {}
+    target:
+      device_id: e7e7e5508cc6cd57f9cc07bf81cda039
+    data:
+      command: POWER
+  - action: androidtv.adb_command
+    metadata: {}
+    target:
+      device_id: e7e7e5508cc6cd57f9cc07bf81cda039
+    data:
+      command: HDMI3
+  mode: single
+- id: '1777327937205'
+  alias: Turn off 5 hours
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: 42ae7895a9688d99bf981e9a9036b93b
+    entity_id: b13be207ee4b60e509dbe05c173d6b97
+    domain: switch
+    trigger: device
+    for:
+      hours: 5
+      minutes: 0
+      seconds: 0
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      device_id: 42ae7895a9688d99bf981e9a9036b93b
+    data: {}
+  mode: single
+- id: '1777328105052'
+  alias: Turn off 3 hours
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: f9b4782ed42e7f2cc4c82743c1be3c09
+    entity_id: 6c1747cc32b393c491bd7bbe5a68e9d0
+    domain: switch
+    trigger: device
+    for:
+      hours: 3
+      minutes: 0
+      seconds: 0
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      device_id: f9b4782ed42e7f2cc4c82743c1be3c09
+  mode: single
+- id: '1777328247516'
+  alias: Turn off 3 hours nick lamp
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: 89e4fb70696f4369da50f54734fa2f1c
+    entity_id: 937bc46fc371e2c8f4b37e1a6ae82bc1
+    domain: switch
+    trigger: device
+    for:
+      hours: 3
+      minutes: 0
+      seconds: 0
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      device_id: 89e4fb70696f4369da50f54734fa2f1c
+  mode: single
+- id: '1777927907887'
+  alias: Rihanna
+  description: ''
+  triggers:
+  - device_id: 176c7e2dbfd60f2d304a788a0676b326
+    domain: zha
+    type: remote_button_short_press
+    subtype: button
+    trigger: device
+  conditions: []
+  actions:
+  - action: media_player.unjoin
+    metadata: {}
+    target:
+      entity_id: media_player.office_2
+    data: {}
+  - action: media_player.play_media
+    metadata: {}
+    target:
+      entity_id: media_player.office_sonos_speaker
+    data:
+      media:
+        media_content_id: FV:2/3
+        media_content_type: favorite_item_id
+        metadata:
+          title: Rihanna
+          thumbnail: https://i.scdn.co/image/ab67616d00001e02e24cbbd5cef05ca77ec67df6
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: favorites
+            media_content_id: ''
+          - media_content_type: favorites_folder
+            media_content_id: object.container.playlistContainer
+          browse_entity_id: media_player.office_sonos_speaker
+  mode: single
+- id: '1777928509217'
+  alias: Stop- Rihanna
+  description: ''
+  triggers:
+  - device_id: 176c7e2dbfd60f2d304a788a0676b326
+    domain: zha
+    type: remote_button_double_press
+    subtype: button
+    trigger: device
+  conditions:
+  - condition: media_player.is_playing
+    target:
+      entity_id: media_player.office_sonos_speaker
+    options: {}
+  actions:
+  - action: media_player.media_stop
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.office_sonos_speaker
+  mode: single
+- id: '1778039192505'
+  alias: Kitchen Max Display- Show Dashboard
+  description: ''
+  triggers:
+  - trigger: media_player.stopped_playing
+    target:
+      entity_id: media_player.kitchen_max_display
+    options: {}
+  conditions: []
+  actions:
+  - action: media_player.play_media
+    metadata: {}
+    target:
+      entity_id: media_player.kitchen_max_display
+    data:
+      media:
+        media_content_id: nest-control-panels
+        media_content_type: lovelace
+        metadata:
+          title: Nest Control Panels
+          thumbnail: /api/brands/integration/lovelace/logo.png
+          media_class: app
+          children_media_class: app
+          navigateIds:
+          - {}
+          - media_content_type: lovelace
+            media_content_id: ''
+          - media_content_type: lovelace
+            media_content_id: nest-control-panels
+          browse_entity_id: media_player.kitchen_max_display
+  mode: single
+- id: trash_schedule_check
+  alias: Trash Schedule - Check Tomorrow
+  description: 'Sunday evening: check what''s being picked up Monday'
+  triggers:
+  - trigger: time
+    at: '18:00:00'
+  conditions:
+  - condition: time
+    weekday:
+    - sun
+  actions:
+  - action: calendar.get_events
+    target:
+      entity_id: calendar.trash_recycling
+    data:
+      duration:
+        hours: 48
+    response_variable: agenda
+  - variables:
+      event_title: '{{ agenda[''calendar.trash_recycling''].events[0].summary | default('''')
+        | lower }}
+
+        '
+  - action: input_boolean.turn_{{ 'on' if 'trash' in event_title else 'off' }}
+    target:
+      entity_id: input_boolean.rubbish
+  - action: input_boolean.turn_{{ 'on' if 'recycle' in event_title else 'off' }}
+    target:
+      entity_id: input_boolean.recycle
+  - action: input_boolean.turn_{{ 'on' if 'compost' in event_title else 'off' }}
+    target:
+      entity_id: input_boolean.compost
+  - action: input_boolean.turn_{{ 'on' if 'large item' in event_title else 'off' }}
+    target:
+      entity_id: input_boolean.large_item
+- id: trash_schedule_clear
+  alias: Trash Schedule - Clear After Pickup
+  triggers:
+  - trigger: time
+    at: '12:00:00'
+  conditions:
+  - condition: time
+    weekday:
+    - mon
+  actions:
+  - action: input_boolean.turn_off
+    target:
+      entity_id:
+      - input_boolean.rubbish
+      - input_boolean.recycle
+      - input_boolean.compost
+      - input_boolean.large_item
+- alias: 'Basement: Manual lock = guest inside'
+  trigger:
+  - platform: state
+    entity_id: sensor.side_door_operator
+    to: Manual Lock
+  condition:
+  - condition: state
+    entity_id: calendar.zenobia_airbnb
+    state: 'on'
+  action:
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.basement_last_inside_signal
+    data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+  mode: single
+  id: f80691550f284240a3ecce6d5eb22c45
+- alias: 'Basement: One touch lock = guest left'
+  trigger:
+  - platform: state
+    entity_id: sensor.side_door_operator
+    to: One Touch Lock
+  condition:
+  - condition: state
+    entity_id: calendar.zenobia_airbnb
+    state: 'on'
+  action:
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.basement_last_outside_signal
+    data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+  mode: single
+  id: 56a9a577389244b3a89d33efea82336d
+- alias: 'Basement: Motion corroborates guest inside'
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.downstairs_occupancy
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: calendar.zenobia_airbnb
+    state: 'on'
+  action:
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.basement_last_inside_signal
+    data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+  mode: single
+  id: 6293266aca9b46568620c131ee4a139a
+- alias: 'Basement: Sync occupancy boolean from smart sensor'
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.basement_guest_present
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.basement_guest_present
+        state: 'on'
+      sequence:
+      - service: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.basement_airbnb_occupancy
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.basement_guest_present
+        state: 'off'
+      sequence:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.basement_airbnb_occupancy
+  mode: single
+  id: 02c3b822751a4dbeb24246e44f67893d
+- id: '1778278971843'
+  alias: Keep Camera Streams Alive
+  description: ''
+  triggers:
+  - trigger: homeassistant
+    event: start
+  conditions: []
+  actions:
+  - action: shell_command.keep_streams_alive
+    data: {}
+  mode: single
+- id: '1778371502291'
+  alias: AI Camera Events
+  description: ''
+  use_blueprint:
+    path: valentinfrlch/event_summary.yaml
+    input:
+      camera_entities:
+      - camera.doorbell
+      - camera.alley_live_view
+      - camera.garage_camera
+      - camera.side_door_camera
+      - camera.backyard_camera
+      cooldown:
+        hours: 0
+        minutes: 5
+        seconds: 0
+      provider: 01KR7JMHXJHTSC78891A458V37
+      model: gemini-2.5-flash
+      important: true
+- id: '1778381242657'
+  alias: Alley Camera AI
+  description: ''
+  use_blueprint:
+    path: valentinfrlch/event_summary.yaml
+    input:
+      camera_entities:
+      - camera.alley_live_view
+      trigger_state: recording
+      run_conditions: []
+      provider: 01KR7JMHXJHTSC78891A458V37
+      model: gemini-2.5-flash

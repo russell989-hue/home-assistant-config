@@ -1,0 +1,100 @@
+# ----------------------------------------------------
+# Home Assistant .gitignore
+# ----------------------------------------------------
+secrets.yaml
+home-assistant_v2.db
+home-assistant_v2.db-shm
+home-assistant_v2.db-wal
+*.log
+home-assistant.log
+home-assistant.log.1
+home-assistant.log.fault
+.storage/
+OZW_Log.txt
+zwcfg_*.xml
+zwscene.xml
+zigbee.db
+zigbee.db-shm
+zigbee.db-wal
+.google.token
+.cloud/
+.ios.conf
+.DS_Store
+Thumbs.db
+go2rtc.yaml
+.cache/
+__pycache__/
+*.pyc
+.ha_run.lock
+tts/
+.shopping_list.json
+*.mp4# ----------------------------------------------------
+# Home Assistant .gitignore
+# ----------------------------------------------------
+
+# NEVER COMMIT SECRETS
+secrets.yaml
+
+# Home Assistant core database (Avoid pushing massive local DBs)
+home-assistant_v2.db
+home-assistant_v2.db-shm
+home-assistant_v2.db-wal
+
+# Log files
+*.log
+home-assistant.log
+home-assistant.log.1
+home-assistant.log.fault
+
+# Hidden storage directory (CRITICAL: Contains auth tokens and integration configurations)
+.storage/
+
+# Z-Wave and Zigbee device configurations and logs
+OZW_Log.txt
+zwcfg_*.xml
+zwscene.xml
+zigbee.db
+zigbee.db-shm
+zigbee.db-wal
+
+# Custom Integration Tokens (e.g., Google/Nest developer tokens)
+.google.token
+
+# Cloud and Mobile App settings
+.cloud/
+.ios.conf
+
+# macOS / Windows clutter
+.DS_Store
+Thumbs.db
+
+# --- ADDED: previously exposed files ---
+
+# Camera stream config (contains Nest OAuth credentials)
+go2rtc.yaml
+
+# go2rtc binary (no reason to version a binary)
+go2rtc-*
+
+# Cache directory (may contain tokens/session data)
+.cache/
+
+# Runtime lock file
+.ha_run.lock
+
+# Personal data
+.shopping_list.json
+# Camera stream config (contains Nest OAuth credentials)
+go2rtc.yaml
+
+# go2rtc binary
+go2rtc-*
+
+# Cache directory
+.cache/
+
+# Runtime lock file
+.ha_run.lock
+
+# Personal data
+.shopping_list.json

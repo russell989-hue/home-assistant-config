@@ -1,0 +1,627 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# provides predictions of what entities the user is most likely to interact with. This is used in the frontend to surface the most relevant entities to the user.
+usage_prediction:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /hacsfiles/Bubble-Card/bubble-pop-up-fix.js
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+
+template:
+  - binary_sensor:
+      - name: "Basement Guest Present"
+        unique_id: basement_guest_present
+        device_class: occupancy
+        icon: >
+          {{ 'mdi:account-check' if this.state == 'on' else 'mdi:account-off' }}
+        state: >
+          {% if not is_state('calendar.zenobia_airbnb', 'on') %}
+            false
+          {% else %}
+            {% set now_ts = as_timestamp(now()) %}
+
+            {% set inside_ts = as_timestamp(states('input_datetime.basement_last_inside_signal')) | float(0) %}
+            {% set outside_ts = as_timestamp(states('input_datetime.basement_last_outside_signal')) | float(0) %}
+            {% set hours_since_inside = ((now_ts - inside_ts) / 3600) | float(999) %}
+            {% set hours_since_outside = ((now_ts - outside_ts) / 3600) | float(999) %}
+
+            {% set motion_active = is_state('binary_sensor.downstairs_occupancy', 'on') %}
+            {% set motion_ts = as_timestamp(states.binary_sensor.downstairs_occupancy.last_changed) | float(0) %}
+            {% set hours_since_motion = ((now_ts - motion_ts) / 3600) | float(999) %}
+
+            {% set hour = now().hour %}
+            {% set is_sleep_window = (hour >= 22) or (hour < 9) %}
+            {% set confidence_hours = 10 if is_sleep_window else 3 %}
+
+            {% if motion_active %}
+              true
+            {% elif outside_ts > inside_ts and outside_ts > 0 and hours_since_outside < 24 %}
+              false
+            {% elif inside_ts > outside_ts and hours_since_inside < confidence_hours %}
+              true
+            {% elif hours_since_motion < confidence_hours %}
+              true
+            {% else %}
+              false
+            {% endif %}
+          {% endif %}
+
+        attributes:
+          booking_active: "{{ is_state('calendar.zenobia_airbnb', 'on') }}"
+          hours_since_inside: >
+            {% set ts = as_timestamp(states('input_datetime.basement_last_inside_signal')) | float(0) %}
+            {{ ((as_timestamp(now()) - ts) / 3600) | round(1) }}
+          hours_since_outside: >
+            {% set ts = as_timestamp(states('input_datetime.basement_last_outside_signal')) | float(0) %}
+            {{ ((as_timestamp(now()) - ts) / 3600) | round(1) }}
+          hours_since_motion: >
+            {% set m = states.binary_sensor.downstairs_occupancy %}
+            {{ ((as_timestamp(now()) - as_timestamp(m.last_changed) | float(0)) / 3600) | round(1) }}
+          sleep_window_active: "{{ (now().hour >= 22) or (now().hour < 9) }}"
+          confidence_window_hours: "{{ 10 if ((now().hour >= 22) or (now().hour < 9)) else 3 }}"
+          last_decisive_signal: >
+            {% set inside_ts = as_timestamp(states('input_datetime.basement_last_inside_signal')) | float(0) %}
+            {% set outside_ts = as_timestamp(states('input_datetime.basement_last_outside_signal')) | float(0) %}
+            {% if outside_ts > inside_ts %}outside{% elif inside_ts > 0 %}inside{% else %}none{% endif %}
+
+  - trigger:
+      - trigger: time
+        at: "00:00:00"
+      - trigger: homeassistant
+        event: start
+    action:
+      - action: calendar.get_events
+        target:
+          entity_id: calendar.trash_recycling
+        data:
+          duration:
+            days: 180
+        response_variable: agenda
+    sensor:
+      - name: "Next Large Item Pickup"
+        unique_id: next_large_item_pickup
+        icon: mdi:sofa
+        state: >
+          {% set events = agenda['calendar.trash_recycling'].events | default([]) %}
+          {% set ns = namespace(found='None scheduled') %}
+          {% for event in events %}
+            {% if 'large item' in (event.summary | default('') | lower) and ns.found == 'None scheduled' %}
+              {% set ns.found = as_datetime(event.start).strftime('%b %-d') %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.found }}
+  # --- SECTION 1: TRIGGER-BASED SENSORS (Location & Trip Data) ---
+  - trigger:
+      - platform: state
+        entity_id: device_tracker.shadowfax_location
+    condition:
+      - condition: template
+        value_template: >
+          {{ states('sensor.shadowfax_active_driver') != 'None' or 
+             states('sensor.shadowfax_gear_status') != 'park' }}
+    sensor:
+      - name: "Shadowfax Trip Data"
+        unique_id: shadowfax_trip_data
+        state: "{{ states('sensor.shadowfax_active_driver') }}"
+        attributes:
+          latitude: "{{ state_attr('device_tracker.shadowfax_location', 'latitude') }}"
+          longitude: "{{ state_attr('device_tracker.shadowfax_location', 'longitude') }}"
+          speed: "{{ state_attr('device_tracker.shadowfax_location', 'speed') | float(0) }}"
+          drive_mode: "{{ states('sensor.shadowfax_drive_mode') }}"
+  # --- SECTION 2: STATE-BASED SELECTS (Seat Controls) ---
+  - select:
+      - name: "Driver Seat Combined"
+        unique_id: driver_seat_combined
+        options: "{{ ['Off', 'Heat 1', 'Heat 2', 'Heat 3', 'Cool 1', 'Cool 2', 'Cool 3'] }}"
+        state: >
+          {% set h = states('select.shadowfax_seat_front_left_heat') %}
+          {% set v = states('select.shadowfax_seat_front_left_vent') %}
+          {% if h != 'Off' and 'Level' in h %} Heat {{ h.split('_')[1] }}
+          {% elif v != 'Off' and 'Level' in v %} Cool {{ v.split('_')[1] }}
+          {% else %} Off {% endif %}
+        select_option:
+          - action: select.select_option
+            target:
+              entity_id: [select.shadowfax_seat_front_left_heat, select.shadowfax_seat_front_left_vent]
+            data: { option: "Off" }
+          - action: select.select_option
+            target:
+              entity_id: >
+                {% if 'Heat' in option %} select.shadowfax_seat_front_left_heat
+                {% elif 'Cool' in option %} select.shadowfax_seat_front_left_vent
+                {% endif %}
+            data:
+              option: "{{ 'Level_' ~ option.split(' ')[1] if ' ' in option else 'Off' }}"
+
+      - name: "Passenger Seat Combined"
+        unique_id: passenger_seat_combined
+        options: "{{ ['Off', 'Heat 1', 'Heat 2', 'Heat 3', 'Cool 1', 'Cool 2', 'Cool 3'] }}"
+        state: >
+          {% set h = states('select.shadowfax_seat_front_right_heat') %}
+          {% set v = states('select.shadowfax_seat_front_right_vent') %}
+          {% if h != 'Off' and 'Level' in h %} Heat {{ h.split('_')[1] }}
+          {% elif v != 'Off' and 'Level' in v %} Cool {{ v.split('_')[1] }}
+          {% else %} Off {% endif %}
+        select_option:
+          - action: select.select_option
+            target:
+              entity_id: [select.shadowfax_seat_front_right_heat, select.shadowfax_seat_front_right_vent]
+            data: { option: "Off" }
+          - action: select.select_option
+            target:
+              entity_id: >
+                {% if 'Heat' in option %} select.shadowfax_seat_front_right_heat
+                {% elif 'Cool' in option %} select.shadowfax_seat_front_right_vent
+                {% endif %}
+            data:
+              option: "{{ 'Level_' ~ option.split(' ')[1] if ' ' in option else 'Off' }}"
+
+      - name: "Rear Left Seat Combined"
+        unique_id: rear_left_seat_combined
+        options: "{{ ['Off', 'Heat 1', 'Heat 2', 'Heat 3'] }}"
+        state: >
+          {% set h = states('select.shadowfax_seat_rear_left_heat') %}
+          {{ 'Heat ' ~ h.split('_')[1] if h != 'Off' and 'Level' in h else 'Off' }}
+        select_option:
+          - action: select.select_option
+            target:
+              entity_id: select.shadowfax_seat_rear_left_heat
+            data:
+              option: "{{ 'Level_' ~ option.split(' ')[1] if ' ' in option else 'Off' }}"
+
+      - name: "Rear Right Seat Combined"
+        unique_id: rear_right_seat_combined
+        options: "{{ ['Off', 'Heat 1', 'Heat 2', 'Heat 3'] }}"
+        state: >
+          {% set h = states('select.shadowfax_seat_rear_right_heat') %}
+          {{ 'Heat ' ~ h.split('_')[1] if h != 'Off' and 'Level' in h else 'Off' }}
+        select_option:
+          - action: select.select_option
+            target:
+              entity_id: select.shadowfax_seat_rear_right_heat
+            data:
+              option: "{{ 'Level_' ~ option.split(' ')[1] if ' ' in option else 'Off' }}"
+
+      - name: "Steering Wheel Combined"
+        unique_id: steering_wheel_combined
+        options: "{{ ['Off', 'On'] }}"
+        state: "{{ states('switch.shadowfax_steering_wheel_heat') | capitalize }}"
+        select_option:
+                - choose:
+                    - conditions: "{{ option == 'On' }}"
+                      sequence:
+                        - action: switch.turn_on
+                          target:
+                            entity_id: switch.shadowfax_steering_wheel_heat
+                    - conditions: "{{ option == 'Off' }}"
+                      sequence:
+                        - action: switch.turn_off
+                          target:
+                            entity_id: switch.shadowfax_steering_wheel_heat
+
+  # -------------------------------------------------------------------
+  # 1) Weather condition → mdi icon (simple, non-triggered)
+  # -------------------------------------------------------------------
+  - sensor:
+      - name: "Weather Condition Icon"
+        unique_id: weather_condition_icon
+        state: >
+          {% set condition = states('weather.forecast_home_2') | lower %}
+          {% if condition in ['sunny', 'clear'] %}
+            mdi:weather-sunny
+          {% elif condition == 'clear-night' %}
+            mdi:weather-night
+          {% elif condition in ['partlycloudy', 'partly cloudy'] %}
+            mdi:weather-partly-cloudy
+          {% elif condition == 'cloudy' %}
+            mdi:weather-cloudy
+          {% elif condition in ['rainy', 'rain'] %}
+            mdi:weather-rainy
+          {% elif condition == 'pouring' %}
+            mdi:weather-pouring
+          {% elif condition == 'windy' %}
+            mdi:weather-windy
+          {% elif condition in ['fog', 'foggy'] %}
+            mdi:weather-fog
+          {% elif condition in ['snow', 'snowy'] %}
+            mdi:weather-snowy
+          {% elif condition == 'snowy-rainy' %}
+            mdi:weather-snowy-rainy
+          {% elif condition == 'hail' %}
+            mdi:weather-hail
+          {% elif condition == 'lightning' %}
+            mdi:weather-lightning
+          {% elif condition == 'lightning-rainy' %}
+            mdi:weather-lightning-rainy
+          {% elif condition == 'windy-variant' %}
+            mdi:weather-windy-variant
+          {% elif condition == 'exceptional' %}
+            mdi:alert-circle-outline
+          {% else %}
+            mdi:weather-cloudy-alert
+          {% endif %}
+
+  # -------------------------------------------------------------------
+  # 2) Active Notification Count
+  # -------------------------------------------------------------------
+  - sensor:
+      - name: "Active Notification Count"
+        unique_id: active_notification_count
+        icon: mdi:bell
+        state: >
+          {% set ns = namespace(count=0) %}
+
+          {# Front door lock battery low — currently 10%, urgent #}
+          {% if states('sensor.front_door_battery_2') | float(100) < 20 %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Other locks battery low #}
+          {% if states('sensor.side_door_battery') | float(100) < 20 %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+          {% if states('sensor.side_door_battery_2') | float(100) < 20 %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Any door unlocked when nobody's home #}
+          {% if states('zone.home') | int(0) == 0 %}
+            {% if is_state('lock.front_door', 'unlocked')
+                  or is_state('lock.side_door', 'unlocked')
+                  or is_state('lock.side_door_2', 'unlocked') %}
+              {% set ns.count = ns.count + 1 %}
+            {% endif %}
+          {% endif %}
+
+          {# Trash / recycle reminder is on #}
+          {% if is_state('input_boolean.rubbish', 'on') %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+          {% if is_state('input_boolean.recycle', 'on') %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Washer or dryer running #}
+          {% if is_state('sensor.ge_washer_d828c9a07203_d828c9a07203_laundry_machine_state', 'Run') %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+          {% if is_state('sensor.ge_dryer_av102747g_av102747g_laundry_machine_state', 'Run') %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Washer or dryer just finished — end-of-cycle binary sensors #}
+          {% if is_state('binary_sensor.ge_washer_d828c9a07203_d828c9a07203_laundry_end_of_cycle', 'on') %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+          {% if is_state('binary_sensor.ge_dryer_av102747g_av102747g_laundry_end_of_cycle', 'on') %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Ghost's litter box needs emptying #}
+          {% if is_state('binary_sensor.petkit_puramax_wastebin_filled', 'on') %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Ghost's litter low #}
+          {% if states('sensor.petkit_puramax_litter_level') | float(100) < 20 %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Smart spray liquid low #}
+          {% if states('sensor.air_smart_spray_liquid_level') | float(100) < 15 %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Shadowfax low charge #}
+          {% if states('sensor.shadowfax_battery_state_of_charge') | float(100) < 25 %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Internet down #}
+          {% if is_state('binary_sensor.be5000_wan_status', 'off') %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {# Any battery-powered phone / iPad below 25% (one bump per device) #}
+          {% if states('sensor.brians_ipad_783_battery_level') | float(100) < 25 %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+          {% if states('sensor.office_ha_display_battery_level') | float(100) < 25 %}
+            {% set ns.count = ns.count + 1 %}
+          {% endif %}
+
+          {{ ns.count }}
+
+  # -------------------------------------------------------------------
+  # 3) Hourly + Daily Weather Forecast (TRIGGER-BASED — needs HA restart)
+  # -------------------------------------------------------------------
+  - trigger:
+      - platform: time_pattern
+        minutes: /15
+      - platform: homeassistant
+        event: start
+
+    action:
+      - action: weather.get_forecasts
+        target:
+          entity_id: weather.forecast_home_2
+        data:
+          type: hourly
+        response_variable: forecast_hourly
+      - action: weather.get_forecasts
+        target:
+          entity_id: weather.forecast_home_2
+        data:
+          type: daily
+        response_variable: forecast_daily
+
+    sensor:
+      - name: "Hourly Weather Data"
+        unique_id: hourly_weather_data
+        state: >
+          {% if forecast_hourly['weather.forecast_home_2'].forecast is defined
+                and forecast_hourly['weather.forecast_home_2'].forecast | length > 0 %}
+            {{ as_local(strptime(forecast_hourly['weather.forecast_home_2'].forecast[0].datetime,
+                                 '%Y-%m-%dT%H:%M:%S%z')) }}
+          {% else %}
+            unknown
+          {% endif %}
+        attributes:
+          forecast_data: >
+            {% if forecast_hourly['weather.forecast_home_2'].forecast is defined
+                  and forecast_hourly['weather.forecast_home_2'].forecast | length > 0 %}
+              {{ forecast_hourly['weather.forecast_home_2'].forecast[0] }}
+            {% else %}
+              {}
+            {% endif %}
+          forecasts: >
+            {{ forecast_hourly['weather.forecast_home_2'].forecast
+               if forecast_hourly['weather.forecast_home_2'].forecast is defined
+               else [] }}
+
+      - name: "Daily Weather Data"
+        unique_id: daily_weather_data
+        state: >
+          {% if forecast_daily['weather.forecast_home_2'].forecast is defined
+                and forecast_daily['weather.forecast_home_2'].forecast | length > 0 %}
+            {{ as_local(strptime(forecast_daily['weather.forecast_home_2'].forecast[0].datetime,
+                                 '%Y-%m-%dT%H:%M:%S%z')) }}
+          {% else %}
+            unknown
+          {% endif %}
+        attributes:
+          forecast_data: >
+            {% if forecast_daily['weather.forecast_home_2'].forecast is defined
+                  and forecast_daily['weather.forecast_home_2'].forecast | length > 0 %}
+              {{ forecast_daily['weather.forecast_home_2'].forecast[0] }}
+            {% else %}
+              {}
+            {% endif %}
+          forecasts: >
+            {{ forecast_daily['weather.forecast_home_2'].forecast
+               if forecast_daily['weather.forecast_home_2'].forecast is defined
+               else [] }}
+
+  # -------------------------------------------------------------------
+  # 4) Camera Last-Activity Status sensors
+  # -------------------------------------------------------------------
+  - sensor:
+
+      - name: "Doorbell Camera Status"
+        unique_id: doorbell_camera_status
+        state: >-
+          {% set last = states.event.doorbell_motion.state if states.event.doorbell_motion is not none else None %}
+          {% if last in [None, 'unknown', 'unavailable'] %}
+            No recent activity
+          {% else %}
+            {% set t = as_timestamp(last) %}
+            {% if t %}
+              {% set diff = as_timestamp(now()) - t %}
+              {% set h = (diff // 3600) | int %}
+              {% set m = ((diff % 3600) / 60) | int %}
+              {% if h > 0 %}{{ h }}h {{ m }}m ago
+              {% else %}{{ m }}m ago{% endif %}
+            {% else %}
+              No recent activity
+            {% endif %}
+          {% endif %}
+
+      - name: "Front Door Ding Status"
+        unique_id: front_door_ding_status
+        state: >-
+          {% set last = states.event.front_door_ding.state if states.event.front_door_ding is not none else None %}
+          {% if last in [None, 'unknown', 'unavailable'] %}
+            No recent activity
+          {% else %}
+            {% set t = as_timestamp(last) %}
+            {% if t %}
+              {% set diff = as_timestamp(now()) - t %}
+              {% set h = (diff // 3600) | int %}
+              {% set m = ((diff % 3600) / 60) | int %}
+              {% if h > 0 %}{{ h }}h {{ m }}m ago
+              {% else %}{{ m }}m ago{% endif %}
+            {% else %}
+              No recent activity
+            {% endif %}
+          {% endif %}
+
+  # -------------------------------------------------------------------
+  # 5) Doorbell popup helper — auto-off binary sensor
+  # -------------------------------------------------------------------
+  # Fires ON the instant event.doorbell_ding changes state (someone rang).
+  # Automatically resets to OFF after 60 seconds.
+  # Used by the conditional card in the office iPad dashboard.
+  - trigger:
+      - platform: state
+        entity_id: event.doorbell_ding
+    binary_sensor:
+      - name: "Doorbell Recently Rang"
+        unique_id: doorbell_recently_rang
+        device_class: occupancy
+        state: "on"
+        auto_off: "00:01:00"
+
+
+input_boolean:
+
+  # ---- Modes (whole-house) ----
+  guest_mode:
+    name: Guest Mode
+    icon: mdi:account-multiple
+
+  movie_mode:
+    name: Movie Mode
+    icon: mdi:movie-open
+
+  party_mode:
+    name: Party Mode
+    icon: mdi:party-popper
+
+  # ---- Alerts ----
+  rubbish:
+    name: Trash Day
+    icon: mdi:trash-can
+
+  compost:
+    name: Compost Day
+    icon: mdi:leaf
+
+  large_item:
+    name: Large Item Pickup
+    icon: mdi:sofa
+
+  recycle:
+    name: Recycling Day
+    icon: mdi:recycle
+
+  siren_alarm:
+    name: Siren Alarm
+    icon: mdi:bullhorn
+
+  # ---- Zenobia room occupancy ----
+  kitchen_occupancy:
+    name: Kitchen Occupancy
+    icon: mdi:silverware-fork-knife
+
+  primary_bedroom_occupancy:
+    name: Primary Bedroom Occupancy
+    icon: mdi:bed
+
+  living_room_occupancy:
+    name: Living Room Occupancy
+    icon: mdi:sofa
+
+  office_occupancy:
+    name: Office Occupancy
+    icon: mdi:desk
+
+  speakeasy_occupancy:
+    name: Speakeasy Occupancy
+    icon: mdi:glass-cocktail
+
+  garage_occupancy:
+    name: Garage Occupancy
+    icon: mdi:garage
+
+  # ---- AirBnB units ----
+  basement_airbnb_occupancy:
+    name: Basement AirBnB Occupied
+    icon: mdi:home-account
+
+  riviera_airbnb_occupancy:
+    name: Riviera AirBnB Occupied (SD)
+    icon: mdi:home-roof
+
+  # ---- Per-room "show more lights" popup toggles ----
+  primary_bedroom_other_lights:
+    name: Primary Bedroom — Show Other Lights
+    icon: mdi:lightbulb-multiple
+
+  speakeasy_other_lights:
+    name: Speakeasy — Show Other Lights
+    icon: mdi:lightbulb-multiple
+
+  living_room_show_media:
+    name: Living Room — Show Media Controls
+    icon: mdi:cast
+
+
+input_number:
+  decrement:
+    name: Decrement Helper
+    min: 0
+    max: 100
+    step: 1
+    icon: mdi:minus
+
+  increment:
+    name: Increment Helper
+    min: 0
+    max: 100
+    step: 1
+    icon: mdi:plus
+
+
+input_text:
+  set_value:
+    name: Set Value Helper
+    max: 255
+    icon: mdi:form-textbox
+
+
+light:
+  - platform: group
+    name: Speakeasy All Cans
+    unique_id: speakeasy_all_cans
+    entities:
+      - light.tz3210_dwzfzfjc_ts0505b
+      - light.tz3210_dwzfzfjc_ts0505b_2
+      - light.tz3210_dwzfzfjc_ts0505b_3
+      - light.tz3210_dwzfzfjc_ts0505b_4
+      - light.tz3210_dwzfzfjc_ts0505b_5
+      - light.tz3210_dwzfzfjc_ts0505b_6
+      - light.tz3210_dwzfzfjc_ts0505b_7
+      - light.tz3210_dwzfzfjc_ts0505b_8
+      - light.tz3210_dwzfzfjc_ts0505b_9
+
+influxdb:
+  host: localhost
+  port: 8086
+  database: shadowfaxdb
+  include:
+    entities:
+      - sensor.shadowfax_trip_data
+      - sensor.shadowfax_battery_level
+      - sensor.shadowfax_total_mileage
+      
+input_datetime:
+  basement_last_inside_signal:
+    name: "Basement Last Inside Signal"
+    has_date: true
+    has_time: true
+    icon: mdi:door-closed-lock
+
+  basement_last_outside_signal:
+    name: "Basement Last Outside Signal"
+    has_date: true
+    has_time: true
+    icon: mdi:door-open
+    
+shell_command:
+  keep_streams_alive: /config/scripts/keep_streams_alive.sh
+
+# --- LOGGER SETTINGS ---
+logger:
+  default: info
+
+homeassistant:
+  allowlist_external_dirs:
+    - "/config"

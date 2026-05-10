@@ -1,0 +1,56 @@
+# themes/zenobia_glass.yaml
+# Drop into config/themes/zenobia_glass.yaml, add to configuration.yaml:
+#   frontend:
+#     themes: !include_dir_merge_named themes
+# Then in user profile pick the "Zenobia Glass" theme.
+# Approximates the Direction A "Frosted Glass" mock — dusk gradient
+# backdrop + translucent surfaces + amber accent.
+
+Zenobia Glass:
+  # ── core palette ──────────────────────────────────────────────
+  primary-color: "#E8A867"          # amber accent
+  accent-color:  "#7CC2C9"          # teal accent
+  app-header-background-color: "transparent"
+  app-header-text-color: "#fff"
+  text-primary-color: "#fff"
+
+  # ── backdrop (dusk gradient) ──────────────────────────────────
+  primary-background-color: "#1a1428"
+  secondary-background-color: "#1a1428"
+  lovelace-background: >-
+    radial-gradient(ellipse at 20% 0%,  rgba(232,168,103,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(124,194,201,0.15) 0%, transparent 55%),
+    linear-gradient(160deg, #1a1428 0%, #2a1f3a 50%, #1f1a2e 100%)
+
+  # ── surfaces (glass) ──────────────────────────────────────────
+  card-background-color: "rgba(255,255,255,0.06)"
+  ha-card-background: "rgba(255,255,255,0.06)"
+  ha-card-border-color: "rgba(255,255,255,0.10)"
+  ha-card-border-width: "0.5px"
+  ha-card-border-radius: "20px"
+  ha-card-box-shadow: "0 8px 32px rgba(0,0,0,0.32)"
+  ha-card-backdrop-filter: "blur(24px) saturate(1.4)"
+
+  # ── text ──────────────────────────────────────────────────────
+  primary-text-color: "#ffffff"
+  secondary-text-color: "rgba(255,255,255,0.6)"
+  disabled-text-color: "rgba(255,255,255,0.35)"
+
+  # ── tile / state ──────────────────────────────────────────────
+  state-icon-color: "#fff"
+  state-icon-active-color: "#E8A867"
+  paper-item-icon-color: "rgba(255,255,255,0.85)"
+  paper-item-icon-active-color: "#E8A867"
+
+  # ── dividers / chips ──────────────────────────────────────────
+  divider-color: "rgba(255,255,255,0.08)"
+  chip-background: "rgba(255,255,255,0.10)"
+
+  # ── tile card surface ─────────────────────────────────────────
+  tile-color: "#E8A867"
+
+  # ── sidebar (kiosk) ───────────────────────────────────────────
+  sidebar-background-color: "transparent"
+  sidebar-icon-color: "rgba(255,255,255,0.55)"
+  sidebar-selected-icon-color: "#E8A867"
+  sidebar-selected-background-color: "rgba(232,168,103,0.18)"

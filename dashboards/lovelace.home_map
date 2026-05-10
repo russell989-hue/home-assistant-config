@@ -1,0 +1,980 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace.home_map",
+  "data": {
+    "config": {
+      "views": [
+        {
+          "type": "sections",
+          "path": "new",
+          "title": "Home",
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "initial_view": "dayGridMonth",
+                  "type": "calendar",
+                  "entities": [
+                    "calendar.zenobia_airbnb"
+                  ],
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 8
+                  },
+                  "title": "Zenobia AirBnB"
+                },
+                {
+                  "maxDaysToShow": 14,
+                  "showDate": true,
+                  "showFullDayProgress": true,
+                  "enableModeChange": true,
+                  "type": "custom:atomic-calendar-revive",
+                  "entities": [
+                    {
+                      "entity": "calendar.zenobia_airbnb",
+                      "color": "#3b82f6",
+                      "showMultiDay": true
+                    },
+                    {
+                      "entity": "calendar.travel",
+                      "color": "#ef4444"
+                    },
+                    {
+                      "entity": "calendar.blackgate"
+                    }
+                  ],
+                  "name": "Calendars",
+                  "showTimeRemaining": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "thermostat",
+                  "entity": "climate.main_floor",
+                  "features": [
+                    {
+                      "type": "climate-hvac-modes"
+                    },
+                    {
+                      "type": "climate-fan-modes",
+                      "style": "dropdown"
+                    }
+                  ]
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "entity": "sensor.main_floor_current_temperature",
+                  "detail": 1,
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 2
+                  },
+                  "name": "AVERAGE temp"
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "detail": 1,
+                  "entity": "sensor.downstairs_temperature",
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 2
+                  },
+                  "name": {
+                    "type": "floor"
+                  }
+                },
+                {
+                  "type": "energy-distribution",
+                  "grid_options": {
+                    "rows": 5,
+                    "columns": "full"
+                  }
+                },
+                {
+                  "type": "energy-date-selection",
+                  "vertical_opening_direction": "auto",
+                  "opening_direction": "auto",
+                  "collection_key": "energy_today",
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": "auto"
+                  }
+                },
+                {
+                  "type": "energy-solar-graph",
+                  "collection_key": "energy_today",
+                  "title": "Solar Production"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "thermostat",
+                  "features": [
+                    {
+                      "type": "climate-hvac-modes"
+                    },
+                    {
+                      "type": "climate-fan-modes",
+                      "style": "dropdown"
+                    }
+                  ],
+                  "entity": "climate.upstairs_thermostat",
+                  "show_current_as_primary": false
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "detail": 1,
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 2
+                  },
+                  "entity": "sensor.upstairs_thermostat_temperature",
+                  "name": {
+                    "type": "floor"
+                  }
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "detail": 1,
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 2
+                  },
+                  "name": {
+                    "type": "floor"
+                  },
+                  "entity": "sensor.speakeasy_sensor_temperature"
+                },
+                {
+                  "type": "energy-sankey",
+                  "layout": "auto",
+                  "group_by_floor": true,
+                  "group_by_area": true,
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 5
+                  }
+                },
+                {
+                  "display_order": "none",
+                  "type": "todo-list",
+                  "theme": "Frosted Glass Dark",
+                  "hide_completed": true,
+                  "entity": "todo.shopping_list"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:weather-forecast-card",
+                  "show_current": true,
+                  "show_forecast": true,
+                  "default_forecast": "daily",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/home-map/weather"
+                  },
+                  "entity": "weather.forecast_home_2",
+                  "show_condition_effects": true,
+                  "grid_options": {
+                    "rows": "auto",
+                    "columns": 12
+                  },
+                  "forecast": {
+                    "mode": "chart",
+                    "show_sun_times": true,
+                    "use_color_thresholds": true,
+                    "scroll_to_selected": true,
+                    "default_chart_attribute": "temperature_and_precipitation",
+                    "show_attribute_selector": true,
+                    "hourly_group_size": 1
+                  },
+                  "forecast_action": {
+                    "tap_action": {
+                      "action": "toggle-forecast"
+                    },
+                    "hold_action": {
+                      "action": "select-forecast-attribute"
+                    }
+                  },
+                  "current": {
+                    "secondary_info_attribute": "wind_speed"
+                  }
+                },
+                {
+                  "type": "custom:weather-radar-card",
+                  "data_source": "RainViewer",
+                  "map_style": "OSM",
+                  "show_recenter": true,
+                  "show_scale": false,
+                  "show_marker": true,
+                  "show_zoom": false,
+                  "show_playback": false,
+                  "double_tap_action": "recenter",
+                  "markers": [
+                    {
+                      "entity": "zone.home"
+                    }
+                  ],
+                  "smooth_animation": true,
+                  "frame_count": 8,
+                  "show_snow": true
+                },
+                {
+                  "type": "heading",
+                  "icon": "mdi:airplane-clock",
+                  "heading": "Next Travel Dates",
+                  "heading_style": "title",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/home-map/calendar"
+                  }
+                },
+                {
+                  "entities": [
+                    "calendar.travel"
+                  ],
+                  "days_to_show": 180,
+                  "weather": {
+                    "position": "date",
+                    "date": {
+                      "show_conditions": true,
+                      "show_high_temp": true,
+                      "show_low_temp": false,
+                      "show_uv_index": false,
+                      "uv_index_threshold": 0,
+                      "icon_size": "14px",
+                      "font_size": "12px",
+                      "color": "var(--primary-text-color)"
+                    },
+                    "event": {
+                      "show_conditions": true,
+                      "show_temp": true,
+                      "show_uv_index": false,
+                      "uv_index_threshold": 0,
+                      "icon_size": "14px",
+                      "font_size": "12px",
+                      "color": "var(--primary-text-color)"
+                    }
+                  },
+                  "type": "custom:calendar-card-pro"
+                }
+              ]
+            }
+          ],
+          "badges": [
+            {
+              "type": "entity",
+              "show_name": true,
+              "show_state": true,
+              "show_icon": true,
+              "entity": "person.brianrussell",
+              "name": "Brian",
+              "show_entity_picture": false
+            },
+            {
+              "type": "entity",
+              "show_name": true,
+              "show_state": true,
+              "show_icon": true,
+              "entity": "person.nick"
+            },
+            {
+              "type": "entity",
+              "show_name": true,
+              "show_state": true,
+              "show_icon": true,
+              "entity": "binary_sensor.downstairs_occupancy",
+              "name": "AirBnB Guest"
+            }
+          ],
+          "header": {
+            "layout": "responsive",
+            "badges_position": "bottom",
+            "badges_wrap": "scroll",
+            "card": {
+              "type": "markdown",
+              "content": "# {{ now().strftime('%A, %b %-d - %I:%M %p') }}\n  ",
+              "title": "Zenobia House"
+            }
+          },
+          "max_columns": 4,
+          "show_icon_and_title": true,
+          "dense_section_placement": true,
+          "cards": [],
+          "theme": "Frosted Glass Dark",
+          "background": {
+            "opacity": 33,
+            "alignment": "center",
+            "size": "cover",
+            "repeat": "repeat",
+            "attachment": "fixed"
+          },
+          "top_margin": false,
+          "icon": "mdi:home",
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            }
+          ]
+        },
+        {
+          "type": "sections",
+          "max_columns": 6,
+          "title": "AirBnBs",
+          "path": "airbnbs",
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:webrtc-camera",
+                  "url": "side_door",
+                  "ui": true
+                },
+                {
+                  "type": "thermostat",
+                  "entity": "climate.main_floor",
+                  "features": [
+                    {
+                      "type": "climate-hvac-modes"
+                    }
+                  ]
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "entity": "sensor.downstairs_temperature",
+                  "detail": 1,
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": 2
+                  },
+                  "name": {
+                    "type": "entity"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "icon": "mdi:home-alert",
+                  "heading": "Zenobia",
+                  "heading_style": "title"
+                },
+                {
+                  "type": "entity",
+                  "entity": "binary_sensor.downstairs_occupancy",
+                  "name": {
+                    "type": "entity"
+                  },
+                  "grid_options": {
+                    "columns": "full"
+                  }
+                },
+                {
+                  "type": "history-graph",
+                  "entities": [
+                    {
+                      "entity": "binary_sensor.downstairs_occupancy",
+                      "name": " "
+                    }
+                  ],
+                  "title": "AirBnB Occupancy"
+                },
+                {
+                  "type": "logbook",
+                  "target": {
+                    "entity_id": [
+                      "lock.side_door"
+                    ]
+                  },
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 3
+                  }
+                },
+                {
+                  "initial_view": "dayGridMonth",
+                  "type": "calendar",
+                  "entities": [
+                    "calendar.zenobia_airbnb"
+                  ],
+                  "title": "Zenobia",
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": 8
+                  }
+                }
+              ],
+              "column_span": 1
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Riviera",
+                  "heading_style": "title"
+                },
+                {
+                  "type": "entity",
+                  "entity": "sensor.front_door_last_activity",
+                  "name": {
+                    "type": "entity"
+                  },
+                  "grid_options": {
+                    "columns": "full"
+                  }
+                },
+                {
+                  "initial_view": "dayGridMonth",
+                  "type": "calendar",
+                  "entities": [
+                    "calendar.riviera_airbnb"
+                  ],
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 8
+                  },
+                  "theme": "Frosted Glass Dark Lite",
+                  "title": "Riviera Calendar"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "show_state": true,
+                  "show_name": true,
+                  "camera_view": "live",
+                  "fit_mode": "cover",
+                  "type": "picture-entity",
+                  "entity": "camera.garage_interior_live_view",
+                  "image": {
+                    "media_content_id": "https://demo.home-assistant.io/stub_config/bedroom.png"
+                  },
+                  "camera_image": "camera.garage_interior_live_view"
+                },
+                {
+                  "show_state": true,
+                  "show_name": true,
+                  "camera_view": "live",
+                  "fit_mode": "cover",
+                  "type": "picture-entity",
+                  "entity": "camera.front_door_live_view",
+                  "image": {
+                    "media_content_id": "https://demo.home-assistant.io/stub_config/bedroom.png"
+                  },
+                  "camera_image": "camera.doorbell"
+                }
+              ]
+            }
+          ],
+          "cards": [],
+          "dense_section_placement": false,
+          "header": {
+            "layout": "center",
+            "badges_position": "bottom",
+            "badges_wrap": "wrap",
+            "card": {
+              "type": "markdown",
+              "text_only": true,
+              "content": "AirBnBs"
+            }
+          },
+          "theme": "Frosted Glass Dark Lite",
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            }
+          ],
+          "show_icon_and_title": true,
+          "icon": "mdi:home-heart"
+        },
+        {
+          "type": "panel",
+          "title": "Map",
+          "icon": "mdi:map",
+          "cards": [
+            {
+              "type": "map",
+              "auto_fit": true,
+              "show_all": true
+            }
+          ],
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            }
+          ]
+        },
+        {
+          "type": "sections",
+          "max_columns": 3,
+          "title": "Weather",
+          "path": "weather",
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:weather-forecast-card",
+                  "show_current": true,
+                  "show_forecast": true,
+                  "default_forecast": "daily",
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "entity": "weather.forecast_home_2",
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": "auto"
+                  },
+                  "show_condition_effects": true,
+                  "forecast": {
+                    "mode": "chart",
+                    "show_sun_times": true,
+                    "use_color_thresholds": true,
+                    "scroll_to_selected": true,
+                    "hourly_group_size": 1,
+                    "temperature_precision": 0,
+                    "show_attribute_selector": true
+                  },
+                  "forecast_action": {
+                    "tap_action": {
+                      "action": "toggle-forecast"
+                    },
+                    "hold_action": {
+                      "action": "select-forecast-attribute"
+                    },
+                    "double_tap_action": {
+                      "action": "more-info"
+                    }
+                  },
+                  "current": {
+                    "temperature_precision": 0,
+                    "show_attributes": []
+                  }
+                },
+                {
+                  "type": "custom:weather-radar-card",
+                  "map_style": "OSM",
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": 7
+                  },
+                  "show_recenter": true,
+                  "extra_labels": true,
+                  "frame_count": 10,
+                  "markers": [
+                    {
+                      "entity": "zone.home"
+                    }
+                  ],
+                  "show_zoom": false,
+                  "show_playback": true,
+                  "show_range": true,
+                  "double_tap_action": "recenter",
+                  "smooth_animation": true,
+                  "height": "1000",
+                  "zoom_level": 8
+                }
+              ],
+              "column_span": 3
+            },
+            {
+              "type": "grid",
+              "cards": [],
+              "column_span": 2
+            }
+          ],
+          "cards": [],
+          "header": {
+            "card": {
+              "type": "markdown",
+              "text_only": true,
+              "content": "# Weather- Zenobia"
+            }
+          },
+          "theme": "Frosted Glass Dark Lite",
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            }
+          ]
+        },
+        {
+          "type": "sidebar",
+          "path": "floor-plan",
+          "title": "Floor Plan",
+          "cards": [
+            {
+              "type": "picture-elements",
+              "elements": [
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "50%",
+                    "top": "50%"
+                  },
+                  "entity": "light.speakeasy_all_cans",
+                  "icon": "mdi:lightbulb-group"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "75%",
+                    "top": "28%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_3",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "87%",
+                    "top": "29%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_9",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "36%",
+                    "top": "30%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_6",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "47%",
+                    "top": "29%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "60%",
+                    "top": "29%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_5",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "49%",
+                    "top": "76%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_7",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "61%",
+                    "top": "77%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_8",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "74%",
+                    "top": "76%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_2",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "87%",
+                    "top": "77%"
+                  },
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_4",
+                  "icon": "mdi:light-recessed"
+                },
+                {
+                  "type": "state-icon",
+                  "style": {
+                    "left": "90%",
+                    "top": "66%",
+                    "Color": "black"
+                  },
+                  "entity": "switch.speakeasy_green_lamp"
+                },
+                {
+                  "type": "icon",
+                  "style": {
+                    "left": "91%",
+                    "top": "48%",
+                    "color": "black"
+                  },
+                  "icon": "m3o:google-tv-remote",
+                  "entity": "media_player.nick_s_fire_tv"
+                },
+                {
+                  "type": "icon",
+                  "style": {
+                    "left": "81%",
+                    "top": "20%",
+                    "color": "black"
+                  },
+                  "icon": "m3o:google-tv-remote",
+                  "entity": "media_player.fire_tv_192_168_68_83",
+                  "title": "Main TV"
+                }
+              ],
+              "image": {
+                "media_content_id": "media-source://image_upload/85384f500776c103945aa9d9bcfc968c",
+                "media_content_type": "image/png",
+                "metadata": {
+                  "title": "Screenshot 2026-03-24 232420.png",
+                  "thumbnail": "/api/image/serve/85384f500776c103945aa9d9bcfc968c/256x256",
+                  "media_class": "image",
+                  "navigateIds": [
+                    {},
+                    {
+                      "media_content_type": "app",
+                      "media_content_id": "media-source://image_upload"
+                    }
+                  ]
+                }
+              },
+              "title": "Third Floor",
+              "view_layout": {
+                "position": "main"
+              }
+            },
+            {
+              "type": "picture-elements",
+              "elements": [
+                {
+                  "type": "state-badge",
+                  "style": {
+                    "left": "50%",
+                    "top": "50%"
+                  },
+                  "entity": "climate.upstairs_thermostat"
+                },
+                {
+                  "type": "state-badge",
+                  "style": {
+                    "left": "62%",
+                    "top": "52%"
+                  },
+                  "entity": "sensor.upstairs_thermostat_temperature"
+                }
+              ],
+              "image": {
+                "media_content_id": "media-source://image_upload/7daafde162f549d695a35d6ee5497c85",
+                "media_content_type": "image/png",
+                "metadata": {
+                  "title": "Screenshot 2026-03-24 231835.png",
+                  "thumbnail": "/api/image/serve/7daafde162f549d695a35d6ee5497c85/256x256",
+                  "media_class": "image",
+                  "children_media_class": null,
+                  "navigateIds": [
+                    {},
+                    {
+                      "media_content_type": "app",
+                      "media_content_id": "media-source://image_upload"
+                    }
+                  ]
+                }
+              },
+              "view_layout": {
+                "position": "sidebar"
+              },
+              "title": "Second Floor"
+            },
+            {
+              "type": "picture-elements",
+              "elements": [
+                {
+                  "type": "state-badge",
+                  "style": {
+                    "left": "33%",
+                    "top": "29%"
+                  },
+                  "entity": "sensor.main_floor_current_temperature"
+                },
+                {
+                  "type": "state-badge",
+                  "style": {
+                    "left": "45%",
+                    "top": "23%"
+                  },
+                  "entity": "climate.main_floor"
+                },
+                {
+                  "type": "state-badge",
+                  "style": {
+                    "left": "3%",
+                    "top": "21%"
+                  },
+                  "entity": "camera.doorbell"
+                },
+                {
+                  "type": "image",
+                  "style": {
+                    "left": "87%",
+                    "top": "50%"
+                  },
+                  "camera_image": "camera.garage_camera",
+                  "camera_view": "live"
+                },
+                {
+                  "type": "image",
+                  "style": {
+                    "left": "25%",
+                    "top": "79%"
+                  },
+                  "camera_image": "camera.backyard_camera",
+                  "camera_view": "live"
+                },
+                {
+                  "type": "state-badge",
+                  "style": {
+                    "left": "93%",
+                    "top": "95%"
+                  },
+                  "entity": "camera.alley_live_view"
+                }
+              ],
+              "title": "First Floor",
+              "image": {
+                "media_content_id": "media-source://image_upload/fa03f4a237d42e84d05af74f7df7056d",
+                "media_content_type": "image/png",
+                "metadata": {
+                  "title": "Screenshot 2026-03-24 232703.png",
+                  "thumbnail": "/api/image/serve/fa03f4a237d42e84d05af74f7df7056d/256x256",
+                  "media_class": "image",
+                  "children_media_class": null,
+                  "navigateIds": [
+                    {},
+                    {
+                      "media_content_type": "app",
+                      "media_content_id": "media-source://image_upload"
+                    }
+                  ]
+                }
+              },
+              "view_layout": {
+                "position": "main"
+              }
+            },
+            {
+              "type": "picture-elements",
+              "elements": [
+                {
+                  "type": "state-badge",
+                  "style": {
+                    "left": "50%",
+                    "top": "50%"
+                  },
+                  "entity": "sensor.downstairs_temperature"
+                }
+              ],
+              "image": {
+                "media_content_id": "media-source://image_upload/e3c0998d2e46c6b46a09c794eb518f07",
+                "media_content_type": "image/png",
+                "metadata": {
+                  "title": "Screenshot 2026-03-24 232725.png",
+                  "thumbnail": "/api/image/serve/e3c0998d2e46c6b46a09c794eb518f07/256x256",
+                  "media_class": "image",
+                  "navigateIds": [
+                    {},
+                    {
+                      "media_content_type": "app",
+                      "media_content_id": "media-source://image_upload"
+                    }
+                  ]
+                }
+              },
+              "view_layout": {
+                "position": "sidebar"
+              },
+              "title": "Basement"
+            }
+          ],
+          "theme": "Frosted Glass",
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            }
+          ]
+        },
+        {
+          "type": "sections",
+          "max_columns": 4,
+          "title": "Calendar",
+          "path": "calendar",
+          "theme": "Frosted Glass Dark",
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "initial_view": "dayGridMonth",
+                  "type": "calendar",
+                  "entities": [
+                    "calendar.travel"
+                  ],
+                  "theme": "Frosted Glass Dark",
+                  "title": "Travel",
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": 8
+                  }
+                }
+              ],
+              "column_span": 2
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

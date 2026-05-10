@@ -1,0 +1,351 @@
+- id: '1777354072524'
+  name: 'Primary Bedroom: lamps and tv on'
+  entities:
+    switch.brian_s_lamp:
+      icon: mdi:floor-lamp
+      friendly_name: Brian's Lamp
+      state: 'on'
+    switch.nicks_lamp:
+      icon: mdi:floor-lamp
+      friendly_name: Nicks Lamp
+      state: 'on'
+    light.master_bedroom_dimmer_light_1:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Primary Bedroom Dimmer Light 1
+      supported_features: 0
+      state: 'off'
+    media_player.primary_bedroom_tv_television:
+      source_list:
+      - FireTV
+      - Cable/Antenna
+      - HDMI 1
+      - HDMI 2
+      - Composite
+      - Media Player
+      - HDMI 3
+      device_class: tv
+      friendly_name: Primary Bedroom TV Television
+      supported_features: 18817
+      source: FireTV
+      state: idle
+  metadata: {}
+  icon: mdi:movie-open-play
+- id: '1777354301468'
+  name: 'Primary Bedroom: all off'
+  entities:
+    switch.brian_s_lamp:
+      icon: mdi:floor-lamp
+      friendly_name: Brian's Lamp
+      state: 'off'
+    switch.nicks_lamp:
+      icon: mdi:floor-lamp
+      friendly_name: Nicks Lamp
+      state: 'off'
+    light.master_bedroom_dimmer_light_1:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Primary Bedroom Dimmer Light 1
+      supported_features: 0
+      state: 'off'
+    media_player.primary_bedroom_tv_television:
+      source_list:
+      - FireTV
+      - Cable/Antenna
+      - HDMI 1
+      - HDMI 2
+      - Composite
+      - Media Player
+      - HDMI 3
+      device_class: tv
+      friendly_name: Primary Bedroom TV Television
+      supported_features: 18817
+      state: 'off'
+  metadata: {}
+  icon: mdi:lightbulb-night
+- id: '1777354839610'
+  name: 'Primary Bedroom: Lights Off'
+  entities:
+    switch.brian_s_lamp:
+      icon: mdi:floor-lamp
+      friendly_name: Brian's Lamp
+      state: 'off'
+    switch.nicks_lamp:
+      icon: mdi:floor-lamp
+      friendly_name: Nicks Lamp
+      state: 'off'
+    light.master_bedroom_dimmer_light_1:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Primary Bedroom Dimmer Light 1
+      supported_features: 0
+      state: 'off'
+  metadata: {}
+  icon: mdi:string-lights-off
+- id: '1777860078914'
+  name: Speakeasy Movie Mode
+  entities:
+    switch.speakeasy_green_lamp:
+      icon: mdi:lightbulb
+      friendly_name: Speakeasy Black Lamp
+      state: 'on'
+    media_player.fire_tv_192_168_68_83:
+      adb_response:
+      hdmi_input:
+      device_class: tv
+      friendly_name: Speakeasy Main TV
+      supported_features: 22961
+      entity_picture: /api/media_player_proxy/media_player.fire_tv_192_168_68_83?token=REDACTED&cache=05377a96972306b7
+      state: idle
+    remote.fire_tv_192_168_68_83:
+      friendly_name: Speakeasy Main TV
+      supported_features: 0
+      state: unknown
+    light.tz3210_dwzfzfjc_ts0505b:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      off_with_transition: false
+      off_brightness: 128
+      friendly_name: Speakeasy Can- Stairwell 2
+      supported_features: 40
+      state: 'off'
+    light.tz3210_dwzfzfjc_ts0505b_2:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      off_with_transition: false
+      off_brightness: 3
+      friendly_name: Speakeasy Can- Back Row 3
+      supported_features: 40
+      state: 'off'
+    light.tz3210_dwzfzfjc_ts0505b_3:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      off_with_transition: false
+      off_brightness: 128
+      friendly_name: Speakeasy Can- Front Left TV
+      supported_features: 40
+      state: 'off'
+    light.tz3210_dwzfzfjc_ts0505b_4:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: color_temp
+      brightness: 3
+      color_temp_kelvin: 3521
+      hs_color:
+      - 27.152
+      - 44.32
+      rgb_color:
+      - 255
+      - 193
+      - 142
+      xy_color:
+      - 0.452
+      - 0.373
+      off_with_transition: false
+      off_brightness:
+      friendly_name: Speakeasy Can- Back Row 4
+      supported_features: 40
+      state: 'on'
+    light.tz3210_dwzfzfjc_ts0505b_5:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      off_with_transition: false
+      off_brightness: 128
+      friendly_name: Speakeasy Can- Stairwell 3
+      supported_features: 40
+      state: 'off'
+    light.tz3210_dwzfzfjc_ts0505b_6:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      off_with_transition: false
+      off_brightness: 128
+      friendly_name: Speakeasy Can- Stairwell 1
+      supported_features: 40
+      state: 'off'
+    light.tz3210_dwzfzfjc_ts0505b_9:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      off_with_transition: false
+      off_brightness: 128
+      friendly_name: Speakeasy Can- Front Right TV
+      supported_features: 40
+      state: 'off'
+    light.tz3210_dwzfzfjc_ts0505b_8:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      off_with_transition: false
+      off_brightness: 3
+      friendly_name: Speakeasy Can- Back Row 2
+      supported_features: 40
+      state: 'off'
+    light.tz3210_dwzfzfjc_ts0505b_7:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: color_temp
+      brightness: 3
+      color_temp_kelvin: 3521
+      hs_color:
+      - 27.152
+      - 44.32
+      rgb_color:
+      - 255
+      - 193
+      - 142
+      xy_color:
+      - 0.452
+      - 0.373
+      off_with_transition: false
+      off_brightness:
+      friendly_name: Speakeasy Can- Back Row 1
+      supported_features: 40
+      state: 'on'
+  metadata: {}
+  icon: m3o:movie
+- id: '1777868335767'
+  name: All Off
+  entities:
+    switch.speakeasy_green_lamp:
+      icon: mdi:lightbulb
+      friendly_name: Speakeasy Black Lamp
+      state: 'off'
+    media_player.fire_tv_192_168_68_83:
+      adb_response:
+      hdmi_input:
+      device_class: tv
+      friendly_name: Speakeasy Main TV
+      supported_features: 22961
+      state: 'off'
+    remote.fire_tv_192_168_68_83:
+      friendly_name: Speakeasy Main TV
+      supported_features: 0
+      state: unknown
+    light.speakeasy_all_cans:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      entity_id:
+      - light.tz3210_dwzfzfjc_ts0505b
+      - light.tz3210_dwzfzfjc_ts0505b_2
+      - light.tz3210_dwzfzfjc_ts0505b_3
+      - light.tz3210_dwzfzfjc_ts0505b_4
+      - light.tz3210_dwzfzfjc_ts0505b_5
+      - light.tz3210_dwzfzfjc_ts0505b_6
+      - light.tz3210_dwzfzfjc_ts0505b_7
+      - light.tz3210_dwzfzfjc_ts0505b_8
+      - light.tz3210_dwzfzfjc_ts0505b_9
+      icon: mdi:lightbulb-group
+      friendly_name: Speakeasy All Cans
+      supported_features: 40
+      state: 'off'
+    media_player.nick_s_fire_tv:
+      volume_level: 0.2
+      media_content_id: spotify--QnqkAFKA://track/0MJxClS6FlYCh1pn68QAzo
+      media_content_type: music
+      media_duration: 227
+      media_position: 2
+      media_position_updated_at: '2026-04-29T01:00:23.943574+00:00'
+      media_title: Say a Prayer For Me (Mazde Remix)
+      media_artist: RÜFÜS DU SOL/Mazde
+      media_album_name: Say a Prayer For Me
+      app_id: music_assistant
+      source: Music Assistant Queue
+      shuffle: false
+      repeat: 'off'
+      entity_picture_local: /api/media_player_proxy/media_player.nick_s_fire_tv?token=REDACTED&cache=77d265f3b0e2aaea
+      mass_player_type: player
+      active_queue: up312b905565df
+      device_class: speaker
+      entity_picture: http://192.168.68.81:8095/imageproxy?provider=spotify--QnqkAFKA&size=500&fmt=jpeg&path=https%253A%252F%252Fi.scdn.co%252Fimage%252Fab67616d0000b2738dc9ae55e18e746550f1870c
+      icon: mdi:speaker
+      friendly_name: Nick's Fire TV
+      supported_features: 7796287
+      state: idle
+  metadata:
+    light.speakeasy_all_cans:
+      entity_only: true
+    media_player.nick_s_fire_tv:
+      entity_only: true
+  icon: m3o:ad-group-off
