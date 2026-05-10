@@ -381,7 +381,16 @@
     input:
       camera_entities:
       - camera.alley_live_view
-      trigger_state: recording
-      run_conditions: []
+      trigger_state: 'on'
+      run_conditions:
+      - condition: switch.is_on
+        target:
+          entity_id: switch.alley_motion_detection
+        options:
+          behavior: any
+          for: 00:00:00
       provider: 01KR7JMHXJHTSC78891A458V37
       model: gemini-2.5-flash
+      important: true
+      condition_notify: []
+      analysis_mode: Snapshot
