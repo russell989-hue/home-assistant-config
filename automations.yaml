@@ -285,23 +285,25 @@
       datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
   mode: single
   id: f80691550f284240a3ecce6d5eb22c45
-- alias: 'Basement: One touch lock = guest left'
-  trigger:
-  - platform: state
-    entity_id: sensor.side_door_operator
-    to: One Touch Lock
-  condition:
+- id: 56a9a577389244b3a89d33efea82336d
+  alias: 'Basement: One touch lock = guest left'
+  triggers:
+  - entity_id:
+    - sensor.side_door_operator
+    to:
+    - One-Touch Lock
+    trigger: state
+  conditions:
   - condition: state
     entity_id: calendar.zenobia_airbnb
     state: 'on'
-  action:
-  - service: input_datetime.set_datetime
-    target:
+  actions:
+  - target:
       entity_id: input_datetime.basement_last_outside_signal
     data:
       datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+    action: input_datetime.set_datetime
   mode: single
-  id: 56a9a577389244b3a89d33efea82336d
 - alias: 'Basement: Motion corroborates guest inside'
   trigger:
   - platform: state
@@ -373,6 +375,7 @@
       provider: 01KR7JMHXJHTSC78891A458V37
       model: gemini-2.5-flash
       important: true
+      trigger_state: 'on'
 - id: '1778381242657'
   alias: Alley Camera AI
   description: ''
