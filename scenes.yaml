@@ -1,38 +1,3 @@
-- id: '1777354072524'
-  name: 'Primary Bedroom: lamps and tv on'
-  entities:
-    switch.brian_s_lamp:
-      icon: mdi:floor-lamp
-      friendly_name: Brian's Lamp
-      state: 'on'
-    switch.nicks_lamp:
-      icon: mdi:floor-lamp
-      friendly_name: Nicks Lamp
-      state: 'on'
-    light.master_bedroom_dimmer_light_1:
-      supported_color_modes:
-      - brightness
-      color_mode:
-      brightness:
-      friendly_name: Primary Bedroom Dimmer Light 1
-      supported_features: 0
-      state: 'off'
-    media_player.primary_bedroom_tv_television:
-      source_list:
-      - FireTV
-      - Cable/Antenna
-      - HDMI 1
-      - HDMI 2
-      - Composite
-      - Media Player
-      - HDMI 3
-      device_class: tv
-      friendly_name: Primary Bedroom TV Television
-      supported_features: 18817
-      source: FireTV
-      state: idle
-  metadata: {}
-  icon: mdi:movie-open-play
 - id: '1777354301468'
   name: 'Primary Bedroom: all off'
   entities:
@@ -43,29 +8,31 @@
     switch.nicks_lamp:
       icon: mdi:floor-lamp
       friendly_name: Nicks Lamp
-      state: 'off'
-    light.master_bedroom_dimmer_light_1:
+      state: unavailable
+    light.primary_bed_cans:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
       supported_color_modes:
-      - brightness
+      - color_temp
+      - xy
       color_mode:
       brightness:
-      friendly_name: Primary Bedroom Dimmer Light 1
-      supported_features: 0
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      entity_id:
+      - light.front_left
+      - light.front_right
+      - light.rear_left
+      - light.rear_right
+      icon: mdi:lightbulb-group
+      friendly_name: Primary Bed Cans
+      supported_features: 40
       state: 'off'
-    media_player.primary_bedroom_tv_television:
-      source_list:
-      - FireTV
-      - Cable/Antenna
-      - HDMI 1
-      - HDMI 2
-      - Composite
-      - Media Player
-      - HDMI 3
-      device_class: tv
-      friendly_name: Primary Bedroom TV Television
-      supported_features: 18817
-      state: 'off'
-  metadata: {}
+  metadata:
+    light.primary_bed_cans:
+      entity_only: true
   icon: mdi:lightbulb-night
 - id: '1777354839610'
   name: 'Primary Bedroom: Lights Off'
@@ -77,16 +44,31 @@
     switch.nicks_lamp:
       icon: mdi:floor-lamp
       friendly_name: Nicks Lamp
-      state: 'off'
-    light.master_bedroom_dimmer_light_1:
+      state: unavailable
+    light.primary_bed_cans:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
       supported_color_modes:
-      - brightness
+      - color_temp
+      - xy
       color_mode:
       brightness:
-      friendly_name: Primary Bedroom Dimmer Light 1
-      supported_features: 0
+      color_temp_kelvin:
+      hs_color:
+      rgb_color:
+      xy_color:
+      entity_id:
+      - light.front_left
+      - light.front_right
+      - light.rear_left
+      - light.rear_right
+      icon: mdi:lightbulb-group
+      friendly_name: Primary Bed Cans
+      supported_features: 40
       state: 'off'
-  metadata: {}
+  metadata:
+    light.primary_bed_cans:
+      entity_only: true
   icon: mdi:string-lights-off
 - id: '1777860078914'
   name: Speakeasy Movie Mode
@@ -96,12 +78,12 @@
       friendly_name: Speakeasy Black Lamp
       state: 'on'
     media_player.fire_tv_192_168_68_83:
-      adb_response:
+      adb_response: 'sendevent: /dev/input/event0: Permission denied'
       hdmi_input:
       device_class: tv
+      entity_picture: /api/media_player_proxy/media_player.fire_tv_192_168_68_83?token=REDACTED&cache=05377a96972306b7
       friendly_name: Speakeasy Main TV
       supported_features: 22961
-      entity_picture: /api/media_player_proxy/media_player.fire_tv_192_168_68_83?token=REDACTED&cache=05377a96972306b7
       state: idle
     remote.fire_tv_192_168_68_83:
       friendly_name: Speakeasy Main TV
@@ -120,7 +102,7 @@
       rgb_color:
       xy_color:
       off_with_transition: false
-      off_brightness: 128
+      off_brightness: 254
       friendly_name: Speakeasy Can- Stairwell 2
       supported_features: 40
       state: 'off'
@@ -137,7 +119,7 @@
       rgb_color:
       xy_color:
       off_with_transition: false
-      off_brightness: 3
+      off_brightness: 254
       friendly_name: Speakeasy Can- Back Row 3
       supported_features: 40
       state: 'off'
@@ -154,7 +136,7 @@
       rgb_color:
       xy_color:
       off_with_transition: false
-      off_brightness: 128
+      off_brightness: 254
       friendly_name: Speakeasy Can- Front Left TV
       supported_features: 40
       state: 'off'
@@ -195,7 +177,7 @@
       rgb_color:
       xy_color:
       off_with_transition: false
-      off_brightness: 128
+      off_brightness: 254
       friendly_name: Speakeasy Can- Stairwell 3
       supported_features: 40
       state: 'off'
@@ -212,7 +194,7 @@
       rgb_color:
       xy_color:
       off_with_transition: false
-      off_brightness: 128
+      off_brightness: 254
       friendly_name: Speakeasy Can- Stairwell 1
       supported_features: 40
       state: 'off'
@@ -229,7 +211,7 @@
       rgb_color:
       xy_color:
       off_with_transition: false
-      off_brightness: 128
+      off_brightness: 254
       friendly_name: Speakeasy Can- Front Right TV
       supported_features: 40
       state: 'off'
@@ -246,7 +228,7 @@
       rgb_color:
       xy_color:
       off_with_transition: false
-      off_brightness: 3
+      off_brightness: 254
       friendly_name: Speakeasy Can- Back Row 2
       supported_features: 40
       state: 'off'

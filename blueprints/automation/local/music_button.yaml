@@ -1,0 +1,100 @@
+blueprint:
+  name: Music Button (Play / Stop / Skip)
+  description: >
+    ZHA button: short=play playlist, long=stop, double=skip.
+    Works with multi-button remotes — pick which button to assign.
+  domain: automation
+  input:
+    device_id:
+      name: ZHA Button Device
+      selector:
+        device:
+          integration: zha
+    button:
+      name: Button Number
+      description: Which button on the remote triggers this playlist
+      selector:
+        select:
+          options:
+            - label: Single Button
+              value: button
+            - label: Button 1
+              value: button_1
+            - label: Button 2
+              value: button_2
+            - label: Button 3
+              value: button_3
+            - label: Button 4
+              value: button_4
+    media_player:
+      name: Media Player
+      description: Speaker to play on
+      selector:
+        entity:
+          domain: media_player
+    playlist:
+      name: Playlist
+      description: Browse and select a Music Assistant playlist
+      selector:
+        media:
+
+triggers:
+  - device_id: !input device_id
+    domain: zha
+    type: remote_button_short_press
+    subtype: !input button
+    trigger: device
+    id: play
+  - device_id: !input device_id
+    domain: zha
+    type: remote_button_long_press
+    subtype: !input button
+    trigger: device
+    id: stop
+  - device_id: !input device_id
+    domain: zha
+    type: remote_button_double_press
+    subtype: !input button
+    trigger: device
+    id: skip
+
+variables:
+  playlist: !input playlist
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: play
+        sequence:
+          - action: media_player.unjoin
+            target:
+              entity_id: !input media_player
+          - action: media_player.play_media
+            data:
+              media_content_id: "{{ playlist.media_content_id }}"
+              media_content_type: "{{ playlist.media_content_type }}"
+              enqueue: replace
+            target:
+              entity_id: !input media_player
+      - conditions:
+          - condition: trigger
+            id: stop
+          - condition: state
+            entity_id: !input media_player
+            state: playing
+        sequence:
+          - action: media_player.media_stop
+            target:
+              entity_id: !input media_player
+      - conditions:
+          - condition: trigger
+            id: skip
+          - condition: state
+            entity_id: !input media_player
+            state: playing
+        sequence:
+          - action: media_player.media_next_track
+            target:
+              entity_id: !input media_player
+mode: single

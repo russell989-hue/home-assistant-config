@@ -1,8 +1,17 @@
 # Loads default set of integrations. Do not remove.
 default_config:
-
+## AUTO FIND ENTITIES
+ssdp:
 # provides predictions of what entities the user is most likely to interact with. This is used in the frontend to surface the most relevant entities to the user.
 usage_prediction:
+
+##Over the air updates allowed for zigby devices
+zha:
+  zigpy_config:
+    ota:
+      otau_directory: /config/zigpy_ota # Keep this for local files
+      extra_providers:
+        - type: sonoff
 
 # Load frontend themes from the themes folder
 frontend:
@@ -456,9 +465,6 @@ template:
   # -------------------------------------------------------------------
   # 5) Doorbell popup helper — auto-off binary sensor
   # -------------------------------------------------------------------
-  # Fires ON the instant event.doorbell_ding changes state (someone rang).
-  # Automatically resets to OFF after 60 seconds.
-  # Used by the conditional card in the office iPad dashboard.
   - trigger:
       - platform: state
         entity_id: event.doorbell_ding
@@ -614,9 +620,70 @@ input_datetime:
     has_date: true
     has_time: true
     icon: mdi:door-open
-    
+
 shell_command:
   keep_streams_alive: /config/scripts/keep_streams_alive.sh
+  # --- JBL MA510 IP Control ---
+  jbl_power_on:        "python3 /config/scripts/jbl_ma510.py power_on"
+  jbl_power_off:       "python3 /config/scripts/jbl_ma510.py power_off"
+  jbl_mute_on:         "python3 /config/scripts/jbl_ma510.py mute_on"
+  jbl_mute_off:        "python3 /config/scripts/jbl_ma510.py mute_off"
+  jbl_input_tv:        "python3 /config/scripts/jbl_ma510.py input_tv"
+  jbl_input_hdmi1:     "python3 /config/scripts/jbl_ma510.py input_hdmi1"
+  jbl_input_hdmi2:     "python3 /config/scripts/jbl_ma510.py input_hdmi2"
+  jbl_input_hdmi3:     "python3 /config/scripts/jbl_ma510.py input_hdmi3"
+  jbl_input_hdmi4:     "python3 /config/scripts/jbl_ma510.py input_hdmi4"
+  jbl_input_optical:   "python3 /config/scripts/jbl_ma510.py input_optical"
+  jbl_input_coax:      "python3 /config/scripts/jbl_ma510.py input_coax"
+  jbl_input_bt:        "python3 /config/scripts/jbl_ma510.py input_bt"
+  jbl_input_network:   "python3 /config/scripts/jbl_ma510.py input_network"
+  jbl_surr_native:     "python3 /config/scripts/jbl_ma510.py surr_native"
+  jbl_surr_stereo20:   "python3 /config/scripts/jbl_ma510.py surr_stereo20"
+  jbl_surr_allstereo:  "python3 /config/scripts/jbl_ma510.py surr_allstereo"
+  jbl_surr_plii:       "python3 /config/scripts/jbl_ma510.py surr_plii"
+  jbl_dialog_on:       "python3 /config/scripts/jbl_ma510.py dialog_on"
+  jbl_dialog_off:      "python3 /config/scripts/jbl_ma510.py dialog_off"
+  jbl_dolby_movie:     "python3 /config/scripts/jbl_ma510.py dolby_movie"
+  jbl_dolby_music:     "python3 /config/scripts/jbl_ma510.py dolby_music"
+  jbl_dolby_off:       "python3 /config/scripts/jbl_ma510.py dolby_off"
+  jbl_volume:          "python3 /config/scripts/jbl_ma510.py volume {{ volume }}"
+  jbl_vol_up:   "python3 /config/scripts/jbl_ma510.py vol_up"
+  jbl_vol_down: "python3 /config/scripts/jbl_ma510.py vol_down"
+  jbl_nav_up:    "python3 /config/scripts/jbl_ma510.py nav_up"
+  jbl_nav_down:  "python3 /config/scripts/jbl_ma510.py nav_down"
+  jbl_nav_left:  "python3 /config/scripts/jbl_ma510.py nav_left"
+  jbl_nav_right: "python3 /config/scripts/jbl_ma510.py nav_right"
+  jbl_nav_ok:    "python3 /config/scripts/jbl_ma510.py nav_ok"
+  jbl_nav_menu:  "python3 /config/scripts/jbl_ma510.py nav_menu"
+  jbl_nav_back:  "python3 /config/scripts/jbl_ma510.py nav_back"
+
+command_line:
+  # --- JBL MA510 State Sensors ---
+  - sensor:
+      name: "JBL Power"
+      unique_id: jbl_ma510_power
+      command: "python3 /config/scripts/jbl_ma510.py power_status"
+      scan_interval: 30
+  - sensor:
+      name: "JBL Input"
+      unique_id: jbl_ma510_input
+      command: "python3 /config/scripts/jbl_ma510.py input_status"
+      scan_interval: 30
+  - sensor:
+      name: "JBL Volume"
+      unique_id: jbl_ma510_volume
+      command: "python3 /config/scripts/jbl_ma510.py volume_status"
+      scan_interval: 30
+  - sensor:
+      name: "JBL Mute"
+      unique_id: jbl_ma510_mute
+      command: "python3 /config/scripts/jbl_ma510.py mute_status"
+      scan_interval: 30
+  - sensor:
+      name: "JBL Surround"
+      unique_id: jbl_ma510_surround
+      command: "python3 /config/scripts/jbl_ma510.py surr_status"
+      scan_interval: 30
 
 # --- LOGGER SETTINGS ---
 logger:
