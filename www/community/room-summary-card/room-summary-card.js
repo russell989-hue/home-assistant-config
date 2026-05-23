@@ -2336,7 +2336,7 @@ function $026d47447e611f6a$var$getNestedTranslation(obj, path) {
 
 });
 parcelRegister("1MmPK", function(module, exports) {
-module.exports = JSON.parse('{"card":{"component":{"problem":{"dialog_title":"Problem Entities","no_problems":"No problem entities found","active":"Active","inactive":"Inactive"}}},"editor":{"area":{"area":"Area","area_name":"Area name","area_side_entities":"Area side entities","room_entity":"Room entity"},"background":{"background":"Background","background_image":"Background Image","background_image_entity":"Background Image Entity","background_opacity":"Background Opacity","disable_background_image":"Disable Background Image","multi_light_background":"Multi-Light Background","light_entities":"Light Entities","multi_light_background_info":"Configure which light entities should be tracked for the multi-light background feature. When enabled, the card background and room icon will light up when any of these lights are on. The card automatically discovers all lights in the area if no entities are specified."},"entity":{"entity_id":"Entity","entity_label":"Label","entity_attribute":"Attribute","entity_icon":"Icon","entity_on_color":"On Color","entity_off_color":"Off Color","ignore_entity":"Ignore Entity","show_entity_labels":"Show Entity Labels","use_entity_icon":"Use Entity Icon","show_state":"Show State","hide_zero_attribute_domains":"Hide State for Zero Attribute Domains","styles":"Styles","states":"States","add_state":"Add State","thresholds":"Thresholds","add_threshold":"Add Threshold","state":{"state":"State","operator":"Operator","icon_color":"Icon Color","title_color":"Title Color","icon":"Icon","label":"Label","attribute":"Attribute","styles":"Styles"},"threshold":{"threshold":"Threshold","icon_color":"Icon Color","title_color":"Title Color","icon":"Icon","label":"Label","attribute":"Attribute","styles":"Styles","operator":"Operator"},"badges":"Badges","add_badge":"Add Badge","slider":"Slider","slider_style":"Slider Style","slider_style_bar":"Bar (full-width strip)","slider_style_ha":"Standard HA Slider","slider_hide_icon":"Hide Icon (entity is shown only as the slider)"},"badge":{"position":{"top_right":"Top Right","top_left":"Top Left","bottom_right":"Bottom Right","bottom_left":"Bottom Left"},"position_label":"Position","mode":{"show_always":"Show Always","if_match":"If Match","homeassistant":"Home Assistant"},"mode_label":"Mode","max_badges":"Maximum 4 badges allowed"},"entities":{"entities_info":"These options are for setting up the right side entities."},"icon":{"disable_icon_animations":"Disable Icon Animations","disable_icon_color":"Disable Icon Color","icon_background":"Icon Background","icon_background_color_occupied":"Icon Background Color (Occupied)","icon_background_color_smoke":"Icon Background Color (Smoke Detected)","icon_background_color_gas":"Icon Background Color (Gas Detected)","icon_background_color_water":"Icon Background Color (Water Detected)","hide_icon_only":"Hide Icon Only","hide_room_icon":"Hide Room Icon"},"card":{"card_border_color_occupied":"Card Border Color (Occupied)","card_border_color_smoke":"Card Border Color (Smoke Detected)","card_border_color_gas":"Card Border Color (Gas Detected)","card_border_color_water":"Card Border Color (Water Detected)","disable_card_border":"Disable Card Border","disable_card_border_animations":"Disable Card Border Animations","skip_card_background_styles":"Skip Card Background Styles"},"sensor":{"sensor_classes":"Sensor classes","hide_sensor_icons":"Hide Sensor icons","hide_sensor_labels":"Hide Sensor labels","hide_sensors":"Hide Sensors","individual_sensor_entities":"Individual sensor entities","sensors_info":"Sensors appear on the top row below the card title. They can be clicked for more info.","features_info":"Configure sensor display features:","hide_sensors_desc":"Hide the climate/sensor information","hide_sensor_icons_desc":"Hide the icons next to sensor values","hide_sensor_labels_desc":"Hide the labels next to sensor icons"},"threshold":{"thresholds":"Thresholds","temperature_threshold":"Temperature threshold","temperature_thresholds":"Temperature Thresholds","add_temperature_threshold":"Add Temperature Threshold","temperature_operator":"Temperature Operator","temperature_entity":"Temperature Entity","temperature_color":"Temperature Border Color","humidity_threshold":"Humidity threshold","humidity_thresholds":"Humidity Thresholds","add_humidity_threshold":"Add Humidity Threshold","humidity_operator":"Humidity Operator","humidity_entity":"Humidity Entity","humidity_color":"Humidity Border Color","mold_threshold":"Mold threshold","operator":{"equal":"Equal (=)","greater_than":"Greater than (>)","greater_than_or_equal":"Greater than or equal (\u2265)","less_than":"Less than (<)","less_than_or_equal":"Less than or equal (\u2264)","not_equal":"Not equal (\u2260)"}},"interactions":{"interactions":"Interactions","tap_action":"Tap Action","double_tap_action":"Double Tap Action","hold_action":"Hold Action"},"occupancy":{"occupancy_presence_detection":"Occupancy & Presence Detection","motion_occupancy_presence_sensors":"Motion/Occupancy/Presence Sensors","occupancy_options":"Options","occupancy_info":"Configure motion, occupancy, and presence detection sensors. When any sensor detects activity, the card border and room icon can change color to indicate the room is occupied."},"alarm":{"alarm_info":"Configure alarm detection sensors. Occupancy sensors detect motion/presence, smoke detectors detect smoke, gas sensors detect gas, and water sensors detect water. Priority: Smoke > Gas > Water > Occupancy.","occupancy_detection":"Occupancy Detection","smoke_detection":"Smoke Detection","gas_detection":"Gas Detection","water_detection":"Water Detection","motion_occupancy_presence_sensors":"Motion/Occupancy/Presence Sensors","smoke_detectors":"Smoke Detectors","gas_sensors":"Gas Sensors","water_sensors":"Water Sensors","alarm_options":"Options"},"problem":{"problem":"Problem Indicator","problem_display":"Display","problem_display_always":"Always","problem_display_active_only":"Active Problems Only","problem_display_never":"Never"},"styles":{"styles":"Styles","css_styles":"Your CSS Styles","card_styles":"Card Styles","entities_container_styles":"Entities Container Styles","entity_icon_styles":"Entity Icon Styles","room_entity_icon_styles":"Main Room Entity Icon Styles","sensor_styles":"Sensor Styles","stats_styles":"Stats Styles","title_styles":"Title Styles","skip_climate_styles":"Skip Climate Styles","skip_mold_styles":"Skip Mold Styles","icon_opacity_preset":"Icon Opacity Preset","icon_opacity_default":"Default","icon_opacity_medium":"Medium","icon_opacity_high_visibility":"High Visibility"},"layout":{"content":"Content","sensor_layout":"Sensor Layout","default_in_label_area":"Default (in label area)","bottom":"Bottom","vertical_stack":"Vertical Stack"},"stats":{"hide_area_stats":"Hide Area Stats"},"slider":{"slider_style":"Slider Style","minimalist":"Minimalist","track":"Track","line":"Line","filled":"Filled/Progress","gradient":"Gradient","dual_rail":"Dual Rail","dots":"Dots/Ticks","notched":"Notched","grid":"Grid","glow":"Glow","shadow_trail":"Shadow Trail","outlined":"Outlined Track","bar":"Bar (No Icon)","bar_filled":"Bar Filled (Proportional)"},"features":{"features":"Features","exclude_default_entities":"Exclude Default Entities","sticky_entities":"Sticky Entities","slider":"Slider","full_card_actions":"Full Card Actions","hide_hidden_entities":"Hide Hidden Entities","sticky_entities_info":"Keep entity positions stable even when their state is unavailable. This prevents UI layout shifts and makes it easier to tap entities on touch dashboards.","features_info":"Configure global features that affect how entities are displayed and handled:","show_entity_labels_desc":"Show entity labels under each entity icon","exclude_default_entities_desc":"Don\'t include default light/fan entities","ignore_entity_desc":"Ignore the entity property in the configuration","sticky_entities_desc":"Keep entity positions even when state is unavailable","slider_desc":"Display a single entity in a slider layout instead of the entity collection","full_card_actions_desc":"Make the entire card clickable using the room entity\'s tap/hold/double-tap actions","hide_hidden_entities_desc":"Skip entities that are marked as hidden in Home Assistant","options":"Options"},"light":{"type":"Type","ambient":"Ambient"}}}');
+module.exports = JSON.parse('{"card":{"component":{"problem":{"dialog_title":"Problem Entities","no_problems":"No problem entities found","active":"Active","inactive":"Inactive"}}},"editor":{"area":{"area":"Area","area_name":"Area name","area_side_entities":"Area side entities","room_entity":"Room entity"},"background":{"background":"Background","background_image":"Background Image","background_image_entity":"Background Image Entity","background_opacity":"Background Opacity","disable_background_image":"Disable Background Image","multi_light_background":"Multi-Light Background","light_entities":"Light Entities","multi_light_background_info":"Configure which light entities should be tracked for the multi-light background feature. When enabled, the card background and room icon will light up when any of these lights are on. The card automatically discovers all lights in the area if no entities are specified."},"entity":{"entity_id":"Entity","entity_label":"Label","entity_attribute":"Attribute","entity_icon":"Icon","entity_on_color":"On Color","entity_off_color":"Off Color","ignore_entity":"Ignore Entity","show_entity_labels":"Show Entity Labels","use_entity_icon":"Use Entity Icon","show_state":"Show State","hide_zero_attribute_domains":"Hide State for Zero Attribute Domains","styles":"Styles","states":"States","add_state":"Add State","thresholds":"Thresholds","add_threshold":"Add Threshold","state":{"state":"State","operator":"Operator","icon_color":"Icon Color","title_color":"Title Color","icon":"Icon","label":"Label","attribute":"Attribute","styles":"Styles"},"threshold":{"threshold":"Threshold","icon_color":"Icon Color","title_color":"Title Color","icon":"Icon","label":"Label","attribute":"Attribute","styles":"Styles","operator":"Operator"},"badges":"Badges","add_badge":"Add Badge","slider":"Slider","slider_style":"Slider Style","slider_style_bar":"Bar (full-width strip)","slider_style_ha":"Standard HA Slider","slider_hide_icon":"Hide Icon (entity is shown only as the slider)"},"badge":{"position":{"top_right":"Top Right","top_left":"Top Left","bottom_right":"Bottom Right","bottom_left":"Bottom Left"},"position_label":"Position","mode":{"show_always":"Show Always","if_match":"If Match","homeassistant":"Home Assistant"},"mode_label":"Mode","label":"Badge Text","max_badges":"Maximum 4 badges allowed"},"entities":{"entities_info":"These options are for setting up the right side entities."},"icon":{"disable_icon_animations":"Disable Icon Animations","disable_icon_color":"Disable Icon Color","icon_background":"Icon Background","icon_background_color_occupied":"Icon Background Color (Occupied)","icon_background_color_smoke":"Icon Background Color (Smoke Detected)","icon_background_color_gas":"Icon Background Color (Gas Detected)","icon_background_color_water":"Icon Background Color (Water Detected)","hide_icon_only":"Hide Icon Only","hide_room_icon":"Hide Room Icon"},"card":{"card_border_color_occupied":"Card Border Color (Occupied)","card_border_color_smoke":"Card Border Color (Smoke Detected)","card_border_color_gas":"Card Border Color (Gas Detected)","card_border_color_water":"Card Border Color (Water Detected)","disable_card_border":"Disable Card Border","disable_card_border_animations":"Disable Card Border Animations","skip_card_background_styles":"Skip Card Background Styles"},"sensor":{"sensor_classes":"Sensor classes","hide_sensor_icons":"Hide Sensor icons","hide_sensor_labels":"Hide Sensor labels","hide_sensors":"Hide Sensors","individual_sensor_entities":"Individual sensor entities","sensors_info":"Sensors appear on the top row below the card title. They can be clicked for more info.","features_info":"Configure sensor display features:","hide_sensors_desc":"Hide the climate/sensor information","hide_sensor_icons_desc":"Hide the icons next to sensor values","hide_sensor_labels_desc":"Hide the labels next to sensor icons"},"threshold":{"thresholds":"Thresholds","temperature_threshold":"Temperature threshold","temperature_thresholds":"Temperature Thresholds","add_temperature_threshold":"Add Temperature Threshold","temperature_operator":"Temperature Operator","temperature_entity":"Temperature Entity","temperature_color":"Temperature Border Color","humidity_threshold":"Humidity threshold","humidity_thresholds":"Humidity Thresholds","add_humidity_threshold":"Add Humidity Threshold","humidity_operator":"Humidity Operator","humidity_entity":"Humidity Entity","humidity_color":"Humidity Border Color","mold_threshold":"Mold threshold","operator":{"equal":"Equal (=)","greater_than":"Greater than (>)","greater_than_or_equal":"Greater than or equal (\u2265)","less_than":"Less than (<)","less_than_or_equal":"Less than or equal (\u2264)","not_equal":"Not equal (\u2260)"}},"interactions":{"interactions":"Interactions","tap_action":"Tap Action","double_tap_action":"Double Tap Action","hold_action":"Hold Action"},"occupancy":{"occupancy_presence_detection":"Occupancy & Presence Detection","motion_occupancy_presence_sensors":"Motion/Occupancy/Presence Sensors","occupancy_options":"Options","occupancy_info":"Configure motion, occupancy, and presence detection sensors. When any sensor detects activity, the card border and room icon can change color to indicate the room is occupied."},"alarm":{"alarm_info":"Configure alarm detection sensors. Occupancy sensors detect motion/presence, smoke detectors detect smoke, gas sensors detect gas, and water sensors detect water. Priority: Smoke > Gas > Water > Occupancy.","occupancy_detection":"Occupancy Detection","smoke_detection":"Smoke Detection","gas_detection":"Gas Detection","water_detection":"Water Detection","motion_occupancy_presence_sensors":"Motion/Occupancy/Presence Sensors","smoke_detectors":"Smoke Detectors","gas_sensors":"Gas Sensors","water_sensors":"Water Sensors","alarm_options":"Options"},"problem":{"problem":"Problem Indicator","problem_display":"Display","problem_display_always":"Always","problem_display_active_only":"Active Problems Only","problem_display_never":"Never"},"styles":{"styles":"Styles","css_styles":"Your CSS Styles","card_styles":"Card Styles","entities_container_styles":"Entities Container Styles","entity_icon_styles":"Entity Icon Styles","room_entity_icon_styles":"Main Room Entity Icon Styles","sensor_styles":"Sensor Styles","stats_styles":"Stats Styles","title_styles":"Title Styles","skip_climate_styles":"Skip Climate Styles","skip_mold_styles":"Skip Mold Styles","icon_opacity_preset":"Icon Opacity Preset","icon_opacity_default":"Default","icon_opacity_medium":"Medium","icon_opacity_high_visibility":"High Visibility"},"layout":{"content":"Content","sensor_layout":"Sensor Layout","default_in_label_area":"Default (in label area)","bottom":"Bottom","vertical_stack":"Vertical Stack"},"stats":{"hide_area_stats":"Hide Area Stats"},"slider":{"slider_style":"Slider Style","minimalist":"Minimalist","track":"Track","line":"Line","filled":"Filled/Progress","gradient":"Gradient","dual_rail":"Dual Rail","dots":"Dots/Ticks","notched":"Notched","grid":"Grid","glow":"Glow","shadow_trail":"Shadow Trail","outlined":"Outlined Track","bar":"Bar (No Icon)","bar_filled":"Bar Filled (Proportional)"},"features":{"features":"Features","exclude_default_entities":"Exclude Default Entities","sticky_entities":"Sticky Entities","slider":"Slider","full_card_actions":"Full Card Actions","hide_hidden_entities":"Hide Hidden Entities","sticky_entities_info":"Keep entity positions stable even when their state is unavailable. This prevents UI layout shifts and makes it easier to tap entities on touch dashboards.","features_info":"Configure global features that affect how entities are displayed and handled:","show_entity_labels_desc":"Show entity labels under each entity icon","exclude_default_entities_desc":"Don\'t include default light/fan entities","ignore_entity_desc":"Ignore the entity property in the configuration","sticky_entities_desc":"Keep entity positions even when state is unavailable","slider_desc":"Display a single entity in a slider layout instead of the entity collection","full_card_actions_desc":"Make the entire card clickable using the room entity\'s tap/hold/double-tap actions","hide_hidden_entities_desc":"Skip entities that are marked as hidden in Home Assistant","options":"Options"},"light":{"type":"Type","ambient":"Ambient"}}}');
 
 });
 
@@ -5544,6 +5544,126 @@ var $2r9I1 = parcelRequire("2r9I1");
 parcelRequire("jcMWt");
 var $aaQtJ = parcelRequire("aaQtJ");
 
+
+var $evAes = parcelRequire("evAes");
+
+/**
+ * Home Assistant `render_template` websocket subscription.
+ * @see https://github.com/home-assistant/frontend/blob/dev/src/data/ws-templates.ts
+ */ 
+var $kJycS = parcelRequire("kJycS");
+const $ba4180e620ae0534$export$851ba8a4d3782151 = (conn, onChange, params)=>conn.subscribeMessage((msg)=>onChange(msg), (0, $kJycS._)({
+        type: 'render_template'
+    }, params));
+
+
+class $a8bfdc087294b7f3$export$d201aad20a44ca08 {
+    get displayedText() {
+        return this._displayedText;
+    }
+    sync(hass, entityId, template) {
+        const trimmed = template === null || template === void 0 ? void 0 : template.trim();
+        if (!(hass === null || hass === void 0 ? void 0 : hass.connection) || !trimmed) {
+            this._tearDown();
+            this._displayedText = '';
+            this._subscriptionKey = undefined;
+            this._requestUpdate();
+            return;
+        }
+        const key = `${entityId}\0${trimmed}`;
+        if (this._subscriptionKey === key && this._unsub) return;
+        this._tearDown();
+        this._subscriptionKey = key;
+        this._displayedText = '';
+        this._callbackGen++;
+        const generation = this._callbackGen;
+        this._unsub = (0, $ba4180e620ae0534$export$851ba8a4d3782151)(hass.connection, (result)=>{
+            if (generation !== this._callbackGen) return;
+            if ('error' in result) {
+                console.warn('room-summary-card: label template:', result.error, `(${entityId})`);
+                return;
+            }
+            var _result_result;
+            this._displayedText = (_result_result = result.result) !== null && _result_result !== void 0 ? _result_result : '';
+            this._requestUpdate();
+        }, {
+            template: trimmed,
+            entity_ids: entityId,
+            strict: true
+        });
+    }
+    _tearDown() {
+        if (this._unsub) {
+            this._unsub.then((u)=>{
+                u();
+            });
+            this._unsub = undefined;
+        }
+    }
+    disconnect() {
+        this._tearDown();
+        this._subscriptionKey = undefined;
+        this._callbackGen++;
+        this._displayedText = '';
+    }
+    constructor(_requestUpdate){
+        this._requestUpdate = _requestUpdate;
+        this._callbackGen = 0;
+        this._displayedText = '';
+    }
+}
+
+
+/**
+ * https://github.com/home-assistant/frontend/blob/dev/src/common/string/has-template.ts
+ */ const $8607a11c9d834a76$var$TEMPLATE_SYNTAX = /{%|{{/;
+const $8607a11c9d834a76$export$a38c9712ad7b7ca2 = (value)=>$8607a11c9d834a76$var$TEMPLATE_SYNTAX.test(value);
+
+
+parcelRequire("fPVm8");
+var $2SS2a = parcelRequire("2SS2a");
+var $ci0wX = parcelRequire("ci0wX");
+var $2r9I1 = parcelRequire("2r9I1");
+parcelRequire("jcMWt");
+var $yv2EM = parcelRequire("yv2EM");
+let $4851f26bdeb7e50a$var$_ = (t)=>t, $4851f26bdeb7e50a$var$t, $4851f26bdeb7e50a$var$t1, $4851f26bdeb7e50a$var$t2;
+class $4851f26bdeb7e50a$export$27ddacf6292c3059 extends (0, $06cd5aba58e27145$export$66a0a6f05155b9e9)((0, $2r9I1.LitElement)) {
+    disconnectedCallback() {
+        this._labelTemplateConn.disconnect();
+        super.disconnectedCallback();
+    }
+    render() {
+        if (!this.label) {
+            this._labelTemplateConn.disconnect();
+            return 0, $ci0wX.nothing;
+        }
+        if ((0, $8607a11c9d834a76$export$a38c9712ad7b7ca2)(this.label)) {
+            this._labelTemplateConn.sync(this.hass, this.entityId, this.label);
+            return (0, $ci0wX.html)($4851f26bdeb7e50a$var$t || ($4851f26bdeb7e50a$var$t = $4851f26bdeb7e50a$var$_`${0}`), this._labelTemplateConn.displayedText);
+        }
+        this._labelTemplateConn.disconnect();
+        return (0, $ci0wX.html)($4851f26bdeb7e50a$var$t1 || ($4851f26bdeb7e50a$var$t1 = $4851f26bdeb7e50a$var$_`${0}`), this.label);
+    }
+    constructor(...args){
+        super(...args), this._labelTemplateConn = new (0, $a8bfdc087294b7f3$export$d201aad20a44ca08)(()=>this.requestUpdate()), this.entityId = '';
+    }
+}
+$4851f26bdeb7e50a$export$27ddacf6292c3059.styles = (0, $2SS2a.css)($4851f26bdeb7e50a$var$t2 || ($4851f26bdeb7e50a$var$t2 = $4851f26bdeb7e50a$var$_`
+    :host {
+      display: inline-flex;
+      justify-content: center;
+      padding: 0 2px;
+      overflow: hidden;
+      font-size: 0.65rem;
+      line-height: 1;
+      white-space: nowrap;
+    }
+  `));
+$4851f26bdeb7e50a$export$27ddacf6292c3059 = (0, $evAes.__decorate)([
+    (0, $yv2EM.customElement)('room-badge-label')
+], $4851f26bdeb7e50a$export$27ddacf6292c3059);
+
+
 parcelRequire("fPVm8");
 var $2SS2a = parcelRequire("2SS2a");
 let $aeaea6f5f5e584ed$var$_ = (t)=>t, $aeaea6f5f5e584ed$var$t;
@@ -5579,7 +5699,7 @@ const $aeaea6f5f5e584ed$export$9dd6ff9ea0189349 = (0, $2SS2a.css)($aeaea6f5f5e58
 `));
 
 
-let $7191b93f31a09a17$var$_ = (t)=>t, $7191b93f31a09a17$var$t;
+let $7191b93f31a09a17$var$_ = (t)=>t, $7191b93f31a09a17$var$t, $7191b93f31a09a17$var$t1, $7191b93f31a09a17$var$t2;
 
 class $7191b93f31a09a17$export$37acb3580601e69a extends (0, $wgzUt.SubscribeEntityStateMixin)((0, $1LdRn.HassUpdateMixin)((0, $2r9I1.LitElement))) {
     /**
@@ -5617,20 +5737,30 @@ class $7191b93f31a09a17$export$37acb3580601e69a extends (0, $wgzUt.SubscribeEnti
         const matchingState = (0, $1c79672e60888038$export$7d2846cf165df04b)(state, badge);
         // For if_match mode, only render if a state match is found
         if (badge.mode === 'if_match' && !matchingState) return 0, $ci0wX.nothing;
-        return (0, $ci0wX.html)($7191b93f31a09a17$var$t || ($7191b93f31a09a17$var$t = $7191b93f31a09a17$var$_`
+        var _matchingState_label;
+        const label = (_matchingState_label = matchingState === null || matchingState === void 0 ? void 0 : matchingState.label) !== null && _matchingState_label !== void 0 ? _matchingState_label : badge.label;
+        return (0, $ci0wX.html)($7191b93f31a09a17$var$t2 || ($7191b93f31a09a17$var$t2 = $7191b93f31a09a17$var$_`
       ${0}
       <ha-tile-badge
         style=${0}
       >
-        <ha-state-icon
-          .hass=${0}
-          .stateObj=${0}
-          .icon=${0}
-        ></ha-state-icon>
+        ${0}
       </ha-tile-badge>
     `), (matchingState === null || matchingState === void 0 ? void 0 : matchingState.styles) ? (0, $6f5f72559a4d178c$export$3703ea65b0ac4726)(matchingState.styles) : (0, $ci0wX.nothing), (0, $709101fc184637c4$export$1e5b4ce2fa884e6a)({
             '--tile-badge-background-color': (0, $2acaa25b6d047245$export$de247ce18e8ed95f)(matchingState === null || matchingState === void 0 ? void 0 : matchingState.icon_color)
-        }), hass, state, matchingState === null || matchingState === void 0 ? void 0 : matchingState.icon);
+        }), label ? (0, $ci0wX.html)($7191b93f31a09a17$var$t || ($7191b93f31a09a17$var$t = $7191b93f31a09a17$var$_`
+              <room-badge-label
+                .hass=${0}
+                .entityId=${0}
+                .label=${0}
+              ></room-badge-label>
+            `), hass, id !== null && id !== void 0 ? id : '', label) : (0, $ci0wX.html)($7191b93f31a09a17$var$t1 || ($7191b93f31a09a17$var$t1 = $7191b93f31a09a17$var$_`
+              <ha-state-icon
+                .hass=${0}
+                .stateObj=${0}
+                .icon=${0}
+              ></ha-state-icon>
+            `), hass, state, matchingState === null || matchingState === void 0 ? void 0 : matchingState.icon));
     }
     constructor(...args){
         super(...args), /**
@@ -5677,6 +5807,7 @@ var $evAes = parcelRequire("evAes");
 
 
 var $fKMMF = parcelRequire("fKMMF");
+
 
 var $cfP8R = parcelRequire("cfP8R");
 parcelRequire("fPVm8");
@@ -5818,12 +5949,12 @@ class $68ce0c44dd114f11$export$806f47322f907427 extends (0, $2r9I1.LitElement) {
     _getItemTitle(item) {
         if (this.mode === 'states') {
             const state = item;
-            if (state.label) return `${state.state} (${state.label})`;
+            if (state.label && !(0, $8607a11c9d834a76$export$a38c9712ad7b7ca2)(state.label)) return `${state.state} (${state.label})`;
             return state.state || 'New State';
         } else {
             var _threshold_threshold;
             const threshold = item;
-            if (threshold.label) return `${threshold.threshold} (${threshold.label})`;
+            if (threshold.label && !(0, $8607a11c9d834a76$export$a38c9712ad7b7ca2)(threshold.label)) return `${threshold.threshold} (${threshold.label})`;
             return ((_threshold_threshold = threshold.threshold) === null || _threshold_threshold === void 0 ? void 0 : _threshold_threshold.toString()) || 'New Threshold';
         }
     }
@@ -5989,27 +6120,20 @@ class $68ce0c44dd114f11$export$806f47322f907427 extends (0, $2r9I1.LitElement) {
                 }
             });
             schema.push({
-                type: 'grid',
-                name: '',
-                label: 'editor.entity.entity_label',
-                schema: [
-                    {
-                        name: 'icon',
-                        label: 'editor.entity.state.icon',
-                        required: false,
-                        selector: {
-                            icon: {}
-                        }
-                    },
-                    {
-                        name: 'label',
-                        label: 'editor.entity.state.label',
-                        required: false,
-                        selector: {
-                            text: {}
-                        }
+                name: 'icon',
+                label: 'editor.entity.state.icon',
+                required: false,
+                selector: {
+                    icon: {}
+                }
+            }, {
+                name: 'label',
+                label: 'editor.entity.state.label',
+                selector: {
+                    template: {
+                        preview: true
                     }
-                ]
+                }
             }, {
                 name: 'attribute',
                 label: 'editor.entity.state.attribute',
@@ -6090,27 +6214,20 @@ class $68ce0c44dd114f11$export$806f47322f907427 extends (0, $2r9I1.LitElement) {
                     }
                 }
             }, {
-                type: 'grid',
-                name: '',
-                label: 'editor.entity.entity_label',
-                schema: [
-                    {
-                        name: 'icon',
-                        label: 'editor.entity.threshold.icon',
-                        required: false,
-                        selector: {
-                            icon: {}
-                        }
-                    },
-                    {
-                        name: 'label',
-                        label: 'editor.entity.threshold.label',
-                        required: false,
-                        selector: {
-                            text: {}
-                        }
+                name: 'icon',
+                label: 'editor.entity.threshold.icon',
+                required: false,
+                selector: {
+                    icon: {}
+                }
+            }, {
+                name: 'label',
+                label: 'editor.entity.threshold.label',
+                selector: {
+                    template: {
+                        preview: true
                     }
-                ]
+                }
             }, {
                 name: 'attribute',
                 label: 'editor.entity.threshold.attribute',
@@ -6224,6 +6341,7 @@ $68ce0c44dd114f11$export$806f47322f907427.styles = (0, $2SS2a.css)($68ce0c44dd11
 
 
 var $kJycS = parcelRequire("kJycS");
+
 function $a82cc86a625f1a34$export$a47fb462a08de82f(item, index) {
     return `badge-${index}`;
 }
@@ -6245,11 +6363,16 @@ function $a82cc86a625f1a34$export$987b01ab9952d54f(obj) {
     return cleaned;
 }
 function $a82cc86a625f1a34$export$4de3ecff88b7fcf(badge) {
-    if (badge.mode === 'show_always') return `Show Always (${badge.position || 'top_right'})`;
-    if (badge.mode === 'if_match') return `If Match (${badge.position || 'top_right'})`;
+    let labelPreview = '';
+    if (badge.label && !(0, $8607a11c9d834a76$export$a38c9712ad7b7ca2)(badge.label)) {
+        const shortLabel = badge.label.length > 20 ? badge.label.slice(0, 20) + '...' : badge.label;
+        labelPreview = ` - ${shortLabel}`;
+    }
+    if (badge.mode === 'show_always') return `Show Always (${badge.position || 'top_right'})${labelPreview}`;
+    if (badge.mode === 'if_match') return `If Match (${badge.position || 'top_right'})${labelPreview}`;
     if (badge.mode === 'homeassistant') return `Home Assistant (${badge.position || 'top_right'})`;
-    if (badge.states && badge.states.length > 0) return `States (${badge.states.length}) - ${badge.position || 'top_right'}`;
-    return `Badge ${badge.position || 'top_right'}`;
+    if (badge.states && badge.states.length > 0) return `States (${badge.states.length}) - ${badge.position || 'top_right'}${labelPreview}`;
+    return `Badge ${badge.position || 'top_right'}${labelPreview}`;
 }
 
 
@@ -6315,6 +6438,16 @@ const $e9b7a98281a80f12$export$7154f02cb7867cee = (0, $l3TbZ.default)((entity_id
             label: 'editor.entity.entity_id',
             selector: {
                 entity: {}
+            }
+        },
+        {
+            name: 'label',
+            required: false,
+            label: 'editor.badge.label',
+            selector: {
+                template: {
+                    preview: true
+                }
             }
         },
         {
@@ -7083,25 +7216,20 @@ class $43564874ab3ed043$export$5062b3ea8745e421 extends (0, $2r9I1.LitElement) {
                     }
                 },
                 {
-                    type: 'grid',
-                    name: '',
+                    name: 'icon',
+                    label: 'editor.entity.entity_icon',
+                    selector: {
+                        icon: {}
+                    }
+                },
+                {
+                    name: 'label',
                     label: 'editor.entity.entity_label',
-                    schema: [
-                        {
-                            name: 'label',
-                            label: 'editor.entity.entity_label',
-                            selector: {
-                                text: {}
-                            }
-                        },
-                        {
-                            name: 'icon',
-                            label: 'editor.entity.entity_icon',
-                            selector: {
-                                icon: {}
-                            }
+                    selector: {
+                        template: {
+                            preview: true
                         }
-                    ]
+                    }
                 },
                 {
                     name: 'attribute',
@@ -7265,25 +7393,20 @@ class $43564874ab3ed043$export$5062b3ea8745e421 extends (0, $2r9I1.LitElement) {
                     }
                 },
                 {
-                    type: 'grid',
-                    name: '',
+                    name: 'icon',
+                    label: 'editor.entity.entity_icon',
+                    selector: {
+                        icon: {}
+                    }
+                },
+                {
+                    name: 'label',
                     label: 'editor.entity.entity_label',
-                    schema: [
-                        {
-                            name: 'label',
-                            label: 'editor.entity.entity_label',
-                            selector: {
-                                text: {}
-                            }
-                        },
-                        {
-                            name: 'icon',
-                            label: 'editor.entity.entity_icon',
-                            selector: {
-                                icon: {}
-                            }
+                    selector: {
+                        template: {
+                            preview: true
                         }
-                    ]
+                    }
                 },
                 {
                     name: 'attribute',
@@ -8573,8 +8696,6 @@ var $1LdRn = parcelRequire("1LdRn");
 
 
 
-var $el4XD = parcelRequire("el4XD");
-
 var $kJycS = parcelRequire("kJycS");
 
 var $1izJ2 = parcelRequire("1izJ2");
@@ -8697,8 +8818,6 @@ function $64ed32997eb866dd$export$25d11e1ce3afd7f7(hass, entity, hideIconContent
 
 
 
-var $8jUVR = parcelRequire("8jUVR");
-
 
 parcelRequire("fPVm8");
 var $ci0wX = parcelRequire("ci0wX");
@@ -8761,6 +8880,99 @@ var $2r9I1 = parcelRequire("2r9I1");
 parcelRequire("jcMWt");
 var $aaQtJ = parcelRequire("aaQtJ");
 var $lYE5o = parcelRequire("lYE5o");
+
+var $evAes = parcelRequire("evAes");
+
+
+
+var $el4XD = parcelRequire("el4XD");
+
+
+var $8jUVR = parcelRequire("8jUVR");
+
+parcelRequire("fPVm8");
+var $ci0wX = parcelRequire("ci0wX");
+let $48eb237c515e3f80$var$_ = (t)=>t, $48eb237c515e3f80$var$t, $48eb237c515e3f80$var$t1, $48eb237c515e3f80$var$t2;
+function $48eb237c515e3f80$export$23d92e23bb73dc02(hass, entity, conn, fallback) {
+    // First priority: label from state/threshold result
+    // or a configured label (second priority)
+    const thresholdResult = (0, $3eeea5b8a350985f$export$76969a794fd1f893)(entity);
+    const label = (0, $3eeea5b8a350985f$export$9d7fd66a8622e6b5)(entity, thresholdResult);
+    // check if the label is a template string
+    if (label && (0, $8607a11c9d834a76$export$a38c9712ad7b7ca2)(label)) {
+        conn.sync(hass, entity.config.entity_id, label);
+        return (0, $ci0wX.html)($48eb237c515e3f80$var$t || ($48eb237c515e3f80$var$t = $48eb237c515e3f80$var$_`${0}`), conn.displayedText);
+    }
+    conn.disconnect();
+    // if the label is not a template string, return it
+    if (label) return (0, $ci0wX.html)($48eb237c515e3f80$var$t1 || ($48eb237c515e3f80$var$t1 = $48eb237c515e3f80$var$_`${0}`), label);
+    const state = entity.state;
+    if (!state) return 0, $ci0wX.nothing;
+    // Third priority: attribute value if attribute is configured
+    if (entity.config.attribute || fallback === 'state-display') return (0, $8jUVR.stateDisplay)(hass, state, entity.config.attribute);
+    // Fallback: entity name
+    return (0, $ci0wX.html)($48eb237c515e3f80$var$t2 || ($48eb237c515e3f80$var$t2 = $48eb237c515e3f80$var$_`${0}`), (0, $el4XD.computeEntityName)(state, hass));
+}
+
+
+parcelRequire("fPVm8");
+var $2SS2a = parcelRequire("2SS2a");
+var $2r9I1 = parcelRequire("2r9I1");
+var $ci0wX = parcelRequire("ci0wX");
+parcelRequire("jcMWt");
+var $yv2EM = parcelRequire("yv2EM");
+var $aaQtJ = parcelRequire("aaQtJ");
+let $1bb40fdc00566efe$var$_ = (t)=>t, $1bb40fdc00566efe$var$t;
+
+class $1bb40fdc00566efe$export$ac61db8e407dba59 extends (0, $06cd5aba58e27145$export$66a0a6f05155b9e9)((0, $2r9I1.LitElement)) {
+    get show() {
+        var _this_config_features, _this_config, _this_config_background_options, _this_config_background, _this_config1;
+        var _this_config_features_includes, _this_config_background_options_includes;
+        return ((_this_config_features_includes = (_this_config = this.config) === null || _this_config === void 0 ? void 0 : (_this_config_features = _this_config.features) === null || _this_config_features === void 0 ? void 0 : _this_config_features.includes('show_entity_labels')) !== null && _this_config_features_includes !== void 0 ? _this_config_features_includes : false) && !(this.isMainRoomEntity && ((_this_config_background_options_includes = (_this_config1 = this.config) === null || _this_config1 === void 0 ? void 0 : (_this_config_background = _this_config1.background) === null || _this_config_background === void 0 ? void 0 : (_this_config_background_options = _this_config_background.options) === null || _this_config_background_options === void 0 ? void 0 : _this_config_background_options.includes('hide_icon_only')) !== null && _this_config_background_options_includes !== void 0 ? _this_config_background_options_includes : false));
+    }
+    /**
+   * Returns the component's styles
+   */ static get styles() {
+        return (0, $2SS2a.css)($1bb40fdc00566efe$var$t || ($1bb40fdc00566efe$var$t = $1bb40fdc00566efe$var$_`
+      :host {
+        position: absolute;
+        font-size: 0.7em;
+        text-align: center;
+        overflow: hidden;
+        margin-top: 75%;
+        display: var(--user-entity-label-display, block);
+      }
+    `));
+    }
+    disconnectedCallback() {
+        this._labelTemplateConn.disconnect();
+        super.disconnectedCallback();
+    }
+    /**
+   * renders the lit element card
+   * @returns {TemplateResult} The rendered HTML template
+   */ render() {
+        if (!this.show) {
+            this._labelTemplateConn.disconnect();
+            return 0, $ci0wX.nothing;
+        }
+        return (0, $48eb237c515e3f80$export$23d92e23bb73dc02)(this.hass, this.entity, this._labelTemplateConn, 'entity-name');
+    }
+    constructor(...args){
+        super(...args), this._labelTemplateConn = new (0, $a8bfdc087294b7f3$export$d201aad20a44ca08)(()=>this.requestUpdate()), this.isMainRoomEntity = false;
+    }
+}
+(0, $evAes.__decorate)([
+    (0, $aaQtJ.property)({
+        type: Object,
+        hasChanged: (a, b)=>!$ee3d06fe83a6a770$exports(a, b)
+    })
+], $1bb40fdc00566efe$export$ac61db8e407dba59.prototype, "entity", void 0);
+$1bb40fdc00566efe$export$ac61db8e407dba59 = (0, $evAes.__decorate)([
+    (0, $yv2EM.customElement)('room-entity-label')
+], $1bb40fdc00566efe$export$ac61db8e407dba59);
+
+
 parcelRequire("fPVm8");
 var $2SS2a = parcelRequire("2SS2a");
 let $3221e0e6382742ce$var$_ = (t)=>t, $3221e0e6382742ce$var$t;
@@ -8827,16 +9039,6 @@ const $3221e0e6382742ce$export$9dd6ff9ea0189349 = (0, $2SS2a.css)($3221e0e638274
     filter: var(--icon-filter, none);
   }
 
-  /* Entity label styling */
-  .entity-label {
-    position: absolute;
-    font-size: 0.7em;
-    text-align: center;
-    overflow: hidden;
-    margin-top: 75%;
-    display: var(--user-entity-label-display, block);
-  }
-
   /* Entity state styling */
   .entity-state {
     position: absolute;
@@ -8900,7 +9102,7 @@ const $3221e0e6382742ce$export$9dd6ff9ea0189349 = (0, $2SS2a.css)($3221e0e638274
 `));
 
 
-let $21884f49b48db948$var$_ = (t)=>t, $21884f49b48db948$var$t, $21884f49b48db948$var$t1, $21884f49b48db948$var$t2, $21884f49b48db948$var$t3;
+let $21884f49b48db948$var$_ = (t)=>t, $21884f49b48db948$var$t, $21884f49b48db948$var$t1, $21884f49b48db948$var$t2;
 
 class $21884f49b48db948$export$8063c4212d705050 extends (0, $1LdRn.HassUpdateMixin)((0, $2r9I1.LitElement)) {
     /**
@@ -8913,11 +9115,9 @@ class $21884f49b48db948$export$8063c4212d705050 extends (0, $1LdRn.HassUpdateMix
    * @param {Config} config - The card configuration
    */ set config(config) {
         if (!$ee3d06fe83a6a770$exports(config, this._config)) {
-            var _config_background_options, _config_background, _config_features;
+            var _config_background_options, _config_background;
             var _config_background_options_includes;
             this.iconBackground = (_config_background_options_includes = (_config_background = config.background) === null || _config_background === void 0 ? void 0 : (_config_background_options = _config_background.options) === null || _config_background_options === void 0 ? void 0 : _config_background_options.includes('icon_background')) !== null && _config_background_options_includes !== void 0 ? _config_background_options_includes : false;
-            var _config_features_includes;
-            this._showLabels = (_config_features_includes = (_config_features = config.features) === null || _config_features === void 0 ? void 0 : _config_features.includes('show_entity_labels')) !== null && _config_features_includes !== void 0 ? _config_features_includes : false;
             // Calculate hiding logic for main room entity
             if (this.isMainRoomEntity) {
                 var _config_background_options1, _config_background1;
@@ -8966,25 +9166,12 @@ class $21884f49b48db948$export$8063c4212d705050 extends (0, $1LdRn.HassUpdateMix
         const thresholdResult = (0, $3eeea5b8a350985f$export$76969a794fd1f893)(this.entity);
         const iconStyle = (0, $591072dd54c0e5bc$export$5edf3a158822b217)(this._hass, this.entity, this.isActive, this._image);
         const iconStyles = (0, $kJycS._)({}, (_this__config = this._config) === null || _this__config === void 0 ? void 0 : (_this__config_styles = _this__config.styles) === null || _this__config_styles === void 0 ? void 0 : _this__config_styles.entity_icon, this.isMainRoomEntity ? (_this__config1 = this._config) === null || _this__config1 === void 0 ? void 0 : (_this__config_styles1 = _this__config1.styles) === null || _this__config_styles1 === void 0 ? void 0 : _this__config_styles1.room_entity_icon : undefined, this.entity.config.styles, thresholdResult === null || thresholdResult === void 0 ? void 0 : thresholdResult.styles);
-        // Get label (priority: state/threshold label > config label > attribute value > entity name)
-        let label;
-        if (this._showLabels && !this._hideIconContent) {
-            // First priority: label from state/threshold result
-            const thresholdLabel = (0, $3eeea5b8a350985f$export$9d7fd66a8622e6b5)(this.entity, thresholdResult);
-            if (thresholdLabel) label = thresholdLabel;
-            else if (this.entity.config.label) // Second priority: configured label
-            label = this.entity.config.label;
-            else if (this.entity.config.attribute) // Third priority: attribute value if attribute is configured
-            label = (0, $8jUVR.stateDisplay)(this._hass, state, this.entity.config.attribute);
-            else // Fallback: entity name
-            label = (0, $el4XD.computeEntityName)(state, this._hass);
-        }
         const icon = (0, $ac519daeba261117$export$d5d9aad110ad14a)(this.entity, this._config, {
             thresholdResult: thresholdResult
         });
         // Render badges (max 4)
         const badgeElements = (0, $042bfa5e9e75bf5a$export$5aaff3aa40310f76)(this.entity, this._hass, this._config);
-        return (0, $ci0wX.html)($21884f49b48db948$var$t3 || ($21884f49b48db948$var$t3 = $21884f49b48db948$var$_`
+        return (0, $ci0wX.html)($21884f49b48db948$var$t2 || ($21884f49b48db948$var$t2 = $21884f49b48db948$var$_`
       ${0}
       <div
         class="icon"
@@ -8994,14 +9181,19 @@ class $21884f49b48db948$export$8063c4212d705050 extends (0, $1LdRn.HassUpdateMix
       >
         ${0}
         ${0}
-        ${0}
+        <room-entity-label
+          .hass=${0}
+          .config=${0}
+          .entity=${0}
+          .isMainRoomEntity=${0}
+        ></room-entity-label>
         ${0}
       </div>
     `), (0, $6f5f72559a4d178c$export$3703ea65b0ac4726)(iconStyles), iconStyle, (0, $b96673d7637fba33$export$3d3654ce4577c53d)(this, this.entity), (0, $b96673d7637fba33$export$8a44987212de21b)(this.entity), this._hideIconContent ? (0, $ci0wX.nothing) : (0, $ci0wX.html)($21884f49b48db948$var$t1 || ($21884f49b48db948$var$t1 = $21884f49b48db948$var$_`<ha-state-icon
               .hass=${0}
               .stateObj=${0}
               .icon=${0}
-            ></ha-state-icon>`), this._hass, state, icon), badgeElements, label ? (0, $ci0wX.html)($21884f49b48db948$var$t2 || ($21884f49b48db948$var$t2 = $21884f49b48db948$var$_`<div class="entity-label">${0}</div>`), label) : (0, $ci0wX.nothing), (0, $64ed32997eb866dd$export$25d11e1ce3afd7f7)(this._hass, this.entity, this._hideIconContent));
+            ></ha-state-icon>`), this._hass, state, icon), badgeElements, this._hass, this._config, this.entity, this.isMainRoomEntity, (0, $64ed32997eb866dd$export$25d11e1ce3afd7f7)(this._hass, this.entity, this._hideIconContent));
     }
     constructor(...args){
         super(...args), /**
@@ -9012,9 +9204,6 @@ class $21884f49b48db948$export$8063c4212d705050 extends (0, $1LdRn.HassUpdateMix
 (0, $evAes.__decorate)([
     (0, $lYE5o.state)()
 ], $21884f49b48db948$export$8063c4212d705050.prototype, "_config", void 0);
-(0, $evAes.__decorate)([
-    (0, $lYE5o.state)()
-], $21884f49b48db948$export$8063c4212d705050.prototype, "_showLabels", void 0);
 (0, $evAes.__decorate)([
     (0, $lYE5o.state)()
 ], $21884f49b48db948$export$8063c4212d705050.prototype, "_hideRoomIcon", void 0);
@@ -9099,25 +9288,6 @@ const $bd80f520e20b7898$export$306d3b376c79075a = (0, (/*@__PURE__*/$parcel$inte
 
 
 /**
- * Formats a number with appropriate decimal places
- */ const $23d9b52a9a7ecac4$var$formatNumber = (value, maxDecimals = 1)=>{
-    return value.toFixed(maxDecimals).replace(/\.?0+$/, '');
-};
-/**
- * Adds appropriate spacing before unit if needed
- */ const $23d9b52a9a7ecac4$var$blankBeforeUnit = (unit)=>{
-    // Units that don't need a space (like % or °)
-    const noSpaceUnits = [
-        '%',
-        "\xb0C",
-        "\xb0F"
-    ];
-    return noSpaceUnits.some((u)=>unit.includes(u)) ? '' : ' ';
-};
-const $23d9b52a9a7ecac4$export$6b5316c1eb8ef7e7 = (averagedSensor)=>`${$23d9b52a9a7ecac4$var$formatNumber(averagedSensor.average)}${$23d9b52a9a7ecac4$var$blankBeforeUnit(averagedSensor.uom)}${averagedSensor.uom}`;
-
-
-/**
  * https://github.com/home-assistant/frontend/blob/dev/src/data/icon.ts
  */ const $a6e6dfe1c75e2ac8$export$733ca6fe4b07869c = {
     air_quality: 'mdi:air-filter',
@@ -9174,8 +9344,6 @@ const $23d9b52a9a7ecac4$export$6b5316c1eb8ef7e7 = (averagedSensor)=>`${$23d9b52a
 };
 
 
-
-var $8jUVR = parcelRequire("8jUVR");
 
 
 
@@ -9347,6 +9515,80 @@ const $7b5ce03f476dfece$export$a40009bd2c363351 = (0, $lnb0z.directive)($7b5ce03
 
 
 
+
+var $evAes = parcelRequire("evAes");
+
+
+
+/**
+ * Formats a number with appropriate decimal places
+ */ const $23d9b52a9a7ecac4$var$formatNumber = (value, maxDecimals = 1)=>{
+    return value.toFixed(maxDecimals).replace(/\.?0+$/, '');
+};
+/**
+ * Adds appropriate spacing before unit if needed
+ */ const $23d9b52a9a7ecac4$var$blankBeforeUnit = (unit)=>{
+    // Units that don't need a space (like % or °)
+    const noSpaceUnits = [
+        '%',
+        "\xb0C",
+        "\xb0F"
+    ];
+    return noSpaceUnits.some((u)=>unit.includes(u)) ? '' : ' ';
+};
+const $23d9b52a9a7ecac4$export$6b5316c1eb8ef7e7 = (averagedSensor)=>`${$23d9b52a9a7ecac4$var$formatNumber(averagedSensor.average)}${$23d9b52a9a7ecac4$var$blankBeforeUnit(averagedSensor.uom)}${averagedSensor.uom}`;
+
+
+
+parcelRequire("fPVm8");
+var $ci0wX = parcelRequire("ci0wX");
+var $2r9I1 = parcelRequire("2r9I1");
+parcelRequire("jcMWt");
+var $yv2EM = parcelRequire("yv2EM");
+var $aaQtJ = parcelRequire("aaQtJ");
+let $3b95f56107a2cba7$var$_ = (t)=>t, $3b95f56107a2cba7$var$t;
+
+class $3b95f56107a2cba7$export$ef860f80ba8a1734 extends (0, $06cd5aba58e27145$export$66a0a6f05155b9e9)((0, $2r9I1.LitElement)) {
+    get show() {
+        return !(0, $b02f37b9ae80224f$export$805ddaeeece0413e)(this.config, 'hide_sensor_labels');
+    }
+    disconnectedCallback() {
+        this._labelTemplateConn.disconnect();
+        super.disconnectedCallback();
+    }
+    /**
+   * renders the lit element card
+   * @returns {TemplateResult} The rendered HTML template
+   */ render() {
+        if (!this.show) {
+            this._labelTemplateConn.disconnect();
+            return 0, $ci0wX.nothing;
+        }
+        if (this.sensor) return (0, $ci0wX.html)($3b95f56107a2cba7$var$t || ($3b95f56107a2cba7$var$t = $3b95f56107a2cba7$var$_`${0}`), (0, $23d9b52a9a7ecac4$export$6b5316c1eb8ef7e7)(this.sensor));
+        if (!this.entity) return 0, $ci0wX.nothing;
+        return (0, $48eb237c515e3f80$export$23d92e23bb73dc02)(this.hass, this.entity, this._labelTemplateConn, 'state-display');
+    }
+    constructor(...args){
+        super(...args), this._labelTemplateConn = new (0, $a8bfdc087294b7f3$export$d201aad20a44ca08)(()=>this.requestUpdate());
+    }
+}
+(0, $evAes.__decorate)([
+    (0, $aaQtJ.property)({
+        type: Object,
+        hasChanged: (a, b)=>!$ee3d06fe83a6a770$exports(a, b)
+    })
+], $3b95f56107a2cba7$export$ef860f80ba8a1734.prototype, "entity", void 0);
+(0, $evAes.__decorate)([
+    (0, $aaQtJ.property)({
+        type: Object,
+        hasChanged: (a, b)=>!$ee3d06fe83a6a770$exports(a, b)
+    })
+], $3b95f56107a2cba7$export$ef860f80ba8a1734.prototype, "sensor", void 0);
+$3b95f56107a2cba7$export$ef860f80ba8a1734 = (0, $evAes.__decorate)([
+    (0, $yv2EM.customElement)('room-sensor-label')
+], $3b95f56107a2cba7$export$ef860f80ba8a1734);
+
+
 parcelRequire("fPVm8");
 var $2SS2a = parcelRequire("2SS2a");
 let $a2c19dc37818e84b$var$_ = (t)=>t, $a2c19dc37818e84b$var$t;
@@ -9434,7 +9676,7 @@ const $a2c19dc37818e84b$export$9dd6ff9ea0189349 = (0, $2SS2a.css)($a2c19dc37818e
 `));
 
 
-let $0a8df7eca34388c3$var$_ = (t)=>t, $0a8df7eca34388c3$var$t, $0a8df7eca34388c3$var$t1, $0a8df7eca34388c3$var$t2, $0a8df7eca34388c3$var$t3, $0a8df7eca34388c3$var$t4, $0a8df7eca34388c3$var$t5, $0a8df7eca34388c3$var$t6, $0a8df7eca34388c3$var$t7;
+let $0a8df7eca34388c3$var$_ = (t)=>t, $0a8df7eca34388c3$var$t, $0a8df7eca34388c3$var$t1, $0a8df7eca34388c3$var$t2, $0a8df7eca34388c3$var$t3, $0a8df7eca34388c3$var$t4, $0a8df7eca34388c3$var$t5, $0a8df7eca34388c3$var$t6;
 class $0a8df7eca34388c3$export$265e5e10b1eff6c6 extends (0, $1LdRn.HassUpdateMixin)((0, $2r9I1.LitElement)) {
     /**
    * Returns the component's styles
@@ -9449,7 +9691,6 @@ class $0a8df7eca34388c3$export$265e5e10b1eff6c6 extends (0, $1LdRn.HassUpdateMix
         (0, $dTmXl.d)(this.config, 'sensor-collection', 'set hass');
         this._hass = hass;
         this.hide = (0, $b02f37b9ae80224f$export$805ddaeeece0413e)(this.config, 'hide_sensor_icons');
-        this._hideLabels = (0, $b02f37b9ae80224f$export$805ddaeeece0413e)(this.config, 'hide_sensor_labels');
         var _this_config_sensor_layout;
         this.layout = (_this_config_sensor_layout = this.config.sensor_layout) !== null && _this_config_sensor_layout !== void 0 ? _this_config_sensor_layout : 'default';
     }
@@ -9472,9 +9713,13 @@ class $0a8df7eca34388c3$export$265e5e10b1eff6c6 extends (0, $1LdRn.HassUpdateMix
             if (isMultiple) return (0, $ci0wX.html)($0a8df7eca34388c3$var$t1 || ($0a8df7eca34388c3$var$t1 = $0a8df7eca34388c3$var$_`
           <div class="sensor">
             ${0}
-            ${0}
+            <room-sensor-label
+              .hass=${0}
+              .config=${0}
+              .sensor=${0}
+            ></room-sensor-label>
           </div>
-        `), this.renderMultiIcon(s), this._hideLabels ? (0, $ci0wX.nothing) : (0, $23d9b52a9a7ecac4$export$6b5316c1eb8ef7e7)(s));
+        `), this.renderMultiIcon(s), this._hass, this.config, s);
             // Use the first state from averaged sensor
             const state = s.states[0];
             return this.renderSingleSensor(state);
@@ -9504,8 +9749,6 @@ class $0a8df7eca34388c3$export$265e5e10b1eff6c6 extends (0, $1LdRn.HassUpdateMix
         };
         // Get state/threshold-based styling result
         const result = (0, $3eeea5b8a350985f$export$76969a794fd1f893)(info);
-        // Get label (priority: state/threshold label > config label)
-        const label = (0, $3eeea5b8a350985f$export$9d7fd66a8622e6b5)(info, result);
         // Icon priority: state/threshold icon > configured icon > default
         // State-based icons override configured icons for dynamic behavior
         const icon = (result === null || result === void 0 ? void 0 : result.icon) || (sensorConfig === null || sensorConfig === void 0 ? void 0 : sensorConfig.icon);
@@ -9517,22 +9760,15 @@ class $0a8df7eca34388c3$export$265e5e10b1eff6c6 extends (0, $1LdRn.HassUpdateMix
         .actionHandler=${0}
       >
         ${0}
-        ${0}
+        <room-sensor-label
+          .hass=${0}
+          .config=${0}
+          .entity=${0}
+        ></room-sensor-label>
       </div>
     `), (0, $709101fc184637c4$export$1e5b4ce2fa884e6a)((0, $kJycS._)({
             '--sensor-icon-color': (0, $2acaa25b6d047245$export$de247ce18e8ed95f)(result === null || result === void 0 ? void 0 : result.color)
-        }, result === null || result === void 0 ? void 0 : result.styles)), (0, $b96673d7637fba33$export$3d3654ce4577c53d)(this, info), (0, $b96673d7637fba33$export$8a44987212de21b)(info), this.renderStateIcon(state, icon), this.renderSensorLabel(state, label, sensorConfig));
-    }
-    /**
-   * Renders the sensor label with proper fallback logic
-   * @param state - The entity state
-   * @param label - The configured label (if any)
-   * @param sensorConfig - The sensor configuration (if any)
-   * @returns The label content, attribute value, state display, or nothing if labels are hidden
-   */ renderSensorLabel(state, label, sensorConfig) {
-        if (this._hideLabels) return 0, $ci0wX.nothing;
-        if (label) return (0, $ci0wX.html)($0a8df7eca34388c3$var$t3 || ($0a8df7eca34388c3$var$t3 = $0a8df7eca34388c3$var$_`${0}`), label);
-        return (0, $8jUVR.stateDisplay)(this._hass, state, sensorConfig === null || sensorConfig === void 0 ? void 0 : sensorConfig.attribute);
+        }, result === null || result === void 0 ? void 0 : result.styles)), (0, $b96673d7637fba33$export$3d3654ce4577c53d)(this, info), (0, $b96673d7637fba33$export$8a44987212de21b)(info), this.renderStateIcon(state, icon), this._hass, this.config, info);
     }
     /**
    * Gets the sensor configuration for a given entity ID
@@ -9553,15 +9789,15 @@ class $0a8df7eca34388c3$export$265e5e10b1eff6c6 extends (0, $1LdRn.HassUpdateMix
         const iconPromise = (0, $bd80f520e20b7898$export$306d3b376c79075a)(this._hass).then((icons)=>{
             var _icons_resources_sensor_domain_sensor_device_class, _icons_resources_sensor_domain, _icons_resources;
             const icon = (_icons_resources = icons.resources) === null || _icons_resources === void 0 ? void 0 : (_icons_resources_sensor_domain = _icons_resources[sensor.domain]) === null || _icons_resources_sensor_domain === void 0 ? void 0 : (_icons_resources_sensor_domain_sensor_device_class = _icons_resources_sensor_domain[sensor.device_class]) === null || _icons_resources_sensor_domain_sensor_device_class === void 0 ? void 0 : _icons_resources_sensor_domain_sensor_device_class.default;
-            if (icon) return (0, $ci0wX.html)($0a8df7eca34388c3$var$t4 || ($0a8df7eca34388c3$var$t4 = $0a8df7eca34388c3$var$_`<ha-icon .icon=${0}></ha-icon>`), icon);
+            if (icon) return (0, $ci0wX.html)($0a8df7eca34388c3$var$t3 || ($0a8df7eca34388c3$var$t3 = $0a8df7eca34388c3$var$_`<ha-icon .icon=${0}></ha-icon>`), icon);
             const fallback = (0, $a6e6dfe1c75e2ac8$export$733ca6fe4b07869c)[sensor.domain];
-            return fallback ? (0, $ci0wX.html)($0a8df7eca34388c3$var$t5 || ($0a8df7eca34388c3$var$t5 = $0a8df7eca34388c3$var$_`<ha-icon .icon=${0}></ha-icon>`), fallback) : (0, $ci0wX.nothing);
+            return fallback ? (0, $ci0wX.html)($0a8df7eca34388c3$var$t4 || ($0a8df7eca34388c3$var$t4 = $0a8df7eca34388c3$var$_`<ha-icon .icon=${0}></ha-icon>`), fallback) : (0, $ci0wX.nothing);
         });
-        return (0, $ci0wX.html)($0a8df7eca34388c3$var$t6 || ($0a8df7eca34388c3$var$t6 = $0a8df7eca34388c3$var$_`${0}`), (0, $7b5ce03f476dfece$export$a40009bd2c363351)(iconPromise));
+        return (0, $ci0wX.html)($0a8df7eca34388c3$var$t5 || ($0a8df7eca34388c3$var$t5 = $0a8df7eca34388c3$var$_`${0}`), (0, $7b5ce03f476dfece$export$a40009bd2c363351)(iconPromise));
     }
     renderStateIcon(state, icon) {
         if (this.hide || !state) return 0, $ci0wX.nothing;
-        return (0, $ci0wX.html)($0a8df7eca34388c3$var$t7 || ($0a8df7eca34388c3$var$t7 = $0a8df7eca34388c3$var$_`<ha-state-icon
+        return (0, $ci0wX.html)($0a8df7eca34388c3$var$t6 || ($0a8df7eca34388c3$var$t6 = $0a8df7eca34388c3$var$_`<ha-state-icon
       .hass=${0}
       .stateObj=${0}
       .icon=${0}
@@ -11580,7 +11816,7 @@ class $0f35678ae26800e3$export$be1ca41262ce011e extends (0, $2r9I1.LitElement) {
 
 
 var $649c526c16197344$exports = {};
-$649c526c16197344$exports = JSON.parse("{\"name\":\"room-summary-card\",\"version\":\"0.66.0\",\"author\":\"Patrick Masters\",\"license\":\"ISC\",\"description\":\"Custom card Home Assistant which can show a summary of room entities.\",\"source\":\"src/index.ts\",\"module\":\"dist/room-summary-card.js\",\"targets\":{\"module\":{\"includeNodeModules\":true}},\"scripts\":{\"watch\":\"parcel watch\",\"build\":\"parcel build\",\"format\":\"prettier --write .\",\"test\":\"TS_NODE_PROJECT='./tsconfig.test.json' mocha\",\"test:coverage\":\"nyc npm run test\",\"test:watch\":\"TS_NODE_PROJECT='./tsconfig.test.json' mocha --watch\",\"test:e2e\":\"playwright test\",\"test:e2e:auth\":\"source .env && npx playwright codegen --save-storage=$PLAYWRIGHT_HA_STORAGE_STATE $PLAYWRIGHT_HA_ORIGIN\",\"update\":\"npx npm-check-updates -u && yarn install\"},\"devDependencies\":{\"@istanbuljs/nyc-config-typescript\":\"^1.0.2\",\"@open-wc/testing\":\"^4.0.0\",\"@parcel/transformer-inline-string\":\"^2.16.4\",\"@playwright/test\":\"^1.51.0\",\"@testing-library/dom\":\"^10.4.1\",\"@trivago/prettier-plugin-sort-imports\":\"^6.0.2\",\"@types/chai\":\"^5.2.3\",\"@types/jsdom\":\"^28.0.1\",\"@types/mocha\":\"^10.0.10\",\"@types/sinon\":\"^21.0.1\",\"chai\":\"^6.2.2\",\"jsdom\":\"^29.1.1\",\"mocha\":\"^11.7.5\",\"nyc\":\"^17.1.0\",\"parcel\":\"^2.16.4\",\"prettier\":\"3.8.3\",\"prettier-plugin-organize-imports\":\"^4.3.0\",\"sinon\":\"^21.1.2\",\"ts-node\":\"^10.9.2\",\"tsconfig-paths\":\"^4.2.0\",\"typescript\":\"^6.0.3\"},\"dependencies\":{\"@lit/task\":\"^1.0.3\",\"async-memoize-one\":\"^1.2.1\",\"fast-deep-equal\":\"^3.1.3\",\"lit\":\"^3.3.2\",\"memoize-one\":\"^6.0.0\"}}");
+$649c526c16197344$exports = JSON.parse("{\"name\":\"room-summary-card\",\"version\":\"0.67.0\",\"author\":\"Patrick Masters\",\"license\":\"ISC\",\"description\":\"Custom card Home Assistant which can show a summary of room entities.\",\"source\":\"src/index.ts\",\"module\":\"dist/room-summary-card.js\",\"targets\":{\"module\":{\"includeNodeModules\":true}},\"scripts\":{\"watch\":\"parcel watch\",\"build\":\"parcel build\",\"format\":\"prettier --write .\",\"test\":\"TS_NODE_PROJECT='./tsconfig.test.json' mocha\",\"test:coverage\":\"nyc npm run test\",\"test:watch\":\"TS_NODE_PROJECT='./tsconfig.test.json' mocha --watch\",\"test:e2e\":\"playwright test\",\"test:e2e:auth\":\"source .env && npx playwright codegen --save-storage=$PLAYWRIGHT_HA_STORAGE_STATE $PLAYWRIGHT_HA_ORIGIN\",\"update\":\"npx npm-check-updates -u && yarn install\"},\"devDependencies\":{\"@istanbuljs/nyc-config-typescript\":\"^1.0.2\",\"@open-wc/testing\":\"^4.0.0\",\"@parcel/transformer-inline-string\":\"^2.16.4\",\"@playwright/test\":\"^1.51.0\",\"@testing-library/dom\":\"^10.4.1\",\"@trivago/prettier-plugin-sort-imports\":\"^6.0.2\",\"@types/chai\":\"^5.2.3\",\"@types/jsdom\":\"^28.0.1\",\"@types/mocha\":\"^10.0.10\",\"@types/sinon\":\"^21.0.1\",\"chai\":\"^6.2.2\",\"jsdom\":\"^29.1.1\",\"mocha\":\"^11.7.5\",\"nyc\":\"^17.1.0\",\"parcel\":\"^2.16.4\",\"prettier\":\"3.8.3\",\"prettier-plugin-organize-imports\":\"^4.3.0\",\"sinon\":\"^22.0.0\",\"ts-node\":\"^10.9.2\",\"tsconfig-paths\":\"^4.2.0\",\"typescript\":\"^6.0.3\"},\"dependencies\":{\"@lit/task\":\"^1.0.3\",\"async-memoize-one\":\"^1.2.1\",\"fast-deep-equal\":\"^3.1.3\",\"lit\":\"^3.3.2\",\"memoize-one\":\"^6.0.0\"}}");
 
 
 // Register the custom element with the browser

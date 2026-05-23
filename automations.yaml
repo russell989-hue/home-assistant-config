@@ -81,9 +81,9 @@
   actions:
   - action: switch.turn_off
     metadata: {}
-    target:
-      device_id: 42ae7895a9688d99bf981e9a9036b93b
     data: {}
+    target:
+      entity_id: switch.speakeasy_black_lamp
   mode: single
 - id: '1777328105052'
   alias: Turn off 3 hours
@@ -613,15 +613,17 @@
   alias: NWS Alerts
   description: ''
   triggers:
-  - trigger: state
-    entity_id: sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts
+  - entity_id:
+    - sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts
+    trigger: state
   conditions:
   - condition: template
     value_template: '{% set alerts = state_attr(''sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts'',
-      ''alerts'') or [] %} {% set keywords = [''Thunderstorm'', ''Hail'', ''Tornado'',
+      ''Alerts'') or [] %} {% set keywords = [''Thunderstorm'', ''Hail'', ''Tornado'',
       ''Severe'', ''Wind Advisory'', ''Winter Storm'', ''Blizzard'', ''Ice Storm'',
-      ''Flood''] %} {{ alerts | selectattr(''event'', ''defined'') | selectattr(''event'',
-      ''search'', keywords | join(''|'')) | list | count > 0 }}'
+      ''Flood'', ''Special Weather Statement''] %} {{ alerts | selectattr(''Event'',
+      ''defined'') | selectattr(''Event'', ''search'', keywords | join(''|''), true)
+      | list | count > 0 }}'
   actions:
   - action: notify.send_message
     target:
@@ -633,31 +635,39 @@
     data:
       title: '⚠️ Weather Alert:'
       message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
-        'alerts') or [] -%}\n{%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
-        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood']
-        -%}\n{%- set matched = alerts | selectattr('event', 'defined') | selectattr('event',
-        'search', keywords | join('|')) | map(attribute='event') | list -%}\n{%- set
-        zones = state_attr('device_tracker.shadowfax_location', 'in_zones') or []
-        -%}\n{%- set sfx = '✅ Shadowfax is in the garage — protected.' if 'zone.garage'
-        in zones else ('⚠️ Shadowfax is at home but not in the garage.' if 'zone.home'
-        in zones or 'zone.front_door' in zones else ('❗ Shadowfax is on the street
-        — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax is away from
-        home!')) -%}\n⚠️ NWS issued: {{ matched | join(', ') }}\n{{ sfx }}"
+        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
+        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
+        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
+        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
+        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
+        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
+        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
+        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
+        %}\n        {{ sfx }}"
   - action: notify.persistent_notification
     metadata: {}
     data:
       title: '⚠️ Weather Alert:'
       message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
-        'alerts') or [] -%}\n{%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
-        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood']
-        -%}\n{%- set matched = alerts | selectattr('event', 'defined') | selectattr('event',
-        'search', keywords | join('|')) | map(attribute='event') | list -%}\n{%- set
-        zones = state_attr('device_tracker.shadowfax_location', 'in_zones') or []
-        -%}\n{%- set sfx = '✅ Shadowfax is in the garage — protected.' if 'zone.garage'
-        in zones else ('⚠️ Shadowfax is at home but not in the garage.' if 'zone.home'
-        in zones or 'zone.front_door' in zones else ('❗ Shadowfax is on the street
-        — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax is away from
-        home!')) -%}\n⚠️ NWS issued: {{ matched | join(', ') }}\n{{ sfx }}"
+        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
+        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
+        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
+        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
+        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
+        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
+        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
+        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
+        %}\n        {{ sfx }}"
   mode: single
 - id: '1778966311414'
   alias: Weather - Morning Forecast Alert
@@ -668,42 +678,61 @@
   conditions: []
   actions:
   - action: weather.get_forecasts
-    target:
-      entity_id: weather.home
     data:
       type: hourly
     response_variable: hourly_forecast
+    target:
+      entity_id: weather.forecast_home_2
   - condition: template
     value_template: '{% set bad = [''lightning'', ''lightning-rainy'', ''hail'', ''exceptional'',
-      ''pouring'', ''hurricane'', ''tornado''] %} {% set forecast = hourly_forecast[''weather.home''][''forecast''][:12]
-      %} {{ forecast | selectattr(''condition'', ''in'', bad) | list | count > 0 }}'
+      ''pouring'', ''hurricane'', ''tornado''] %} {% set forecast = hourly_forecast[''weather.forecast_home_2''][''forecast''][:12]
+      %} {{ forecast | selectattr(''condition'', ''search'', bad | join(''|''), true)
+      | list | count > 0 }}'
   - action: notify.send_message
     target:
       entity_id: notify.brian_s_z_flip_7
     data:
       title: "\U0001F329️ Severe Weather Forecast Today"
       message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
-        'pouring', 'hurricane', 'tornado'] -%}\n{%- set forecast = hourly_forecast['weather.home']['forecast'][:12]
-        -%}\n{%- set hits = forecast | selectattr('condition', 'in', bad) | list -%}\n{%-
-        set zones = state_attr('device_tracker.shadowfax_location', 'in_zones') or
-        [] -%}\n{%- set sfx = '✅ Shadowfax is in the garage — protected.' if 'zone.garage'
-        in zones else ('⚠️ Shadowfax is at home but not in the garage.' if 'zone.home'
-        in zones or 'zone.front_door' in zones else ('❗ Shadowfax is on the street
-        — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax is away from
-        home!')) -%}\n{{ hits | count }} hour(s) of severe conditions expected today.\nFirst:
-        {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M %p')
-        }} ({{ hits[0].condition }})\n{{ sfx }}"
+        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
+        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
+        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
+        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
+        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
+  - action: persistent_notification.create
+    data:
+      title: Morning Forecast Alert
+      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
+        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
+        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
+        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
+        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
+        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
   mode: single
 - id: '1778966416586'
   alias: Weather - Thunderstorm Conditions Now
   description: ''
   triggers:
   - trigger: state
-    entity_id: weather.home
-    to: lightning
+    entity_id:
+    - weather.forecast_home_2
+    to:
+    - lightning
   - trigger: state
-    entity_id: weather.home
-    to: lightning-rainy
+    entity_id:
+    - weather.forecast_home_2
+    to:
+    - lightning-rainy
   conditions: []
   actions:
   - action: notify.send_message
@@ -717,4 +746,40 @@
         in zones or 'zone.front_door' in zones else ('❗ Shadowfax is on the street
         — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax is away from
         home!')) -%}\nThunderstorm detected — hail is possible.\n{{ sfx }}"
+  - action: notify.persistent_notification
+    metadata: {}
+    data: {}
+  mode: single
+- id: '1778991863770'
+  alias: Office Nest Display- Always on
+  description: ''
+  triggers:
+  - trigger: media_player.stopped_playing
+    target:
+      entity_id: media_player.office_display
+    options:
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 30
+  conditions: []
+  actions:
+  - action: media_player.play_media
+    metadata: {}
+    target:
+      entity_id: media_player.office_display
+    data:
+      media:
+        media_content_id: office-ipad
+        media_content_type: lovelace
+        metadata:
+          title: Office iPad
+          thumbnail: /api/brands/integration/lovelace/logo.png
+          media_class: app
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: lovelace
+            media_content_id: ''
+          browse_entity_id: media_player.office_display
   mode: single

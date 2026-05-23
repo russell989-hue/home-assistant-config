@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); entries=data['data']['entries']; print\\('\\\\n'.join\\(sorted\\(set\\(e['domain'] for e in entries\\)\\)\\)\\)\")",
+      "Bash(mount)",
+      "Bash(apt-get install *)",
+      "Bash(python3.exe --version)",
+      "Bash(py --version)"
+    ]
+  }
+}

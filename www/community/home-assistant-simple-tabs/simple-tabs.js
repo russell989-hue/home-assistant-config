@@ -89,7 +89,7 @@ function t(t,e,i,n){var r,s=arguments.length,o=s<3?e:null===n?n=Object.getOwnPro
                             @click=${t=>{t.stopPropagation(),this._moveTab(e,"down")}}
                         ></ha-icon>
                     </div>
-                    <ha-textfield
+                    <ha-input
                         class="summary-title"
                         .name=${"title"}
                         .value=${t.title||""}
@@ -97,7 +97,7 @@ function t(t,e,i,n){var r,s=arguments.length,o=s<3?e:null===n?n=Object.getOwnPro
                         @input=${t=>this._handleTabChange(t,e)}
                         @click=${t=>t.stopPropagation()}
                         @keydown=${t=>t.stopPropagation()}
-                    ></ha-textfield>
+                    ></ha-input>
                     <ha-icon
                         class="remove-icon"
                         icon="mdi:delete"
@@ -114,20 +114,20 @@ function t(t,e,i,n){var r,s=arguments.length,o=s<3?e:null===n?n=Object.getOwnPro
                             .name=${"icon"}
                             @value-changed=${t=>this._handleTabChange(t,e)}
                         ></ha-icon-picker>
-                        <ha-textfield
+                        <ha-input
                             .label=${"Tab ID (for deep linking)"}
                             .value=${t.id||""}
                             .name=${"id"}
                             @input=${t=>this._handleTabChange(t,e)}
-                        ></ha-textfield>
+                        ></ha-input>
                     </div>
-                    <ha-textfield
+                    <ha-input
                         .label=${"Badge Template (Jinja)"}
                         .value=${t.badge||""}
                         .name=${"badge"}
                         placeholder="{{ is_state('light.kitchen', 'on') }}"
                         @input=${t=>this._handleTabChange(t,e)}
-                    ></ha-textfield>
+                    ></ha-input>
 
                     <div style="margin-top: 16px;">
                       <h3 style="margin: 0 0 12px 0;">Cards</h3>
