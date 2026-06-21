@@ -1,33 +1,20 @@
 substitutions:
-  # Settings - Editable values
   device_name: "front-door-light-switch"
   friendly_name: "Front Door Light Switch"
-  wifi_ssid: !secret wifi_ssid_iot
+  wifi_ssid: !secret wifi_ssid
   wifi_password: REDACTED
-  ota_password: ""  # Optional: set OTA password, or use ${wifi_password} for backward compatibility (see migration guide)
-  language: en      # Language code - see docs/localization.md for all supported codes
+  ota_password: ""
+  language: en
   boot_sound: false
-  # Add-on configuration (if needed)
-  ## Upload TFT
   upload_tft_automatically: true
-  ## Climate add-on
-  # heater_relay: "1"  # Possible values: "1" or "2"
 
-# Customization area
 ##### My customization - Start #####
 ##### My customization - End #####
 
-# Core and optional configurations
 packages:
   remote_package:
     url: https://github.com/edwardtfn/NSPanel-Easy
     ref: latest
     refresh: 300s
     files:
-      - nspanel_esphome.yaml # Basic package
-      # Optional advanced and add-on configurations
-      # - esphome/nspanel_esphome_addon_climate_cool.yaml
-      # - esphome/nspanel_esphome_addon_climate_heat.yaml
-      # - esphome/nspanel_esphome_addon_climate_dual.yaml
-      # - esphome/nspanel_esphome_addon_cover.yaml
-      # - esphome/nspanel_esphome_addon_display_light.yaml  # Show the display as a light in Home Assistant
+      - nspanel_esphome.yaml
