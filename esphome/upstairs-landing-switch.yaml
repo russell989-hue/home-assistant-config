@@ -1,0 +1,20 @@
+substitutions:
+  device_name: "upstairs-landing-switch"
+  friendly_name: "Upstairs Landing Switch"
+  wifi_ssid: !secret wifi_ssid
+  wifi_password: REDACTED
+  ota_password: ""
+  language: en
+  boot_sound: false
+  upload_tft_automatically: true
+
+##### My customization - Start #####
+##### My customization - End #####
+
+packages:
+  remote_package:
+    url: https://github.com/edwardtfn/NSPanel-Easy
+    ref: latest
+    refresh: 300s
+    files:
+      - nspanel_esphome.yaml
