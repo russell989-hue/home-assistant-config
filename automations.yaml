@@ -630,7 +630,7 @@
       right_button_entity: light.front_door_light_switch_relay_1
       right_button_name: Foyer
       screensaver_display_time: true
-      screensaver_display_time_font_size: '6'
+      screensaver_display_time_font_size: '11'
       temperature_unit: °F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
@@ -655,6 +655,7 @@
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
       screensaver_display_time: true
+      screensaver_display_time_font_size: '11'
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779773167330'
   alias: Bedroom Light Settings
@@ -698,7 +699,7 @@
       right_button_entity: light.downstairs_landing_light_panel_relay_1
       right_button_name: Stairwell
       screensaver_display_time: true
-      screensaver_display_time_font_size: '6'
+      screensaver_display_time_font_size: '11'
       temperature_unit: F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
@@ -723,14 +724,14 @@
       right_button_entity: light.dining_cans
       right_button_name: Dining Room Cans
       screensaver_display_time: true
-      screensaver_display_time_font_size: '6'
+      screensaver_display_time_font_size: '11'
       temperature_unit: °F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
     path: edwardtfn/nspanel_easy_blueprint.yaml
-- alias: Kitchen Panel Settings
+- id: '1779823749940'
+  alias: Kitchen Panel Settings
   description: ''
-  id: '1779823749940'
   use_blueprint:
     input:
       button_pages_icon_size: '10'
@@ -745,7 +746,7 @@
       right_button_entity: switch.kitchen_light_panel_kitchen_cans
       right_button_name: Kitchen Cans
       screensaver_display_time: true
-      screensaver_display_time_font_size: '6'
+      screensaver_display_time_font_size: '11'
       temperature_unit: °F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
@@ -1303,6 +1304,7 @@
       entity02: scene.speakeasy_movie_mode
       entity03: automation.secure_home_lights_off_doors_locked_shadowfax_check
       screensaver_display_time: true
+      screensaver_display_time_font_size: '11'
 - id: '1782197029408'
   alias: Brian's Lamp Night Timer
   description: ''
