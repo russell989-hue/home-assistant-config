@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:adamgibbons/ics
+METHOD:PUBLISH
+X-PUBLISHED-TTL:PT1H
+BEGIN:VEVENT
+UID:0PlKk3CeeQDjvOV4mMyNZ
+SUMMARY:Splash Before We Sail
+DTSTAMP:20260630T013450Z
+DTSTART:20260919T110000
+DTEND:20260919T140000
+DESCRIPTION:We completely understand if you need a slow morning and sleep a
+	fter a night of celebrations. But if you find yourself ready for a splash 
+	in the pool\, we would love to see you there.
+LOCATION:Hacienda at Rancho Valencia Resort & Spa 5921 Valencia Cir Rancho 
+	Santa Fe CA 92067
+END:VEVENT
+END:VCALENDAR

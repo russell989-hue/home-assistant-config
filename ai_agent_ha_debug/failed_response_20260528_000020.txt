@@ -1,0 +1,48 @@
+Timestamp: 20260528_000020
+Provider: anthropic
+Error: Expecting value: line 1 column 1 (char 0)
+Response length: 674
+Response bytes: b'I\'ll help you create that automation. First, let me gather information about your lights, doors, and Shadowfax\'s location.\n\n```json\n{\n  "request_type": "data_request",\n  "request": "get_entities_by_domain",\n  "parameters": {\n    "domain": "light"\n  }\n}\n```\n\n```json\n{\n  "request_type": "data_request",\n  "request": "get_entities_by_domain",\n  "parameters": {\n    "domain": "lock"\n  }\n}\n```\n\n```json\n{\n  "request_type": "data_request",\n  "request": "get_entities_by_domain",\n  "parameters": {\n    "domain": "device_tracker"\n  }\n}\n```\n\n```json\n{\n  "request_type": "data_request",\n  "request": "get_entities_by_domain",\n  "parameters": {\n    "domain": "binary_sensor"\n  }\n}\n```'
+Response repr: 'I\'ll help you create that automation. First, let me gather information about your lights, doors, and Shadowfax\'s location.\n\n```json\n{\n  "request_type": "data_request",\n  "request": "get_entities_by_domain",\n  "parameters": {\n    "domain": "light"\n  }\n}\n```\n\n```json\n{\n  "request_type": "data_request",\n  "request": "get_entities_by_domain",\n  "parameters": {\n    "domain": "lock"\n  }\n}\n```\n\n```json\n{\n  "request_type": "data_request",\n  "request": "get_entities_by_domain",\n  "parameters": {\n    "domain": "device_tracker"\n  }\n}\n```\n\n```json\n{\n  "request_type": "data_request",\n  "request": "get_entities_by_domain",\n  "parameters": {\n    "domain": "binary_sensor"\n  }\n}\n```'
+Full response:
+I'll help you create that automation. First, let me gather information about your lights, doors, and Shadowfax's location.
+
+```json
+{
+  "request_type": "data_request",
+  "request": "get_entities_by_domain",
+  "parameters": {
+    "domain": "light"
+  }
+}
+```
+
+```json
+{
+  "request_type": "data_request",
+  "request": "get_entities_by_domain",
+  "parameters": {
+    "domain": "lock"
+  }
+}
+```
+
+```json
+{
+  "request_type": "data_request",
+  "request": "get_entities_by_domain",
+  "parameters": {
+    "domain": "device_tracker"
+  }
+}
+```
+
+```json
+{
+  "request_type": "data_request",
+  "request": "get_entities_by_domain",
+  "parameters": {
+    "domain": "binary_sensor"
+  }
+}
+```

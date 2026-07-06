@@ -107,6 +107,7 @@ template:
             {% endif %}
           {% endfor %}
           {{ ns.found }}
+
   # --- SECTION 1: TRIGGER-BASED SENSORS (Location & Trip Data) ---
   - trigger:
       - platform: state
@@ -125,6 +126,7 @@ template:
           longitude: "{{ state_attr('device_tracker.shadowfax_location', 'longitude') }}"
           speed: "{{ state_attr('device_tracker.shadowfax_location', 'speed') | float(0) }}"
           drive_mode: "{{ states('sensor.shadowfax_drive_mode') }}"
+
   # --- SECTION 2: STATE-BASED SELECTS (Seat Controls) ---
   - select:
       - name: "Driver Seat Combined"
@@ -461,6 +463,15 @@ template:
               No recent activity
             {% endif %}
           {% endif %}
+
+      # NSPanel temperature mirror — bypasses embedded_indoor_temperature shortcut
+      # for proper °F string display on panel home page
+      - name: "Office Panel Temperature F"
+        unique_id: office_panel_temp_f
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: "{{ states('sensor.office_light_switch_temperature') | float | round(1) }}"
 
   # -------------------------------------------------------------------
   # 5) Doorbell popup helper — auto-off binary sensor

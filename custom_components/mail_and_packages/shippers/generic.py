@@ -28,7 +28,7 @@ from custom_components.mail_and_packages.const import (
     SENSOR_DATA,
 )
 from custom_components.mail_and_packages.utils.cache import EmailCache
-from custom_components.mail_and_packages.utils.email import find_text
+from custom_components.mail_and_packages.utils.email import find_text, find_text_matches
 from custom_components.mail_and_packages.utils.imap import (
     email_fetch,
     email_fetch_headers,
@@ -100,8 +100,12 @@ class GenericShipper(Shipper):
         # but the delivered email is not.
         is_delivered = sensor_type.endswith("_delivered")
         search_date = date
-        if since_date and sensor_type.endswith(
-            ("_delivering", "_exception", "_delivered", "_packages")
+        if (
+            since_date
+            and sensor_type.endswith(
+                ("_delivering", "_exception", "_delivered", "_packages")
+            )
+            and sensor_type != "post_de_delivering"
         ):
             search_date = since_date
 
@@ -144,6 +148,9 @@ class GenericShipper(Shipper):
         if result[ATTR_TRACKING]:
             count = len(result[ATTR_TRACKING])
 
+        if is_delivered:
+            result["pre_filtered_tracking"] = result.get(ATTR_TRACKING, [])
+
         # For _delivered sensors, the extended-window search gives us tracking
         # numbers needed for deduplication (above), but the count must reflect
         # only today's deliveries so the sensor resets at midnight.
@@ -165,6 +172,7 @@ class GenericShipper(Shipper):
                 sensor_type, today_found, account, cache
             )
             count = len(today_tracking) if today_tracking else today_count
+            result[ATTR_TRACKING] = today_tracking
 
         result[ATTR_COUNT] = count
         if shipper_cfg:
@@ -217,10 +225,14 @@ class GenericShipper(Shipper):
         # Merge results and aggregate global tracking
         res = {}
         for sensor, sensor_res in batch_results:
+            tracking = (
+                sensor_res.pop("pre_filtered_tracking", [])
+                if sensor.endswith("_delivered")
+                else sensor_res.get(ATTR_TRACKING)
+            )
             res.update(sensor_res)
             # Expose per-sensor raw tracking for coordinator state management.
             # Keyed as "_tracking_details" to distinguish from the public data dict.
-            tracking = sensor_res.get(ATTR_TRACKING)
             if tracking and sensor.endswith(
                 ("_delivering", "_delivered", "_exception")
             ):
@@ -251,11 +263,17 @@ class GenericShipper(Shipper):
             if sensor not in sensor_res and ATTR_COUNT in sensor_res:
                 sensor_res[sensor] = sensor_res[ATTR_COUNT]
 
+            # Capture today-only tracking for _delivered sensors BEFORE
+            # _deduplicate_batch_tracking runs (which currently only modifies
+            # _delivering and _packages sensor results).
+            if sensor_res.get(ATTR_TRACKING) and sensor.endswith("_delivered"):
+                sensor_res[f"{sensor}_tracking"] = sensor_res[ATTR_TRACKING]
+
             # Record results for post-processing
             batch_results.append((sensor, sensor_res))
 
             # Aggregate all tracking numbers found
-            if ATTR_TRACKING in sensor_res:
+            if sensor_res.get(ATTR_TRACKING):
                 all_tracking.update(sensor_res[ATTR_TRACKING])
 
         return batch_results, all_tracking
@@ -386,11 +404,12 @@ class GenericShipper(Shipper):
         image_found = False
 
         (server_response, sdata) = await email_search(
-            account,
-            email_addresses,
-            date,
-            subjects,
-            forwarding_header,
+            account=account,
+            address=email_addresses,
+            date=date,
+            subject=subjects,
+            body=config.get(ATTR_BODY, ""),
+            header=forwarding_header,
         )
 
         if server_response == "OK" and sdata[0]:
@@ -527,19 +546,20 @@ class GenericShipper(Shipper):
     ) -> tuple[int, bool]:
         """Process a batch of matched unique emails."""
         image_found = False
-        count = await self._process_emails_by_type(
+        count, matched_ids = await self._process_emails_by_type(
             account, config, new_ids, current_count, cache
         )
-        found_data.append(b" ".join(new_ids))
+        if matched_ids:
+            found_data.append(b" ".join(matched_ids))
 
-        if shipper_cfg:
-            if await self._extract_images_for_shipper(
-                account, new_ids, shipper_cfg, cache
-            ):
-                image_found = True
+            if shipper_cfg:
+                if await self._extract_images_for_shipper(
+                    account, matched_ids, shipper_cfg, cache
+                ):
+                    image_found = True
 
-        if sensor_type.endswith("_delivered") and sensor_type != AMAZON_DELIVERED:
-            await self._check_amazon_mentions(account, new_ids, result, cache)
+            if sensor_type.endswith("_delivered") and sensor_type != AMAZON_DELIVERED:
+                await self._check_amazon_mentions(account, matched_ids, result, cache)
 
         return count, image_found
 
@@ -611,19 +631,20 @@ class GenericShipper(Shipper):
         ids: list,
         current_count: int,
         cache: EmailCache | None = None,
-    ) -> int:
+    ) -> tuple[int, list]:
         """Process emails based on body search or just count."""
         if ATTR_BODY in config:
             body_count = config.get(ATTR_BODY_COUNT, False)
             mock_data = (b" ".join(ids),)
-            return current_count + await find_text(
+            count, matched_ids = await find_text_matches(
                 mock_data,
                 account,
                 config[ATTR_BODY],
                 body_count,
                 cache,
             )
-        return current_count + len(ids)
+            return current_count + count, matched_ids
+        return current_count + len(ids), list(ids)
 
     async def _extract_images_for_shipper(
         self,

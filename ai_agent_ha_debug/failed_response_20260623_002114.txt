@@ -1,0 +1,13 @@
+Timestamp: 20260623_002114
+Provider: anthropic
+Error: Expecting value: line 1 column 1 (char 0)
+Response length: 419
+Response bytes: b'I can see you have an ESPHome NSPanel in the Primary Bedroom. To create an automation triggered by a button press on that panel, I need to know which button you want to use. I can see:\n\n- `binary_sensor.primary_bedroom_light_panel_left_button`\n- `binary_sensor.primary_bedroom_light_panel_right_button`\n\nWhich button would you like to use as the trigger? And what action should the automation perform when you press it?'
+Response repr: 'I can see you have an ESPHome NSPanel in the Primary Bedroom. To create an automation triggered by a button press on that panel, I need to know which button you want to use. I can see:\n\n- `binary_sensor.primary_bedroom_light_panel_left_button`\n- `binary_sensor.primary_bedroom_light_panel_right_button`\n\nWhich button would you like to use as the trigger? And what action should the automation perform when you press it?'
+Full response:
+I can see you have an ESPHome NSPanel in the Primary Bedroom. To create an automation triggered by a button press on that panel, I need to know which button you want to use. I can see:
+
+- `binary_sensor.primary_bedroom_light_panel_left_button`
+- `binary_sensor.primary_bedroom_light_panel_right_button`
+
+Which button would you like to use as the trigger? And what action should the automation perform when you press it?

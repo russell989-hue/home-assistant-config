@@ -672,6 +672,31 @@ function segmentTimeline(points, config, zones) {
     return segments;
 }
 
+function filterSpeedOutliers(points, maxSpeed) {
+    if (points.length < 3 || maxSpeed === 0) {
+        return points;
+    }
+    const filtered = [points[0]];
+    let index = 1;
+    while (index < points.length) {
+        const a = filtered[filtered.length - 1];
+        const b = points[index];
+        const c = points[index + 1];
+
+        if (!(b && c && speedBetweenPoints(a, b) > maxSpeed && speedBetweenPoints(a, c) <= maxSpeed)) {
+            filtered.push(b);
+        }
+        index += 1;
+    }
+    return filtered;
+}
+
+function speedBetweenPoints(a, b) {
+    const distanceKm = haversineMeters(toLatLon(a), toLatLon(b)) / 1000;
+    const durationH = (b.timestamp - a.timestamp) / (60 * 60 * 1000);
+    return distanceKm / durationH;
+}
+
 function detectStays(points, config) {
     const stayRadius = Math.max(10, config.stay_radius_m || 75);
     const minStayMs = Math.max(1, config.min_stay_minutes || 10) * 60000;
@@ -807,12 +832,11 @@ function collectZones(hass) {
 
 async function fetchEntityHistory(hass, entityId, date) {
     if (!hass || !entityId) return [];
-    const start = startOfDay(date);
-    const end = endOfDay(date);
+    const historyPadding = 6 * 60 * 60 * 1000;
     const message = {
         type: "history/history_during_period",
-        start_time: start.toISOString(),
-        end_time: end.toISOString(),
+        start_time: new Date(startOfDay(date).getTime() - historyPadding).toISOString(),
+        end_time: new Date(endOfDay(date).getTime() + historyPadding).toISOString(),
         entity_ids: [entityId],
         minimal_response: false,
         no_attributes: false,
@@ -820,7 +844,44 @@ async function fetchEntityHistory(hass, entityId, date) {
     };
 
     const response = await callWS(hass, message);
-    return extractEntityStates(response, entityId);
+    const states = extractEntityStates(response, entityId);
+    return clampHistoryToDay(states, date);
+}
+
+function clampHistoryToDay(states, date) {
+    const start = startOfDay(date);
+    const end = endOfDay(date);
+
+    const currentDayStates = [];
+    let previousState = null;
+    let previousTimestamp = null;
+    let nextState = null;
+    let nextTimestamp = null;
+
+    for (const state of states) {
+        const timestamp = state.lu * 1000;
+        if (timestamp < start) {
+            if (previousTimestamp === null || timestamp > previousTimestamp) {
+                previousState = state;
+                previousTimestamp = timestamp;
+            }
+        } else if (timestamp > end) {
+            if (nextTimestamp === null || timestamp < nextTimestamp) {
+                nextState = state;
+                nextTimestamp = timestamp;
+            }
+        } else {
+            currentDayStates.push(state);
+        }
+    }
+
+    if (previousState) {
+        currentDayStates.unshift({...previousState, lu: start / 1000, lc: start / 1000,});
+    }
+    if (nextState) {
+        currentDayStates.push({...nextState, lu: end / 1000, lc: end / 1000,});
+    }
+    return currentDayStates;
 }
 
 async function callWS(hass, message) {
@@ -855,7 +916,8 @@ async function getSegmentedTracks(date, config, hass, onQueueUpdate) {
         entityEntries.map(async (entry) => {
             const entityId = entry.entity;
             const rawStates = await fetchEntityHistory(hass, entityId, date);
-            const points = rawStates.map((state) => toPoint(state)).filter(Boolean);
+            const rawPoints = rawStates.map((state) => toPoint(state)).filter(Boolean).filter((p) => p.lat !== 0 || p.lon !== 0);
+            const points = filterSpeedOutliers(rawPoints, config.max_reasonable_speed_kmh);
 
             const placeEntityId = entry.places_entity || null;
             const placeStates = placeEntityId ? await fetchEntityHistory(hass, placeEntityId, date) : [];
@@ -15400,17 +15462,17 @@ function requireLeafletSrc () {
 var leafletSrcExports = requireLeafletSrc();
 var Leaflet = /*@__PURE__*/getDefaultExportFromCjs(leafletSrcExports);
 
-const DEFAULT_CENTER = [52.3731339, 4.8903147];
 const DEFAULT_ZOOM = 13;
 
 class TimelineLeafletMap {
-    constructor(mapElement) {
+    constructor(mapElement, homeZoneCenter = null) {
         if (!mapElement?.isConnected) {
             throw new Error("Cannot setup Leaflet map on disconnected element");
         }
 
         this._Leaflet = Leaflet;
         this._mapElement = mapElement;
+        this._homeZoneCenter = homeZoneCenter;
         this._leafletMap = Leaflet.map(mapElement, {zoomControl: true});
 
         const attribution =
@@ -15422,7 +15484,8 @@ class TimelineLeafletMap {
             maxZoom: 20,
         });
         tileLayer.addTo(this._leafletMap);
-        this._leafletMap.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+
+        if (this._homeZoneCenter) this._leafletMap.setView(this._homeZoneCenter, DEFAULT_ZOOM);
 
         this._mapLayers = [];
         this._fullDayPaths = [];
@@ -15528,7 +15591,10 @@ class TimelineLeafletMap {
         if (bounds === null) {
             bounds = this._fullDayPath?.points?.map((point) => point.point) || [];
         }
-        if (!bounds.length) return;
+        if (!bounds.length) {
+            if (this._homeZoneCenter) this._leafletMap.setView(this._homeZoneCenter, DEFAULT_ZOOM);
+            return;
+        }
         const normalizedBounds = bounds
             .map(normalizeLatLng)
             .filter((point) => point && Number.isFinite(point.lat) && Number.isFinite(point.lng));
@@ -15741,22 +15807,27 @@ function renderTimeline(segments, locale, config) {
         return `<div class="empty">${localize("timeline.empty")}</div>`;
     }
 
-    const firstIsStay = segments[0]?.type === "stay";
-    const lastIsStay = segments[segments.length - 1]?.type === "stay";
+    const entries = segments.map((segment, index) => ({segment, index}));
+    if (config.reverse_timeline_order) {
+        entries.reverse();
+    }
+
+    const firstIsStay = entries[0]?.segment?.type === "stay";
+    const lastIsStay = entries[entries.length - 1]?.segment?.type === "stay";
     const timelineClass = ["timeline", firstIsStay ? "trim-spine-top" : "", lastIsStay ? "trim-spine-bottom" : ""];
 
     return `
     <div class="${timelineClass.join(" ")}">
       <div class="spine"></div>
-      ${segments
-          .map((segment, index) =>
+      ${entries
+          .map(({segment, index}) =>
               renderSegment(segment, index, {
                   locale: locale,
                   iconMap: config.activity_icon_map || {},
                   distanceUnit: config.distance_unit || "metric",
                   hideMoving: Boolean(config.hide_moving),
-                  hideStartTime: index === 0 && firstIsStay,
-                  hideEndTime: index === segments.length - 1 && lastIsStay,
+                  hideStartTime: index === 0 && segment.type === "stay",
+                  hideEndTime: index === segments.length - 1 && segment.type === "stay",
               }),
           )
           .join("")}
@@ -15857,6 +15928,10 @@ function getConfigFormSchema() {
                                 name: "min_stay_minutes",
                                 selector: {number: {min: 1, step: 1, mode: "box"}},
                             },
+                            {
+                                name: "max_reasonable_speed_kmh",
+                                selector: {number: {min: 0, step: 1, mode: "box"}},
+                            },
                         ],
                     },
                 ],
@@ -15900,6 +15975,7 @@ function getConfigFormSchema() {
                         schema: [
                             {name: "hide_current_location", selector: {boolean: {}}},
                             {name: "hide_moving", selector: {boolean: {}}},
+                            {name: "reverse_timeline_order", selector: {boolean: {}}},
                         ],
                     },
                     {
@@ -15951,12 +16027,14 @@ const DEFAULT_CONFIG = {
     osm_api_key: null,
     stay_radius_m: 75,
     min_stay_minutes: 10,
+    max_reasonable_speed_kmh: 300,
     map_appearance: "auto",
     map_height_px: 200,
     distance_unit: "metric",
     colors: [],
     hide_current_location: false,
     hide_moving: false,
+    reverse_timeline_order: false,
     collapse_timeline: false,
     timeline_use_entity_color: false,
     debug: false,
@@ -16011,6 +16089,7 @@ class TimelineCard extends HTMLElement {
         this._setDarkMode();
         this._renderEntitySelector();
         if (!this._config.entity) return;
+        this._config.entity = normalizeEntityEntries(this._config, this._hass);
         const dateKey = formatDate(this._selectedDate);
         if (!this._cache.has(dateKey)) {
             this._ensureDay(this._selectedDate);
@@ -16019,7 +16098,6 @@ class TimelineCard extends HTMLElement {
             this._render();
             this._rendered = true;
         }
-        this._config.entity = normalizeEntityEntries(this._config, this._hass);
     }
 
     // noinspection JSUnusedGlobalSymbols
@@ -16262,7 +16340,7 @@ class TimelineCard extends HTMLElement {
 
         this._isLoadingMap = true;
         try {
-            this._mapView = new TimelineLeafletMap(container);
+            this._mapView = new TimelineLeafletMap(container, this._getHomeZoneCenter());
             this._setDarkMode();
             this._drawMapPaths();
         } catch (err) {
@@ -16429,6 +16507,14 @@ class TimelineCard extends HTMLElement {
         this._activeEntityIndex = index;
         this._renderEntitySelector(true);
         this._render();
+    }
+
+    _getHomeZoneCenter() {
+        const state = this._hass?.states?.["zone.home"];
+        const lat = Number(state?.attributes?.latitude);
+        const lng = Number(state?.attributes?.longitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+        return {lat, lng};
     }
 
     _fitMapToCurrentMode() {

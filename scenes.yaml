@@ -77,18 +77,6 @@
       icon: mdi:lightbulb
       friendly_name: Speakeasy Black Lamp
       state: 'on'
-    media_player.fire_tv_192_168_68_83:
-      adb_response: 'sendevent: /dev/input/event0: Permission denied'
-      hdmi_input:
-      device_class: tv
-      entity_picture: /api/media_player_proxy/media_player.fire_tv_192_168_68_83?token=REDACTED&cache=05377a96972306b7
-      friendly_name: Speakeasy Main TV
-      supported_features: 22961
-      state: idle
-    remote.fire_tv_192_168_68_83:
-      friendly_name: Speakeasy Main TV
-      supported_features: 0
-      state: unknown
     light.tz3210_dwzfzfjc_ts0505b:
       min_color_temp_kelvin: 2000
       max_color_temp_kelvin: 6535

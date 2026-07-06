@@ -1,37 +1,26 @@
-- id: '1775764304059'
-  alias: 5 min auto lock
-  description: ''
-  triggers:
-  - device_id: cd4ed681731aebf1948decd37efc02b4
-    domain: lock
-    entity_id: 430a192b46f72741058d64788ef8cd42
-    type: unlocked
-    trigger: device
-    for:
-      hours: 0
-      minutes: 5
-      seconds: 0
-  conditions: []
-  actions:
+- actions:
   - device_id: cd4ed681731aebf1948decd37efc02b4
     domain: lock
     entity_id: 430a192b46f72741058d64788ef8cd42
     type: lock
+  alias: 5 min auto lock
+  conditions: []
+  description: ''
+  id: '1775764304059'
   mode: single
-- id: '1775893852917'
-  alias: 'Shadowfax: Climate Safety Timeout'
-  description: Turns off climate after 1 hour in Park if Pet Mode is off
   triggers:
-  - entity_id: climate.shadowfax_cabin_climate
-    to: 'on'
+  - device_id: cd4ed681731aebf1948decd37efc02b4
+    domain: lock
+    entity_id: 430a192b46f72741058d64788ef8cd42
     for:
-      hours: 1
-    trigger: state
-  - entity_id: sensor.shadowfax_gear_selector
-    to: Park
-    for:
-      hours: 1
-    trigger: state
+      hours: 0
+      minutes: 5
+      seconds: 0
+    trigger: device
+    type: unlocked
+- actions:
+  - action: script.all_seats_off
+  alias: 'Shadowfax: Climate Safety Timeout'
   conditions:
   - condition: state
     entity_id: climate.shadowfax_cabin_climate
@@ -42,140 +31,141 @@
   - condition: state
     entity_id: sensor.shadowfax_pet_mode
     state: Not running
-  actions:
-  - action: script.all_seats_off
+  description: Turns off climate after 1 hour in Park if Pet Mode is off
+  id: '1775893852917'
   mode: restart
-- id: '1775969670747'
-  alias: Turn on Speakeasy TV When Computer On
-  description: ''
-  triggers: []
-  conditions: []
-  actions:
+  triggers:
+  - entity_id: climate.shadowfax_cabin_climate
+    for:
+      hours: 1
+    to: 'on'
+    trigger: state
+  - entity_id: sensor.shadowfax_gear_selector
+    for:
+      hours: 1
+    to: Park
+    trigger: state
+- actions:
   - action: androidtv.adb_command
-    metadata: {}
-    target:
-      device_id: e7e7e5508cc6cd57f9cc07bf81cda039
     data:
       command: POWER
-  - action: androidtv.adb_command
     metadata: {}
     target:
       device_id: e7e7e5508cc6cd57f9cc07bf81cda039
+  - action: androidtv.adb_command
     data:
       command: HDMI3
-  mode: single
-- id: '1777327937205'
-  alias: Turn off 5 hours
+    metadata: {}
+    target:
+      device_id: e7e7e5508cc6cd57f9cc07bf81cda039
+  alias: Turn on Speakeasy TV When Computer On
+  conditions: []
   description: ''
+  id: '1775969670747'
+  mode: single
+  triggers: []
+- actions:
+  - action: switch.turn_off
+    data: {}
+    metadata: {}
+    target:
+      entity_id: switch.speakeasy_black_lamp
+  alias: Turn off 5 hours
+  conditions: []
+  description: ''
+  id: '1777327937205'
+  mode: single
   triggers:
-  - type: turned_on
-    device_id: 42ae7895a9688d99bf981e9a9036b93b
-    entity_id: b13be207ee4b60e509dbe05c173d6b97
+  - device_id: 42ae7895a9688d99bf981e9a9036b93b
     domain: switch
-    trigger: device
+    entity_id: b13be207ee4b60e509dbe05c173d6b97
     for:
       hours: 5
       minutes: 0
       seconds: 0
-  conditions: []
-  actions:
-  - action: switch.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.speakeasy_black_lamp
-  mode: single
-- id: '1777328105052'
-  alias: Turn off 3 hours
-  description: ''
-  triggers:
-  - type: turned_on
-    device_id: f9b4782ed42e7f2cc4c82743c1be3c09
-    entity_id: 6c1747cc32b393c491bd7bbe5a68e9d0
-    domain: switch
     trigger: device
-    for:
-      hours: 3
-      minutes: 0
-      seconds: 0
-  conditions: []
-  actions:
+    type: turned_on
+- actions:
   - action: switch.turn_off
-    metadata: {}
     data: {}
+    metadata: {}
     target:
       device_id: f9b4782ed42e7f2cc4c82743c1be3c09
-  mode: single
-- id: '1777328247516'
-  alias: Turn off 3 hours nick lamp
+  alias: Turn off 3 hours
+  conditions: []
   description: ''
+  id: '1777328105052'
+  mode: single
   triggers:
-  - type: turned_on
-    device_id: 89e4fb70696f4369da50f54734fa2f1c
-    entity_id: 937bc46fc371e2c8f4b37e1a6ae82bc1
+  - device_id: f9b4782ed42e7f2cc4c82743c1be3c09
     domain: switch
-    trigger: device
+    entity_id: 6c1747cc32b393c491bd7bbe5a68e9d0
     for:
       hours: 3
       minutes: 0
       seconds: 0
-  conditions: []
-  actions:
+    trigger: device
+    type: turned_on
+- actions:
   - action: switch.turn_off
-    metadata: {}
     data: {}
+    metadata: {}
     target:
       device_id: 89e4fb70696f4369da50f54734fa2f1c
-  mode: single
-- id: '1778039192505'
-  alias: Kitchen Max Display- Show Dashboard
-  description: ''
-  triggers:
-  - trigger: media_player.stopped_playing
-    target:
-      entity_id: media_player.kitchen_max_display
-    options: {}
+  alias: Turn off 3 hours nick lamp
   conditions: []
-  actions:
+  description: ''
+  id: '1777328247516'
+  mode: single
+  triggers:
+  - device_id: 89e4fb70696f4369da50f54734fa2f1c
+    domain: switch
+    entity_id: 937bc46fc371e2c8f4b37e1a6ae82bc1
+    for:
+      hours: 3
+      minutes: 0
+      seconds: 0
+    trigger: device
+    type: turned_on
+- actions:
   - action: media_player.play_media
-    metadata: {}
-    target:
-      entity_id: media_player.kitchen_max_display
     data:
       media:
         media_content_id: nest-control-panels
         media_content_type: lovelace
         metadata:
-          title: Nest Control Panels
-          thumbnail: /api/brands/integration/lovelace/logo.png
-          media_class: app
+          browse_entity_id: media_player.kitchen_max_display
           children_media_class: app
+          media_class: app
           navigateIds:
           - {}
-          - media_content_type: lovelace
-            media_content_id: ''
-          - media_content_type: lovelace
-            media_content_id: nest-control-panels
-          browse_entity_id: media_player.kitchen_max_display
-  mode: single
-- id: trash_schedule_check
-  alias: Trash Schedule - Check Tomorrow
-  description: 'Sunday evening: check what''s being picked up Monday'
-  triggers:
-  - trigger: time
-    at: '18:00:00'
-  conditions:
-  - condition: time
-    weekday:
-    - sun
-  actions:
-  - action: calendar.get_events
+          - media_content_id: ''
+            media_content_type: lovelace
+          - media_content_id: nest-control-panels
+            media_content_type: lovelace
+          thumbnail: /api/brands/integration/lovelace/logo.png
+          title: Nest Control Panels
+    metadata: {}
     target:
-      entity_id: calendar.trash_recycling
+      entity_id: media_player.kitchen_max_display
+  alias: Kitchen Max Display- Show Dashboard
+  conditions: []
+  description: ''
+  id: '1778039192505'
+  mode: single
+  triggers:
+  - options: {}
+    target:
+      entity_id: media_player.kitchen_max_display
+    trigger: media_player.stopped_playing
+- actions:
+  - action: calendar.get_events
     data:
       duration:
         hours: 48
     response_variable: agenda
+    target:
+      entity_id: calendar.trash_recycling
   - variables:
       event_title: '{{ agenda[''calendar.trash_recycling''].events[0].summary | default('''')
         | lower }}
@@ -193,16 +183,17 @@
   - action: input_boolean.turn_{{ 'on' if 'large item' in event_title else 'off' }}
     target:
       entity_id: input_boolean.large_item
-- id: trash_schedule_clear
-  alias: Trash Schedule - Clear After Pickup
-  triggers:
-  - trigger: time
-    at: '12:00:00'
+  alias: Trash Schedule - Check Tomorrow
   conditions:
   - condition: time
     weekday:
-    - mon
-  actions:
+    - sun
+  description: 'Sunday evening: check what''s being picked up Monday'
+  id: trash_schedule_check
+  triggers:
+  - at: '18:00:00'
+    trigger: time
+- actions:
   - action: input_boolean.turn_off
     target:
       entity_id:
@@ -210,64 +201,69 @@
       - input_boolean.recycle
       - input_boolean.compost
       - input_boolean.large_item
-- alias: 'Basement: Manual lock = guest inside'
-  trigger:
-  - platform: state
-    entity_id: sensor.side_door_operator
-    to: Manual Lock
+  alias: Trash Schedule - Clear After Pickup
+  conditions:
+  - condition: time
+    weekday:
+    - mon
+  id: trash_schedule_clear
+  triggers:
+  - at: '12:00:00'
+    trigger: time
+- action:
+  - data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+    service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.basement_last_inside_signal
+  alias: 'Basement: Manual lock = guest inside'
   condition:
   - condition: state
     entity_id: calendar.zenobia_airbnb
     state: 'on'
-  action:
-  - service: input_datetime.set_datetime
-    target:
-      entity_id: input_datetime.basement_last_inside_signal
+  id: f80691550f284240a3ecce6d5eb22c45
+  mode: single
+  trigger:
+  - entity_id: sensor.side_door_operator
+    platform: state
+    to: Manual Lock
+- actions:
+  - action: input_datetime.set_datetime
     data:
       datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
-  mode: single
-  id: f80691550f284240a3ecce6d5eb22c45
-- id: 56a9a577389244b3a89d33efea82336d
+    target:
+      entity_id: input_datetime.basement_last_outside_signal
   alias: 'Basement: One touch lock = guest left'
+  conditions:
+  - condition: state
+    entity_id: calendar.zenobia_airbnb
+    state: 'on'
+  id: 56a9a577389244b3a89d33efea82336d
+  mode: single
   triggers:
   - entity_id:
     - sensor.side_door_operator
     to:
     - One-Touch Lock
     trigger: state
-  conditions:
-  - condition: state
-    entity_id: calendar.zenobia_airbnb
-    state: 'on'
-  actions:
-  - target:
-      entity_id: input_datetime.basement_last_outside_signal
-    data:
+- action:
+  - data:
       datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
-    action: input_datetime.set_datetime
-  mode: single
-- alias: 'Basement: Motion corroborates guest inside'
-  trigger:
-  - platform: state
-    entity_id: binary_sensor.downstairs_occupancy
-    to: 'on'
+    service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.basement_last_inside_signal
+  alias: 'Basement: Motion corroborates guest inside'
   condition:
   - condition: state
     entity_id: calendar.zenobia_airbnb
     state: 'on'
-  action:
-  - service: input_datetime.set_datetime
-    target:
-      entity_id: input_datetime.basement_last_inside_signal
-    data:
-      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
-  mode: single
   id: 6293266aca9b46568620c131ee4a139a
-- alias: 'Basement: Sync occupancy boolean from smart sensor'
+  mode: single
   trigger:
-  - platform: state
-    entity_id: binary_sensor.basement_guest_present
-  action:
+  - entity_id: binary_sensor.downstairs_occupancy
+    platform: state
+    to: 'on'
+- action:
   - choose:
     - conditions:
       - condition: state
@@ -285,24 +281,27 @@
       - service: input_boolean.turn_off
         target:
           entity_id: input_boolean.basement_airbnb_occupancy
-  mode: single
+  alias: 'Basement: Sync occupancy boolean from smart sensor'
   id: 02c3b822751a4dbeb24246e44f67893d
-- id: '1778278971843'
-  alias: Keep Camera Streams Alive
-  description: ''
-  triggers:
-  - trigger: homeassistant
-    event: start
-  conditions: []
-  actions:
+  mode: single
+  trigger:
+  - entity_id: binary_sensor.basement_guest_present
+    platform: state
+- actions:
   - action: shell_command.keep_streams_alive
     data: {}
-  mode: single
-- id: '1778371502291'
-  alias: AI Camera Events
+  alias: Keep Camera Streams Alive
+  conditions: []
   description: ''
+  id: '1778278971843'
+  mode: single
+  triggers:
+  - event: start
+    trigger: homeassistant
+- alias: AI Camera Events
+  description: ''
+  id: '1778371502291'
   use_blueprint:
-    path: valentinfrlch/event_summary.yaml
     input:
       camera_entities:
       - camera.doorbell
@@ -314,172 +313,625 @@
         hours: 0
         minutes: 5
         seconds: 0
-      provider: 01KR7JMHXJHTSC78891A458V37
-      model: gemini-2.5-flash
       important: true
+      model: gemini-2.5-flash
+      provider: 01KR7JMHXJHTSC78891A458V37
       trigger_state: 'on'
-- id: '1778381242657'
-  alias: Alley Camera AI
-  description: ''
-  use_blueprint:
     path: valentinfrlch/event_summary.yaml
+- alias: Alley Camera AI
+  description: ''
+  id: '1778381242657'
+  use_blueprint:
     input:
+      analysis_mode: Snapshot
       camera_entities:
       - camera.alley_live_view
-      trigger_state: 'on'
+      condition_notify: []
+      important: true
+      model: gemini-2.5-flash
+      provider: 01KR7JMHXJHTSC78891A458V37
       run_conditions:
       - condition: switch.is_on
-        target:
-          entity_id: switch.alley_motion_detection
         options:
           behavior: any
           for: 00:00:00
-      provider: 01KR7JMHXJHTSC78891A458V37
-      model: gemini-2.5-flash
-      important: true
-      condition_notify: []
-      analysis_mode: Snapshot
-- id: '1778652639214'
-  alias: NSPanel Easy Configuration (v2026.5.4)
-  description: Speakeasy Light Switch Settings
-  use_blueprint:
-    path: edwardtfn/nspanel_easy_blueprint.yaml
-    input:
-      nspanel_name: 03d83a2f79202e0e7a26f2d313e9ec00
-      temperature_unit: °F
-      time_format: '%I:%M %p'
-      date_format: '%A, %-m/%-d'
-      weather_entity: weather.forecast_home_2
-      indoortemp: sensor.speakeasy_sensor_temperature
-      relay1_local_fallback: true
-      left_button_entity: switch.light_switch_relay_2
-      left_button_name: Stairwell Light
-      right_button_entity: light.speakeasy_all_cans
-      right_button_name: Color Cans
-      home_value01_icon: ''
-      home_value02_icon: ''
-      home_value03_icon: ''
-      home_value04_icon: ''
-      home_custom_button01_icon: ''
-      home_custom_button01_name: Color Cans
-      home_custom_button02_icon: ''
-      home_custom_button02_name: Cans
-      home_custom_button03_icon: ''
-      home_custom_button04_icon: ''
-      home_custom_button05_icon: ''
-      home_custom_button06_icon: ''
-      home_custom_button07_icon: ''
-      button01: light.speakeasy_all_cans
-      button01_name: Color Cans
-      button02: switch.light_switch_relay_1
-      button02_name: Spksy Cans
-      button03: switch.light_switch_relay_2
-      button03_name: Stairwell
-      button04: light.living_room
-      button04_name: LivRm Cans
-      button05: light.kitchen_dimmer_light_1
-      button05_name: Kitchen
-      button06: scene.speakeasy_movie_mode
-      button06_name: Movie Mode
-      button07: input_boolean.movie_mode
-      button07_name: Movie Bool
-      button08: scene.all_off
-      button08_name: All Off
-      button09: lock.front_door_lock
-      button09_name: Front Door
-      button10: lock.garage_lock
-      button10_name: Garage
-      button11: lock.side_door
-      button11_name: Side Door
-      button12: alarm_control_panel.alarmo
-      button12_name: Alarm
-      button13: switch.front_door_motion_detection
-      button13_name: Front Motion
-      button14: switch.garage_interior_motion_detection
-      button14_name: Garage Cam
-      button_page03_label: Energy
-      button17: sensor.envoy_202504003929_current_power_production
-      button17_name: Solar Now
-      button18: sensor.envoy_202504003929_energy_production_today
-      button18_name: Today kWh
-      button19: sensor.total_solar_forecast_today
-      button19_name: Forecast
-      button20: sensor.xcel_itron_5_instantaneous_demand_value
-      button20_name: Grid Draw
-      button25: sensor.shadowfax_battery_state_of_charge
-      button25_name: Battery
-      button26: sensor.shadowfax_range
-      button26_name: Range
-      button27: climate.shadowfax_cabin_climate
-      button27_name: Cabin
-      button28: switch.shadowfax_charging_enabled
-      button28_name: Charging
-      button29: lock.shadowfax_closures
-      button29_name: Lock
-      entity01: switch.speakeasy_green_lamp
-      entity02: scene.speakeasy_movie_mode
-      entity03: lock.front_door_lock
-      entity04: alarm_control_panel.alarmo
-      climate: climate.upstairs_thermostat
-      relay_1_local_fallback: true
-      button_pages_icon_size: '10'
-      entity02_icon: ''
-- id: '1778689554255'
-  alias: Led Zeppelin
+        target:
+          entity_id: switch.alley_motion_detection
+      trigger_state: 'on'
+    path: valentinfrlch/event_summary.yaml
+- alias: ABBA
   description: ''
+  id: '1778689653949'
   use_blueprint:
-    path: local/music_button.yaml
     input:
+      button: button_4
       device_id: dc367df1d0f481ab0c91918ed522da4b
-      button: button_1
-      playlist:
-        entity_id: media_player.living_room
-        media_content_id: ''
-        media_content_type: ''
-      media_player: media_player.living_room
-- id: '1778689653949'
-  alias: ABBA
-  description: ''
-  use_blueprint:
-    path: local/music_button.yaml
-    input:
-      device_id: dc367df1d0f481ab0c91918ed522da4b
-      button: button_2
+      media_player: media_player.living_room_sonos
       playlist:
         entity_id: media_player.living_room_sonos
-        media_content_id: ''
-        media_content_type: ''
-      media_player: media_player.living_room_sonos
+        media_content_id: library://playlist/95
+        media_content_type: playlist
+        metadata:
+          children_media_class: track
+          media_class: playlist
+          navigateIds:
+          - {}
+          - media_content_id: playlists
+            media_content_type: music_assistant
+          - media_content_id: library://playlist/95
+            media_content_type: music
+          thumbnail:
+          title: ABBA
+    path: local/music_button.yaml
 - id: '1778690297093'
   alias: Rihanna
   description: ''
   use_blueprint:
-    path: local/music_button.yaml
     input:
-      device_id: 176c7e2dbfd60f2d304a788a0676b326
       button: button
+      device_id: 176c7e2dbfd60f2d304a788a0676b326
       media_player: media_player.living_room_sonos
       playlist:
         entity_id: media_player.living_room_sonos
         media_content_id: library://playlist/97
         media_content_type: playlist
         metadata:
-          title: Rihanna2
-          thumbnail:
-          media_class: playlist
           children_media_class: track
+          media_class: playlist
           navigateIds:
           - {}
-          - media_content_type: music_assistant
-            media_content_id: playlists
-          - media_content_type: music
-            media_content_id: library://playlist/97
-- id: '1778690427991'
+          - media_content_id: playlists
+            media_content_type: music_assistant
+          - media_content_id: library://playlist/97
+            media_content_type: music
+          thumbnail:
+          title: Rihanna2
+    path: local/music_button.yaml
+- alias: Earth Wind and Fire
+  description: ''
+  id: '1778691548625'
+  use_blueprint:
+    input:
+      button: button_1
+      device_id: dc367df1d0f481ab0c91918ed522da4b
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/98
+        media_content_type: playlist
+        metadata:
+          children_media_class: track
+          media_class: playlist
+          navigateIds:
+          - {}
+          - media_content_id: playlists
+            media_content_type: music_assistant
+          - media_content_id: library://playlist/98
+            media_content_type: music
+          thumbnail:
+          title: Earth Wind and Fire
+    path: local/music_button.yaml
+- actions:
+  - action: notify.send_message
+    data:
+      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
+        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
+        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
+        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
+        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
+        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
+        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
+        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
+        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
+        %}\n        {{ sfx }}"
+      title: '⚠️ Weather Alert:'
+    target:
+      entity_id:
+      - notify.brian_s_z_flip_7
+      - notify.galaxy_watch8_classic_qfxz
+      - notify.iphone_2
+      - notify.office_ipad
+  - action: notify.persistent_notification
+    data:
+      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
+        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
+        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
+        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
+        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
+        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
+        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
+        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
+        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
+        %}\n        {{ sfx }}"
+      title: '⚠️ Weather Alert:'
+    metadata: {}
+  alias: NWS Alerts
+  conditions:
+  - condition: template
+    value_template: '{% set alerts = state_attr(''sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts'',
+      ''Alerts'') or [] %} {% set keywords = [''Thunderstorm'', ''Hail'', ''Tornado'',
+      ''Severe'', ''Wind Advisory'', ''Winter Storm'', ''Blizzard'', ''Ice Storm'',
+      ''Flood'', ''Special Weather Statement''] %} {{ alerts | selectattr(''Event'',
+      ''defined'') | selectattr(''Event'', ''search'', keywords | join(''|''), true)
+      | list | count > 0 }}'
+  description: ''
+  id: '1778962057533'
+  mode: single
+  triggers:
+  - entity_id:
+    - sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts
+    trigger: state
+- actions:
+  - action: weather.get_forecasts
+    data:
+      type: hourly
+    response_variable: hourly_forecast
+    target:
+      entity_id: weather.forecast_home_2
+  - condition: template
+    value_template: '{% set bad = [''lightning'', ''lightning-rainy'', ''hail'', ''exceptional'',
+      ''pouring'', ''hurricane'', ''tornado''] %} {% set forecast = hourly_forecast[''weather.forecast_home_2''][''forecast''][:12]
+      %} {{ forecast | selectattr(''condition'', ''search'', bad | join(''|''), true)
+      | list | count > 0 }}'
+  - action: notify.send_message
+    data:
+      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
+        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
+        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
+        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
+        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
+        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
+      title: "\U0001F329️ Severe Weather Forecast Today"
+    target:
+      entity_id: notify.brian_s_z_flip_7
+  - action: persistent_notification.create
+    data:
+      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
+        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
+        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
+        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
+        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
+        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
+      title: Morning Forecast Alert
+  alias: Weather - Morning Forecast Alert
+  conditions: []
+  description: ''
+  id: '1778966311414'
+  mode: single
+  triggers:
+  - at: 07:00:00
+    trigger: time
+- actions:
+  - action: notify.send_message
+    data:
+      message: "{%- set zones = state_attr('device_tracker.shadowfax_location', 'in_zones')
+        or [] -%}\n{%- set sfx = '✅ Shadowfax is in the garage — protected.' if 'zone.garage'
+        in zones else ('⚠️ Shadowfax is at home but not in the garage.' if 'zone.home'
+        in zones or 'zone.front_door' in zones else ('❗ Shadowfax is on the street
+        — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax is away from
+        home!')) -%}\nThunderstorm detected — hail is possible.\n{{ sfx }}"
+      title: ⛈️ Thunderstorm Conditions Now
+    target:
+      entity_id: notify.brian_s_z_flip_7
+  - action: notify.persistent_notification
+    data: {}
+    metadata: {}
+  alias: Weather - Thunderstorm Conditions Now
+  conditions: []
+  description: ''
+  id: '1778966416586'
+  mode: single
+  triggers:
+  - entity_id:
+    - weather.forecast_home_2
+    to:
+    - lightning
+    trigger: state
+  - entity_id:
+    - weather.forecast_home_2
+    to:
+    - lightning-rainy
+    trigger: state
+- actions:
+  - action: media_player.play_media
+    data:
+      media:
+        media_content_id: office-ipad
+        media_content_type: lovelace
+        metadata:
+          browse_entity_id: media_player.office_display
+          children_media_class:
+          media_class: app
+          navigateIds:
+          - {}
+          - media_content_id: ''
+            media_content_type: lovelace
+          thumbnail: /api/brands/integration/lovelace/logo.png
+          title: Office iPad
+    metadata: {}
+    target:
+      entity_id: media_player.office_display
+  alias: Office Nest Display- Always on
+  conditions: []
+  description: ''
+  id: '1778991863770'
+  mode: single
+  triggers:
+  - options:
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 30
+    target:
+      entity_id: media_player.office_display
+    trigger: media_player.stopped_playing
+- id: '1779593649665'
+  alias: Office Light Switch
+  description: ''
+  use_blueprint:
+    input:
+      button_pages_icon_size: '10'
+      chip01: sensor.office_light_switch_temperature
+      climate: climate.upstairs_thermostat
+      compact_unit_display: false
+      custom_buttons_font_size: '8'
+      date_format: '%A, %-m/%-d'
+      entity01: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      home_custom_button01: switch.speakeasy_light_panel_relay_stairwell_light
+      left_button_entity: switch.office_light_switch_relay_1
+      left_button_name: Office Cans
+      nspanel_name: ed562eba2e2edd731ef23a91c1e34bbb
+      relay_1_local_fallback: true
+      right_button_entity: switch.upstairs_landing_light_switch_relay_1
+      right_button_name: Hallway
+      screensaver_display_time: true
+      screensaver_display_time_font_size: '11'
+      temperature_unit: °F
+      time_format: '%-I:%M %p'
+      weather_entity: weather.forecast_home_2
+      entity02: switch.speakeasy_light_panel_relay_stairwell_light
+      indoortemp: sensor.office_panel_temperature_f
+    path: edwardtfn/nspanel_easy_blueprint.yaml
+- id: '1779597970275'
+  alias: Front Door Light Switch
+  description: ''
+  use_blueprint:
+    input:
+      button_pages_icon_size: '10'
+      compact_unit_display: true
+      custom_buttons_font_size: '8'
+      date_format: '%A, %-m/%-d'
+      entity01: light.front_door_light_switch_relay_2
+      entity01_name: Front Door Ext.
+      left_button_entity: light.living_room
+      left_button_name: Living Room
+      nspanel_name: 068f64652ba9d4c080235eaaa67edeb3
+      relay_2_local_fallback: true
+      right_button_entity: light.front_door_light_switch_relay_1
+      right_button_name: Foyer
+      screensaver_display_time: true
+      screensaver_display_time_font_size: '6'
+      temperature_unit: °F
+      time_format: '%-I:%M %p'
+      weather_entity: weather.forecast_home_2
+      entity01_icon: mdi:lightbulb
+      entity02: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      entity02_name: Goodnight
+      entity02_icon: m3o:night-shelter
+    path: edwardtfn/nspanel_easy_blueprint.yaml
+- id: '1779764879918'
+  alias: Downstairs Landing Switch Layout
+  description: ''
+  use_blueprint:
+    input:
+      compact_unit_display: true
+      date_format: '%A %-m-%-d'
+      left_button_entity: light.downstairs_landing_light_panel_relay_1
+      left_button_name: Stairwell
+      nspanel_name: 94e03cf008c33172217cd0c3897b62a1
+      right_button_entity: light.dining_room_light_panel_relay_2
+      right_button_name: Dining Room
+      temperature_unit: °F
+      time_format: '%-I:%M %p'
+      weather_entity: weather.forecast_home_2
+      screensaver_display_time: true
+    path: edwardtfn/nspanel_easy_blueprint.yaml
+- id: '1779773167330'
+  alias: Bedroom Light Settings
+  description: ''
+  use_blueprint:
+    input:
+      compact_unit_display: true
+      date_format: '%A %d %b'
+      left_button_entity: switch.primary_bedroom_light_panel_relay_2
+      left_button_name: Ceiling Fan & Lights
+      nspanel_name: a41f11b399db0555f8afc9e093027de5
+      right_button_entity: light.primary_bed_cans
+      right_button_name: Color Cans
+      screensaver_display_time: true
+      screensaver_display_time_font_size: '11'
+      temperature_unit: °F
+      time_format: '%-I:%M %p'
+      weather_entity: weather.forecast_home_2
+      entity01: switch.brian_s_lamp
+      entity01_name: Brian's Lamp
+      entity03: input_button.brian_s_lamp_night_timer
+      entity03_icon: ''
+      button_page01_label: Buttons
+      entity02: switch.nicks_lamp
+      entity04: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      home_indoor_temp_visible: true
+    path: edwardtfn/nspanel_easy_blueprint.yaml
+- id: '1779819877530'
+  alias: Upstairs Landing Settings
+  description: ''
+  use_blueprint:
+    input:
+      button_pages_icon_size: '10'
+      climate: climate.upstairs_thermostat
+      compact_unit_display: false
+      custom_buttons_font_size: '8'
+      date_format: '%A, %-m/%-d'
+      left_button_entity: switch.upstairs_landing_light_switch_relay_1
+      left_button_name: Hallway
+      nspanel_name: 7445db432a326f61daafc8a470afdf68
+      right_button_entity: light.downstairs_landing_light_panel_relay_1
+      right_button_name: Stairwell
+      screensaver_display_time: true
+      screensaver_display_time_font_size: '6'
+      temperature_unit: F
+      time_format: '%-I:%M %p'
+      weather_entity: weather.forecast_home_2
+      indoortemp: sensor.upstairs_landing_light_switch_temperature
+      entity01: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      entity02: switch.kitchen_light_panel_hanging_lights
+      entity03: switch.kitchen_light_panel_kitchen_cans
+      entity04: light.living_room
+    path: edwardtfn/nspanel_easy_blueprint.yaml
+- id: '1779820074575'
+  alias: Dining Room Panel Settings
+  description: ''
+  use_blueprint:
+    input:
+      button_pages_icon_size: '10'
+      compact_unit_display: true
+      custom_buttons_font_size: '8'
+      date_format: '%A, %-m/%-d'
+      left_button_entity: light.dining_room_light_panel_relay_1
+      left_button_name: Patio
+      nspanel_name: 437d6985db69c862acb032970a5bc6bc
+      right_button_entity: light.dining_cans
+      right_button_name: Dining Room Cans
+      screensaver_display_time: true
+      screensaver_display_time_font_size: '6'
+      temperature_unit: °F
+      time_format: '%-I:%M %p'
+      weather_entity: weather.forecast_home_2
+    path: edwardtfn/nspanel_easy_blueprint.yaml
+- alias: Kitchen Panel Settings
+  description: ''
+  id: '1779823749940'
+  use_blueprint:
+    input:
+      button_pages_icon_size: '10'
+      compact_unit_display: true
+      custom_buttons_font_size: '8'
+      date_format: '%A, %-m/%-d'
+      left_button_entity: switch.kitchen_light_panel_hanging_lights
+      left_button_name: Hanging Lights
+      nspanel_name: f1d1966270c27a2d3129c8ad41865055
+      relay_1_local_fallback: true
+      relay_2_local_fallback: true
+      right_button_entity: switch.kitchen_light_panel_kitchen_cans
+      right_button_name: Kitchen Cans
+      screensaver_display_time: true
+      screensaver_display_time_font_size: '6'
+      temperature_unit: °F
+      time_format: '%-I:%M %p'
+      weather_entity: weather.forecast_home_2
+    path: edwardtfn/nspanel_easy_blueprint.yaml
+- actions:
+  - device_id: 068f64652ba9d4c080235eaaa67edeb3
+    domain: light
+    entity_id: 26f33bc7270ce3d2c0935cae584106cc
+    type: turn_on
+  - action: light.turn_on
+    data: {}
+    metadata: {}
+    target:
+      entity_id: light.dining_room_light_panel_relay_1
+  alias: Exterior Lights Sun Set
+  conditions: []
+  description: ''
+  id: '1779901746518'
+  mode: single
+  triggers:
+  - event: sunset
+    offset: 0
+    trigger: sun
+- actions:
+  - device_id: 068f64652ba9d4c080235eaaa67edeb3
+    domain: switch
+    entity_id: ee6fd5b781ac68b8356e3dcfc030a0d3
+    type: turn_off
+  - device_id: 437d6985db69c862acb032970a5bc6bc
+    domain: switch
+    entity_id: c18610f407c25b13ae6daf269c9c0688
+    type: turn_off
+  alias: Exterior Lights- Sunrise
+  conditions: []
+  description: ''
+  id: '1779901987923'
+  mode: single
+  triggers:
+  - event: sunrise
+    offset: 0
+    trigger: sun
+- alias: Led Zeppelin
+  description: ''
+  id: '1779921768497'
+  use_blueprint:
+    input:
+      button: button_2
+      device_id: dc367df1d0f481ab0c91918ed522da4b
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/94
+        media_content_type: music
+        metadata:
+          children_media_class:
+          media_class: playlist
+          navigateIds:
+          - {}
+          - media_content_id: playlists
+            media_content_type: music_assistant
+          thumbnail:
+          title: Led Zeppelin
+    path: local/music_button.yaml
+- alias: Queen
+  description: ''
+  id: '1779922213168'
+  use_blueprint:
+    input:
+      button: button_3
+      device_id: dc367df1d0f481ab0c91918ed522da4b
+      media_player: media_player.living_room
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/104
+        media_content_type: music
+        metadata:
+          children_media_class:
+          media_class: playlist
+          navigateIds:
+          - {}
+          - media_content_id: playlists
+            media_content_type: music_assistant
+          thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/cb2e851c74c042689496e6d8f0b9888a_thumb.jpg&provider=builtin&size=0
+          title: Queen
+    path: local/music_button.yaml
+- id: ai_agent_auto_1779948159386
+  alias: Secure Home - Lights Off, Doors Locked, Shadowfax Check
+  description: 'Turns off all interior lights, keeps exterior lights on, verifies
+    doors are locked, and checks that '
+  triggers: []
+  conditions: []
+  actions:
+  - target:
+      entity_id:
+      - light.office_light_switch_relay_1
+      - light.front_door_light_switch_relay_1
+      - light.downstairs_landing_light_panel_relay_1
+      - light.dining_room_light_panel_relay_2
+      - light.primary_bed_cans
+      - light.living_room
+      - light.speakeasy_all_cans
+    action: light.turn_off
+    data: {}
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: lock.front_door_lock
+      state:
+      - unlocked
+      - jammed
+    - condition: state
+      entity_id: lock.garage_lock
+      state: unlocked
+    - condition: state
+      entity_id: lock.side_door
+      state: unlocked
+  - data:
+      message: 'Warning: One or more doors are unlocked!'
+      title: Security Alert
+    action: notify.notify
+  - action: persistent_notification.create
+    data:
+      message: Door Unlocked or Jammed
+  - condition: not
+    conditions:
+    - condition: zone
+      entity_id: device_tracker.shadowfax_location
+      zone: zone.garage
+  - data:
+      message: 'Warning: Shadowfax is not in the garage!'
+      title: Vehicle Alert
+    action: notify.notify
+  mode: single
+- id: '1779984500987'
   alias: Rihanna
   description: ''
   use_blueprint:
     path: local/music_button.yaml
     input:
+      device_id: 7cc947e58e5035af7b3f0bc369d15985
+      button: button_4
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/114
+        media_content_type: music
+        metadata:
+          title: The Eagles
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1779984821653'
+  alias: Music Button (Play / Stop / Skip)
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      button: button_3
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/103
+        media_content_type: music
+        metadata:
+          title: Daft Punk
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+      device_id: 7cc947e58e5035af7b3f0bc369d15985
+- id: '1780091526413'
+  alias: Rihanna
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: 7cc947e58e5035af7b3f0bc369d15985
+      button: button_1
+      media_player: media_player.living_room_sonos
       playlist:
         entity_id: media_player.living_room_sonos
         media_content_id: library://playlist/97
@@ -493,24 +945,65 @@
           - {}
           - media_content_type: music_assistant
             media_content_id: playlists
-      device_id: 176c7e2dbfd60f2d304a788a0676b326
-      button: button
-      media_player: media_player.living_room_sonos
-- id: '1778691548625'
-  alias: Earth Wind and Fire
+- id: '1780091688645'
+  alias: Fleetwood Mac
   description: ''
   use_blueprint:
     path: local/music_button.yaml
     input:
-      device_id: dc367df1d0f481ab0c91918ed522da4b
-      button: button_3
+      device_id: 7cc947e58e5035af7b3f0bc369d15985
+      button: button_2
       media_player: media_player.living_room_sonos
       playlist:
         entity_id: media_player.living_room_sonos
-        media_content_id: library://playlist/98
+        media_content_id: library://playlist/110
+        media_content_type: music
+        metadata:
+          title: Fleetwood mac
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780091703042'
+  alias: Fleetwood Mac
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: 7cc947e58e5035af7b3f0bc369d15985
+      button: button_2
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/110
+        media_content_type: music
+        metadata:
+          title: Fleetwood mac
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780092416292'
+  alias: Lady Gaga
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: bf03cd594f71ef549b734bc5105ab23e
+      button: button_1
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/99
         media_content_type: playlist
         metadata:
-          title: Earth Wind and Fire
+          title: Lady Gaga
           thumbnail:
           media_class: playlist
           children_media_class: track
@@ -519,267 +1012,384 @@
           - media_content_type: music_assistant
             media_content_id: playlists
           - media_content_type: music
-            media_content_id: library://playlist/98
-- id: '1778715993569'
-  alias: Bedroom Light Settings
-  description: Primary Bedroom Switch Settings
+            media_content_id: library://playlist/99
+- id: '1780092429497'
+  alias: Lady Gaga
+  description: ''
   use_blueprint:
-    path: edwardtfn/nspanel_easy_blueprint.yaml
+    path: local/music_button.yaml
     input:
-      nspanel_name: a41f11b399db0555f8afc9e093027de5
-      temperature_unit: °F
-      time_format: '%I:%M %p'
-      date_format: '%A, %-m/%-d'
-      weather_entity: weather.forecast_home_2
-      indoortemp: sensor.upstairs_thermostat_temperature
-      relay1_local_fallback: true
-      left_button_entity: switch.primary_bedroom_light_switch_relay_2
-      left_button_name: Fan & Light
-      right_button_entity: light.primary_bed_cans
-      right_button_name: Color Cans
-      home_value01_icon: ''
-      home_value02_icon: ''
-      home_value03_icon: ''
-      home_value04_icon: ''
-      home_custom_button01_icon: ''
-      home_custom_button02_icon: ''
-      home_custom_button03_icon: ''
-      home_custom_button04_icon: ''
-      home_custom_button05_icon: ''
-      home_custom_button06_icon: ''
-      home_custom_button07_icon: ''
-      button_page01_label: Bedroom
-      button01: light.primary_bed_cans
-      button01_name: Bed Cans
-      button02: light.master_bedroom_dimmer_light_1
-      button02_name: Dimmer
-      button03: switch.brian_s_lamp
-      button03_name: Brian Lamp
-      button04: switch.nicks_lamp
-      button04_name: Nick Lamp
-      button05: switch.sonoff_100276281a_1
-      button05_name: Can Lights
-      button06: switch.sonoff_100276281a_2
-      button06_name: Fan & Light
-      button07: scene.primary_bedroom_lights_off
-      button07_name: Lights Off
-      button08: scene.primary_bedroom_all_off
-      button08_name: All Off
-      button09: light.speakeasy_all_cans
-      button09_name: Speakeasy
-      button10: light.living_room
-      button10_name: LivRm Cans
-      button11: light.kitchen_dimmer_light_1
-      button11_name: Kitchen
-      button12: scene.speakeasy_movie_mode
-      button12_name: Movie Mode
-      button13: input_boolean.movie_mode
-      button13_name: Movie Bool
-      button14: scene.all_off
-      button14_name: All Off
-      button17: lock.front_door_lock
-      button17_name: Front Door
-      button18: lock.garage_lock
-      button18_name: Garage
-      button19: lock.side_door
-      button19_name: Side Door
-      button20: alarm_control_panel.alarmo
-      button20_name: Alarm
-      button25: sensor.shadowfax_battery_state_of_charge
-      button25_name: Battery
-      button26: sensor.shadowfax_range
-      button26_name: Range
-      button27: climate.shadowfax_cabin_climate
-      button27_name: Cabin
-      button28: switch.shadowfax_charging_enabled
-      button28_name: Charging
-      button29: lock.shadowfax_closures
-      button29_name: Lock
-      climate: climate.upstairs_thermostat
-      entity03_confirm: false
-      relay_1_local_fallback: false
-      entity01: switch.brian_s_lamp
-      entity02: switch.nicks_lamp
-      entity03: alarm_control_panel.alarmo
-      button_pages_icon_size: '10'
-      screensaver_display_time: true
-      home_button08_icon: ''
-      utilities_page01_icon: ''
-      utilities_page01_home_icon: ''
-      utilities_page01_grid_icon: ''
-      entity04: lock.front_door_lock
-      compact_unit_display: true
-- id: '1778962057533'
-  alias: NWS Alerts
-  description: ''
-  triggers:
-  - entity_id:
-    - sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts
-    trigger: state
-  conditions:
-  - condition: template
-    value_template: '{% set alerts = state_attr(''sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts'',
-      ''Alerts'') or [] %} {% set keywords = [''Thunderstorm'', ''Hail'', ''Tornado'',
-      ''Severe'', ''Wind Advisory'', ''Winter Storm'', ''Blizzard'', ''Ice Storm'',
-      ''Flood'', ''Special Weather Statement''] %} {{ alerts | selectattr(''Event'',
-      ''defined'') | selectattr(''Event'', ''search'', keywords | join(''|''), true)
-      | list | count > 0 }}'
-  actions:
-  - action: notify.send_message
-    target:
-      entity_id:
-      - notify.brian_s_z_flip_7
-      - notify.galaxy_watch8_classic_qfxz
-      - notify.iphone_2
-      - notify.office_ipad
-    data:
-      title: '⚠️ Weather Alert:'
-      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
-        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
-        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
-        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
-        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
-        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
-        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
-        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
-        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
-        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
-        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
-        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
-        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
-        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
-        %}\n        {{ sfx }}"
-  - action: notify.persistent_notification
-    metadata: {}
-    data:
-      title: '⚠️ Weather Alert:'
-      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
-        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
-        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
-        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
-        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
-        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
-        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
-        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
-        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
-        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
-        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
-        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
-        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
-        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
-        %}\n        {{ sfx }}"
-  mode: single
-- id: '1778966311414'
-  alias: Weather - Morning Forecast Alert
-  description: ''
-  triggers:
-  - trigger: time
-    at: 07:00:00
-  conditions: []
-  actions:
-  - action: weather.get_forecasts
-    data:
-      type: hourly
-    response_variable: hourly_forecast
-    target:
-      entity_id: weather.forecast_home_2
-  - condition: template
-    value_template: '{% set bad = [''lightning'', ''lightning-rainy'', ''hail'', ''exceptional'',
-      ''pouring'', ''hurricane'', ''tornado''] %} {% set forecast = hourly_forecast[''weather.forecast_home_2''][''forecast''][:12]
-      %} {{ forecast | selectattr(''condition'', ''search'', bad | join(''|''), true)
-      | list | count > 0 }}'
-  - action: notify.send_message
-    target:
-      entity_id: notify.brian_s_z_flip_7
-    data:
-      title: "\U0001F329️ Severe Weather Forecast Today"
-      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
-        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
-        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
-        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
-        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
-        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
-        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
-        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
-        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
-        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
-        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
-  - action: persistent_notification.create
-    data:
-      title: Morning Forecast Alert
-      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
-        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
-        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
-        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
-        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
-        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
-        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
-        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
-        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
-        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
-        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
-  mode: single
-- id: '1778966416586'
-  alias: Weather - Thunderstorm Conditions Now
-  description: ''
-  triggers:
-  - trigger: state
-    entity_id:
-    - weather.forecast_home_2
-    to:
-    - lightning
-  - trigger: state
-    entity_id:
-    - weather.forecast_home_2
-    to:
-    - lightning-rainy
-  conditions: []
-  actions:
-  - action: notify.send_message
-    target:
-      entity_id: notify.brian_s_z_flip_7
-    data:
-      title: ⛈️ Thunderstorm Conditions Now
-      message: "{%- set zones = state_attr('device_tracker.shadowfax_location', 'in_zones')
-        or [] -%}\n{%- set sfx = '✅ Shadowfax is in the garage — protected.' if 'zone.garage'
-        in zones else ('⚠️ Shadowfax is at home but not in the garage.' if 'zone.home'
-        in zones or 'zone.front_door' in zones else ('❗ Shadowfax is on the street
-        — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax is away from
-        home!')) -%}\nThunderstorm detected — hail is possible.\n{{ sfx }}"
-  - action: notify.persistent_notification
-    metadata: {}
-    data: {}
-  mode: single
-- id: '1778991863770'
-  alias: Office Nest Display- Always on
-  description: ''
-  triggers:
-  - trigger: media_player.stopped_playing
-    target:
-      entity_id: media_player.office_display
-    options:
-      for:
-        hours: 0
-        minutes: 0
-        seconds: 30
-  conditions: []
-  actions:
-  - action: media_player.play_media
-    metadata: {}
-    target:
-      entity_id: media_player.office_display
-    data:
-      media:
-        media_content_id: office-ipad
-        media_content_type: lovelace
+      device_id: bf03cd594f71ef549b734bc5105ab23e
+      button: button_1
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/99
+        media_content_type: playlist
         metadata:
-          title: Office iPad
-          thumbnail: /api/brands/integration/lovelace/logo.png
-          media_class: app
+          title: Lady Gaga
+          thumbnail:
+          media_class: playlist
+          children_media_class: track
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+          - media_content_type: music
+            media_content_id: library://playlist/99
+- id: '1780092515066'
+  alias: Tupac
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: bf03cd594f71ef549b734bc5105ab23e
+      button: button_2
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/109
+        media_content_type: music
+        metadata:
+          title: Tupac
+          thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/a6d855d2aef24f0facb069979ad1d220_thumb.jpg&provider=builtin&size=0
+          media_class: playlist
           children_media_class:
           navigateIds:
           - {}
-          - media_content_type: lovelace
-            media_content_id: ''
-          browse_entity_id: media_player.office_display
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780092592498'
+  alias: Tupac
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: bf03cd594f71ef549b734bc5105ab23e
+      button: button_4
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/100
+        media_content_type: music
+        metadata:
+          title: Amy Winehouse
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780092689961'
+  alias: Michael Jackson
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      button: button_3
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/102
+        media_content_type: music
+        metadata:
+          title: Michael Jackson
+          thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/afb4ab3bbf5f4f288ccad0ba3be62d1e_thumb.jpg&provider=builtin&size=0
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+      device_id: bf03cd594f71ef549b734bc5105ab23e
+- id: '1780092694800'
+  alias: Michael Jackson
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      button: button_3
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/102
+        media_content_type: music
+        metadata:
+          title: Michael Jackson
+          thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/afb4ab3bbf5f4f288ccad0ba3be62d1e_thumb.jpg&provider=builtin&size=0
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+      device_id: bf03cd594f71ef549b734bc5105ab23e
+- id: '1780093120472'
+  alias: Prince
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: b5d09b2832467bf93b17e533033a8389
+      button: button_1
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/105
+        media_content_type: music
+        metadata:
+          title: Prince
+          thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/255f2cc89718420a95e76c55b4f2cf7a_thumb.jpg&provider=builtin&size=0
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780093130973'
+  alias: Prince
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: b5d09b2832467bf93b17e533033a8389
+      button: button_1
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/105
+        media_content_type: music
+        metadata:
+          title: Prince
+          thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/255f2cc89718420a95e76c55b4f2cf7a_thumb.jpg&provider=builtin&size=0
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780095131389'
+  alias: Miley Cyrus
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: b5d09b2832467bf93b17e533033a8389
+      button: button_2
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/107
+        media_content_type: music
+        metadata:
+          title: Miley
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780095145000'
+  alias: Miley Cyrus
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: b5d09b2832467bf93b17e533033a8389
+      button: button_2
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/107
+        media_content_type: music
+        metadata:
+          title: Miley
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780095286457'
+  alias: Band of Horses
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      button: button_4
+      device_id: b5d09b2832467bf93b17e533033a8389
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/108
+        media_content_type: music
+        metadata:
+          title: Band of Horses
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780095347846'
+  alias: Foo Fighters
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      button: button_3
+      device_id: b5d09b2832467bf93b17e533033a8389
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/106
+        media_content_type: music
+        metadata:
+          title: Foo Fighters
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780095360050'
+  alias: Foo Fighters
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      button: button_3
+      device_id: b5d09b2832467bf93b17e533033a8389
+      media_player: media_player.living_room_sonos
+      playlist:
+        entity_id: media_player.living_room_sonos
+        media_content_id: library://playlist/106
+        media_content_type: music
+        metadata:
+          title: Foo Fighters
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1780266778627'
+  alias: Speakeasy Panel Settings
+  description: ''
+  use_blueprint:
+    path: edwardtfn/nspanel_easy_blueprint.yaml
+    input:
+      nspanel_name: 03d83a2f79202e0e7a26f2d313e9ec00
+      date_format: '%A, %-m/%-d'
+      time_format: '%-I:%M %p'
+      temperature_unit: °F
+      compact_unit_display: true
+      weather_entity: weather.forecast_home_2
+      indoortemp: sensor.speakeasy_sensor_temperature
+      climate: climate.upstairs_thermostat
+      left_button_entity: light.speakeasy_all_cans
+      left_button_name: Color Cans
+      right_button_entity: switch.speakeasy_light_panel_relay_stairwell_light
+      right_button_name: Stairwell
+      entity01: switch.speakeasy_black_lamp
+      entity01_name: Lamp
+      button_page01_label: Buttons
+      entity02: scene.speakeasy_movie_mode
+      entity03: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      screensaver_display_time: true
+- id: '1782197029408'
+  alias: Brian's Lamp Night Timer
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id: input_button.brian_s_lamp_night_timer
+  conditions: []
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.brian_s_lamp
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.brian_s_lamp
+    data: {}
   mode: single
+- id: '1783140323732'
+  alias: Florence and the Machine
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      button: button
+      media_player: media_player.office_sonos
+      device_id: cea48017eb5433dc0ba67ff7b61fcad2
+      playlist:
+        entity_id: media_player.office_sonos
+        media_content_id: library://playlist/117
+        media_content_type: music
+        metadata:
+          title: Florence and the Machine
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1783195915099'
+  alias: Johnny Cash
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: 176c7e2dbfd60f2d304a788a0676b326
+      button: button
+      media_player: media_player.office_sonos
+      playlist:
+        entity_id: media_player.office_sonos
+        media_content_id: library://playlist/121
+        media_content_type: music
+        metadata:
+          title: Johnny Cash
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists
+- id: '1783196786300'
+  alias: Griz
+  description: ''
+  use_blueprint:
+    path: local/music_button.yaml
+    input:
+      device_id: df0811d947fc0fc2f480cad856fbff6a
+      button: button
+      media_player: media_player.office_sonos
+      playlist:
+        entity_id: media_player.office_sonos
+        media_content_id: library://playlist/122
+        media_content_type: music
+        metadata:
+          title: Griz
+          thumbnail:
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: music_assistant
+            media_content_id: playlists

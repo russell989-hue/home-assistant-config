@@ -1,0 +1,32 @@
+esphome:
+  name: speakeasy-light-panel
+  friendly_name: Speakeasy Light Panel
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "uOLgYWo3wJzWVdDSyz1tWjT+u6XQ7M6lWeK/mfltv00="
+
+ota:
+  - platform: esphome
+    password: "REDACTED"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Speakeasy-Light-Panel"
+    password: "REDACTED"
+
+captive_portal:
+    

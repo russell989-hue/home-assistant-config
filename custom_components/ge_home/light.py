@@ -1,7 +1,7 @@
 """GE Home Select Entities"""
 import logging
 from collections.abc import Collection
-from typing import Callable
+from typing import Callable, Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -9,7 +9,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN
-from .entities import GeErdLight
+from .entities import GeErdLight, GeHoodLight
 from .devices import ApplianceApi
 from .update_coordinator import GeHomeUpdateCoordinator
 
@@ -17,7 +17,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: Callable
+    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: Callable[..., Any]
 ):
     """GE Home lights."""
     _LOGGER.debug("Adding GE Home lights")

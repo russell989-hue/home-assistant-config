@@ -22,6 +22,7 @@ from .const import (
     CONF_AUTH_TYPE,
     CONF_FEDEX_CUSTOM_IMG,
     CONF_FEDEX_CUSTOM_IMG_FILE,
+    CONF_FOLDER,
     CONF_FORWARDED_EMAILS,
     CONF_GENERIC_CUSTOM_IMG,
     CONF_GENERIC_CUSTOM_IMG_FILE,
@@ -139,7 +140,9 @@ async def async_setup_entry(
     if not coordinator.last_update_success:
         if isinstance(coordinator.last_exception, ConfigEntryAuthFailed):
             raise coordinator.last_exception
-        _LOGGER.error("Error updating sensor data: %s", coordinator.last_exception)
+        exc = coordinator.last_exception
+        detail = (str(exc) or type(exc).__name__) if exc else "unknown error"
+        _LOGGER.error("Error updating sensor data: %s", detail)
         raise ConfigEntryNotReady
 
     config_entry.runtime_data = MailAndPackagesData(coordinator=coordinator, cameras=[])
@@ -212,6 +215,7 @@ def _migrate_legacy_versions(updated_config, version, config_entry):
     _migrate_versions_1_to_3(updated_config, version, config_entry)
     _migrate_versions_4_to_16(updated_config, version)
     _migrate_version_17(updated_config, version)
+    _migrate_version_18(updated_config, version)
 
 
 def _migrate_versions_1_to_3(updated_config, version, config_entry):
@@ -306,6 +310,19 @@ def _migrate_version_17(updated_config, version):
                 ]
             else:
                 updated_config.pop(CONF_FORWARDED_EMAILS, None)
+
+
+def _migrate_version_18(updated_config, version):
+    """Handle migration for version 18."""
+    if version <= 18:
+        if CONF_FOLDER in updated_config:
+            folder = updated_config[CONF_FOLDER]
+            if isinstance(folder, str):
+                updated_config[CONF_FOLDER] = folder.strip('"')
+            elif isinstance(folder, (list, tuple, set)):
+                updated_config[CONF_FOLDER] = [
+                    f.strip('"') for f in folder if isinstance(f, str)
+                ]
 
 
 def _apply_default_config(updated_config):
