@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace_dashboards",
+  "data": {
+    "items": [
+      {
+        "id": "map",
+        "icon": "mdi:map",
+        "title": "Map",
+        "url_path": "map",
+        "mode": "storage",
+        "require_admin": true,
+        "show_in_sidebar": false
+      },
+      {
+        "id": "home_map",
+        "show_in_sidebar": true,
+        "icon": "mdi:monitor-dashboard",
+        "title": "Custom Dashboards",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "home-map"
+      },
+      {
+        "id": "new_rivian",
+        "show_in_sidebar": true,
+        "title": "Shadowfax",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "new-rivian",
+        "icon": "mdi:car-estate"
+      },
+      {
+        "id": "dashboard_misc",
+        "show_in_sidebar": true,
+        "title": "Links etc.",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "dashboard-misc",
+        "icon": "mdi:link"
+      },
+      {
+        "id": "control_panel",
+        "show_in_sidebar": true,
+        "icon": "mdi:tablet-dashboard",
+        "title": "Control Panel",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "control-panel"
+      },
+      {
+        "id": "airbnb_dashboard",
+        "show_in_sidebar": true,
+        "icon": "mdi:bed",
+        "title": "AirBnB Dashboard",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "airbnb-dashboard"
+      },
+      {
+        "id": "mobile_test",
+        "show_in_sidebar": true,
+        "title": "Mobile Dashboard",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "mobile-test",
+        "icon": "mdi:cellphone"
+      },
+      {
+        "id": "office_ipad",
+        "show_in_sidebar": true,
+        "icon": "mdi:chair-rolling",
+        "title": "Office iPad",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "office-ipad"
+      },
+      {
+        "id": "ipad_pro",
+        "show_in_sidebar": true,
+        "icon": "mdi:sofa",
+        "title": "Living Room iPad",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "ipad-pro"
+      },
+      {
+        "id": "dashboard_rooms",
+        "show_in_sidebar": true,
+        "icon": "m3o:nest-multi-room",
+        "title": "Rooms",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "dashboard-rooms"
+      }
+    ]
+  }
+}

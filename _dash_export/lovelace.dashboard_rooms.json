@@ -1,0 +1,1422 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace.dashboard_rooms",
+  "data": {
+    "config": {
+      "title": "Rooms",
+      "views": [
+        {
+          "title": "Bedroom",
+          "path": "primary-bedroom",
+          "icon": "mdi:bed-king",
+          "type": "sections",
+          "max_columns": 3,
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Lights"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "Primary Bedroom",
+                  "subtitle": "{{ states('sensor.upstairs_thermostat_temperature') | round(1) }}°F  ·  {{ states('sensor.upstairs_thermostat_humidity') }}% RH",
+                  "icon": "mdi:bed-king",
+                  "icon_color": "purple"
+                },
+                {
+                  "type": "custom:mushroom-light-card",
+                  "entity": "light.primary_bed_cans",
+                  "name": "Cans",
+                  "show_brightness_control": true,
+                  "show_color_control": true,
+                  "collapsible_controls": true,
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "switch.brian_s_lamp",
+                  "name": "Brian's Lamp",
+                  "icon": "mdi:lamp",
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "switch.nicks_lamp",
+                  "name": "Nick's Lamp",
+                  "icon": "mdi:lamp",
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "switch.sonoff_100276281a_2",
+                  "name": "Fan + Light",
+                  "icon": "mdi:ceiling-fan-light",
+                  "icon_color": "orange"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Climate"
+                },
+                {
+                  "type": "thermostat",
+                  "entity": "climate.upstairs_thermostat"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.upstairs_thermostat_temperature",
+                  "name": "Temperature",
+                  "icon": "mdi:thermometer",
+                  "icon_color": "red"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.upstairs_thermostat_humidity",
+                  "name": "Humidity",
+                  "icon": "mdi:water-percent",
+                  "icon_color": "blue"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Media & Scenes"
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.primary_bed_fire_tv",
+                  "name": "Fire TV",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.nick_s_tv",
+                  "name": "Bedroom TV",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "All Off",
+                  "icon": "mdi:power",
+                  "icon_color": "red",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "scene.turn_on",
+                    "target": {
+                      "entity_id": "scene.primary_bedroom_all_off"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Lamps + TV",
+                  "icon": "mdi:lamp",
+                  "icon_color": "amber",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "scene.turn_on",
+                    "target": {
+                      "entity_id": "scene.primary_bedroom_lamps_and_tv_on"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Lights Off",
+                  "icon": "mdi:lightbulb-off",
+                  "icon_color": "grey",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "scene.turn_on",
+                    "target": {
+                      "entity_id": "scene.primary_bedroom_lights_off"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Remotes"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "name",
+                  "name": "Fire TV",
+                  "icon": "mdi:remote-tv",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "styles": "",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#bedroom-firetv"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#bedroom-firetv"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#bedroom-firetv",
+                  "name": "Fire TV Remote",
+                  "icon": "mdi:remote-tv",
+                  "cards": [
+                    {
+                      "type": "custom:firemote-card",
+                      "entity": "media_player.primary_bed_fire_tv",
+                      "device_family": "amazon-fire",
+                      "device_type": "fire_tv_4_series",
+                      "compatibility_mode": "default"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "New section"
+                },
+                {
+                  "type": "custom:room-summary-card",
+                  "area": "bedroom",
+                  "lights": [
+                    "switch.primary_bedroom_light_panel_relay_1",
+                    "switch.primary_bedroom_light_panel_relay_2",
+                    "switch.brian_s_lamp",
+                    "switch.nicks_lamp"
+                  ],
+                  "features": [
+                    "multi_light_background"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Speakeasy",
+          "path": "speakeasy",
+          "icon": "mdi:speaker-wireless",
+          "type": "sections",
+          "max_columns": 3,
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Lights"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "Speakeasy",
+                  "subtitle": "{{ states('sensor.downstairs_temperature') | round(1) }}°F",
+                  "icon": "mdi:speaker-wireless",
+                  "icon_color": "amber"
+                },
+                {
+                  "type": "custom:mushroom-light-card",
+                  "entity": "light.speakeasy_all_cans",
+                  "name": "Cans",
+                  "show_brightness_control": true,
+                  "show_color_control": true,
+                  "collapsible_controls": true,
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "switch.speakeasy_green_lamp",
+                  "name": "Green Lamp",
+                  "icon": "mdi:lamp",
+                  "icon_color": "green"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "switch.sonoff_1002762b6d_1",
+                  "name": "Can Power",
+                  "icon": "mdi:light-recessed",
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "switch.sonoff_1002762b6d_2",
+                  "name": "Stairwell",
+                  "icon": "mdi:stairs",
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "tile",
+                  "entity": "light.office_zigbee_dongle_speakeasy_tv_light_group"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Climate & Occupancy"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.downstairs_temperature",
+                  "name": "Temperature",
+                  "icon": "mdi:thermometer",
+                  "icon_color": "red"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "binary_sensor.downstairs_motion",
+                  "name": "Motion",
+                  "icon": "mdi:motion-sensor",
+                  "icon_color": "teal"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "binary_sensor.downstairs_occupancy",
+                  "name": "Occupancy",
+                  "icon": "mdi:account",
+                  "icon_color": "teal"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Media & Scenes"
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.fire_tv_192_168_68_83",
+                  "name": "Main TV",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.jbl_receiver_amp",
+                  "name": "JBL Receiver",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.nicks_speakeasy_tv",
+                  "name": "Nick's TV",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Movie Mode",
+                  "icon": "mdi:movie-play",
+                  "icon_color": "amber",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "scene.turn_on",
+                    "target": {
+                      "entity_id": "scene.speakeasy_movie_mode"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.br_desktop",
+                  "name": "BR Desktop",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Remotes"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "name",
+                  "name": "Main TV",
+                  "icon": "mdi:remote-tv",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "styles": "",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#speakeasy-main"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#speakeasy-main"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "name",
+                  "name": "JBL Amp",
+                  "icon": "mdi:amplifier",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "styles": "",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#speakeasy-jbl"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#speakeasy-jbl"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "name",
+                  "name": "Second TV",
+                  "icon": "mdi:remote-tv",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "styles": "",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#speakeasy-tv2"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#speakeasy-tv2"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#speakeasy-main",
+                  "name": "Main TV Remote",
+                  "icon": "mdi:remote-tv",
+                  "cards": [
+                    {
+                      "type": "custom:firemote-card",
+                      "entity": "media_player.fire_tv_192_168_68_83",
+                      "device_family": "amazon-fire",
+                      "device_type": "fire_tv_4_series",
+                      "compatibility_mode": "default",
+                      "app_launch_1": "hdmi_3"
+                    }
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#speakeasy-jbl",
+                  "name": "JBL Amp",
+                  "icon": "mdi:amplifier",
+                  "cards": [
+                    {
+                      "type": "custom:mushroom-title-card",
+                      "title": "JBL MA510",
+                      "subtitle": "{{ states('sensor.jbl_input') }}  · Vol {{ states('sensor.jbl_volume') }}  · {{ '🔇 Muted' if states('sensor.jbl_mute') == 'muted' else states('sensor.jbl_surround') }}",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": 1
+                      }
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "\n\n\n\n "
+                    },
+                    {
+                      "type": "button",
+                      "name": "Power On",
+                      "icon": "mdi:power",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_power_on"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Standby",
+                      "icon": "mdi:power-standby",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_power_off"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Mute",
+                      "icon": "mdi:volume-off",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_mute_on"
+                      },
+                      "hold_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_mute_off"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "custom:mushroom-title-card",
+                      "subtitle": "INPUT",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": 1
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "HDMI 1",
+                      "icon": "mdi:hdmi-port",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_input_hdmi1"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Bluetooth",
+                      "icon": "mdi:bluetooth",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_input_bt"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Network",
+                      "icon": "mdi:web",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_input_network"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "custom:mushroom-title-card",
+                      "subtitle": "VOLUME",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": 1
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Vol -",
+                      "icon": "mdi:volume-minus",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_vol_down"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "custom:mushroom-entity-card",
+                      "entity": "sensor.jbl_volume",
+                      "name": "Volume",
+                      "icon": "mdi:volume-high",
+                      "primary_info": "state",
+                      "secondary_info": "name",
+                      "tap_action": {
+                        "action": "none"
+                      },
+                      "grid_options": {
+                        "columns": 4,
+                        "rows": 2
+                      },
+                      "layout": "vertical"
+                    },
+                    {
+                      "type": "button",
+                      "name": "Vol +",
+                      "icon": "mdi:volume-plus",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_vol_up"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "custom:mushroom-title-card",
+                      "subtitle": "NAVIGATE",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": 1
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Menu",
+                      "icon": "mdi:menu",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_nav_menu"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Up",
+                      "icon": "mdi:chevron-up",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_nav_up"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Back",
+                      "icon": "mdi:arrow-u-left-top",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_nav_back"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Left",
+                      "icon": "mdi:chevron-left",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_nav_left"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "OK",
+                      "icon": "mdi:check-circle-outline",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_nav_ok"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Right",
+                      "icon": "mdi:chevron-right",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_nav_right"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "  ",
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Down",
+                      "icon": "mdi:chevron-down",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_nav_down"
+                      },
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "  ",
+                      "grid_options": {
+                        "columns": 4
+                      }
+                    },
+                    {
+                      "type": "custom:mushroom-title-card",
+                      "subtitle": "SURROUND",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": 1
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Native",
+                      "icon": "mdi:surround-sound",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_surr_native"
+                      },
+                      "grid_options": {
+                        "columns": 3
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "Stereo",
+                      "icon": "mdi:speaker-multiple",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_surr_stereo20"
+                      },
+                      "grid_options": {
+                        "columns": 3
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "All Stereo",
+                      "icon": "mdi:speaker-multiple",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_surr_allstereo"
+                      },
+                      "grid_options": {
+                        "columns": 3
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "name": "PL II",
+                      "icon": "mdi:dolby",
+                      "tap_action": {
+                        "action": "perform-action",
+                        "perform_action": "shell_command.jbl_surr_plii"
+                      },
+                      "grid_options": {
+                        "columns": 3
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#speakeasy-tv2",
+                  "name": "Second TV Remote",
+                  "icon": "mdi:remote-tv",
+                  "cards": [
+                    {
+                      "type": "custom:lg-remote-control",
+                      "entity": "media_player.nicks_speakeasy_tv",
+                      "colors": {
+                        "background": "#383838"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Kitchen",
+          "path": "kitchen",
+          "icon": "mdi:chef-hat",
+          "type": "sections",
+          "max_columns": 3,
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Lights"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "Kitchen",
+                  "subtitle": "{{ states('sensor.main_floor_current_temperature') | round(1) }}°F  ·  {{ states('sensor.main_floor_current_humidity') }}% RH",
+                  "icon": "mdi:chef-hat",
+                  "icon_color": "green"
+                },
+                {
+                  "type": "custom:mushroom-light-card",
+                  "entity": "light.kitchen_dimmer_light_1",
+                  "name": "Kitchen Light",
+                  "show_brightness_control": true,
+                  "collapsible_controls": true,
+                  "icon_color": "orange"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Climate"
+                },
+                {
+                  "type": "thermostat",
+                  "entity": "climate.main_floor"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.main_floor_current_temperature",
+                  "name": "Temperature",
+                  "icon": "mdi:thermometer",
+                  "icon_color": "red"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.main_floor_current_humidity",
+                  "name": "Humidity",
+                  "icon": "mdi:water-percent",
+                  "icon_color": "blue"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Media"
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.kitchen_max_display_2",
+                  "name": "Kitchen Display",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Camera"
+                },
+                {
+                  "type": "custom:webrtc-camera",
+                  "url": "kitchen"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Living Room",
+          "path": "living-room",
+          "icon": "mdi:sofa",
+          "type": "sections",
+          "max_columns": 3,
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Lights"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "Living Room",
+                  "subtitle": "{{ states('sensor.main_floor_current_temperature') | round(1) }}°F  ·  {{ states('sensor.main_floor_current_humidity') }}% RH",
+                  "icon": "mdi:sofa",
+                  "icon_color": "blue"
+                },
+                {
+                  "type": "custom:mushroom-light-card",
+                  "entity": "light.living_room",
+                  "name": "Living Room",
+                  "show_brightness_control": true,
+                  "collapsible_controls": true,
+                  "icon_color": "orange"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Climate"
+                },
+                {
+                  "type": "thermostat",
+                  "entity": "climate.main_floor"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.main_floor_current_temperature",
+                  "name": "Temperature",
+                  "icon": "mdi:thermometer",
+                  "icon_color": "red"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.main_floor_current_humidity",
+                  "name": "Humidity",
+                  "icon": "mdi:water-percent",
+                  "icon_color": "blue"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Media"
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.lg_webos_tv_uq7590pub",
+                  "name": "LG TV",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Remotes"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "name",
+                  "name": "LG TV",
+                  "icon": "mdi:remote-tv",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "styles": "",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#living-tv"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#living-tv"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#living-tv",
+                  "name": "Living Room TV",
+                  "icon": "mdi:remote-tv",
+                  "cards": [
+                    {
+                      "type": "custom:lg-remote-control",
+                      "entity": "media_player.living_room_tv",
+                      "colors": {
+                        "background": "#000000"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Office",
+          "path": "office",
+          "icon": "mdi:monitor",
+          "type": "sections",
+          "max_columns": 3,
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "System"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "Office",
+                  "subtitle": "GPU {{ states('sensor.office_gpuload') }}%",
+                  "icon": "mdi:monitor",
+                  "icon_color": "cyan"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.office_gpuload",
+                  "name": "GPU Load",
+                  "icon": "mdi:expansion-card",
+                  "icon_color": "cyan"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Media"
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.office_display_2",
+                  "name": "Office Display",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Desktop"
+                },
+                {
+                  "type": "custom:mushroom-media-player-card",
+                  "entity": "media_player.office",
+                  "name": "PC Audio",
+                  "use_media_info": true,
+                  "show_volume_level": true,
+                  "media_controls": [
+                    "on_off",
+                    "play_pause_stop"
+                  ],
+                  "collapsible_controls": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Remotes"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "name",
+                  "name": "Office TV",
+                  "icon": "mdi:remote-tv",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "styles": "",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#office-tv"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#office-tv"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#office-tv",
+                  "name": "Office TV",
+                  "icon": "mdi:remote-tv",
+                  "cards": [
+                    {
+                      "type": "custom:lg-remote-control",
+                      "entity": "media_player.office_tv_2",
+                      "colors": {
+                        "background": "#000000"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Garage",
+          "path": "garage",
+          "icon": "mdi:garage",
+          "type": "sections",
+          "max_columns": 3,
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Lights & Locks"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "Garage",
+                  "icon": "mdi:garage",
+                  "icon_color": "grey"
+                },
+                {
+                  "type": "custom:mushroom-light-card",
+                  "entity": "light.garage_interior_light",
+                  "name": "Garage Light",
+                  "show_brightness_control": true,
+                  "collapsible_controls": true,
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "lock.side_door",
+                  "name": "Side Door",
+                  "icon": "mdi:door-closed-lock",
+                  "icon_color": "red"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "binary_sensor.side_door_door",
+                  "name": "Door State",
+                  "icon": "mdi:door",
+                  "icon_color": "red"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Washer"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.ge_washer_d828c9a07203_d828c9a07203_laundry_machine_state",
+                  "name": "State",
+                  "icon": "mdi:washing-machine",
+                  "icon_color": "blue"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.ge_washer_d828c9a07203_d828c9a07203_laundry_cycle",
+                  "name": "Cycle",
+                  "icon": "mdi:sync",
+                  "icon_color": "blue"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "binary_sensor.ge_washer_d828c9a07203_d828c9a07203_laundry_end_of_cycle",
+                  "name": "End of Cycle",
+                  "icon": "mdi:check-circle",
+                  "icon_color": "green"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Dryer"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.ge_dryer_av102747g_av102747g_laundry_machine_state",
+                  "name": "State",
+                  "icon": "mdi:tumble-dryer",
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.ge_dryer_av102747g_av102747g_laundry_cycle",
+                  "name": "Cycle",
+                  "icon": "mdi:sync",
+                  "icon_color": "orange"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "binary_sensor.ge_dryer_av102747g_av102747g_laundry_end_of_cycle",
+                  "name": "End of Cycle",
+                  "icon": "mdi:check-circle",
+                  "icon_color": "green"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Garage Cam"
+                },
+                {
+                  "type": "custom:webrtc-camera",
+                  "url": "garage"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Side Door Cam"
+                },
+                {
+                  "type": "custom:webrtc-camera",
+                  "url": "side_door"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Basement",
+          "path": "basement",
+          "icon": "mdi:stairs-down",
+          "type": "sections",
+          "max_columns": 3,
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Climate"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "Basement / AirBnB",
+                  "subtitle": "{{ states('sensor.downstairs_temperature') | round(1) }}°F",
+                  "icon": "mdi:stairs-down",
+                  "icon_color": "teal"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.downstairs_temperature",
+                  "name": "Temperature",
+                  "icon": "mdi:thermometer",
+                  "icon_color": "red"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Occupancy"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "binary_sensor.downstairs_motion",
+                  "name": "Motion",
+                  "icon": "mdi:motion-sensor",
+                  "icon_color": "teal"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "binary_sensor.downstairs_occupancy",
+                  "name": "Occupancy",
+                  "icon": "mdi:account",
+                  "icon_color": "teal"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "AirBnB Tablet"
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.airbnb_ipad_battery_level",
+                  "name": "iPad Battery",
+                  "icon": "mdi:battery",
+                  "icon_color": "teal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Backyard",
+          "path": "backyard",
+          "icon": "mdi:tree",
+          "type": "sections",
+          "max_columns": 3,
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Lights"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "Backyard",
+                  "icon": "mdi:tree",
+                  "icon_color": "light-green"
+                },
+                {
+                  "type": "custom:mushroom-light-card",
+                  "entity": "light.alley_light",
+                  "name": "Alley Light",
+                  "show_brightness_control": true,
+                  "collapsible_controls": true,
+                  "icon_color": "orange"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Backyard Cam"
+                },
+                {
+                  "type": "custom:webrtc-camera",
+                  "url": "backyard"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Alley Cam"
+                },
+                {
+                  "type": "custom:webrtc-camera",
+                  "entity": "camera.alley_live_view"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

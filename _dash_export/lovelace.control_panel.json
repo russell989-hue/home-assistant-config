@@ -1,0 +1,898 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace.control_panel",
+  "data": {
+    "config": {
+      "views": [
+        {
+          "type": "sections",
+          "path": "new",
+          "title": "Home (ipad Copy)",
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "entity",
+                  "entity": "binary_sensor.downstairs_occupancy",
+                  "state_color": true,
+                  "name": [
+                    {
+                      "type": "area"
+                    },
+                    {
+                      "type": "floor"
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": 2
+                  }
+                },
+                {
+                  "type": "logbook",
+                  "state_filter": [],
+                  "target": {
+                    "entity_id": [
+                      "binary_sensor.downstairs_occupancy"
+                    ]
+                  },
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 4
+                  }
+                },
+                {
+                  "initial_view": "dayGridMonth",
+                  "type": "calendar",
+                  "entities": [
+                    "calendar.zenobia_airbnb"
+                  ],
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 8
+                  },
+                  "title": "Zenobia AirBnB",
+                  "theme": "Frosted Glass Dark"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "thermostat",
+                  "entity": "climate.main_floor",
+                  "features": [
+                    {
+                      "type": "climate-hvac-modes"
+                    },
+                    {
+                      "type": "climate-fan-modes",
+                      "style": "dropdown"
+                    }
+                  ]
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "entity": "sensor.main_floor_current_temperature",
+                  "detail": 1,
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 2
+                  }
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "detail": 1,
+                  "entity": "sensor.downstairs_temperature",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 2
+                  }
+                },
+                {
+                  "type": "energy-distribution"
+                },
+                {
+                  "type": "energy-date-selection",
+                  "vertical_opening_direction": "auto",
+                  "opening_direction": "auto",
+                  "collection_key": "energy_today",
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": "auto"
+                  }
+                },
+                {
+                  "type": "energy-solar-graph",
+                  "collection_key": "energy_today",
+                  "title": "Solar Production"
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "detail": 1,
+                  "entity": "sensor.total_solar_forecast_today",
+                  "grid_options": {
+                    "columns": "full",
+                    "rows": 4
+                  },
+                  "unit": "kWh"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "thermostat",
+                  "features": [
+                    {
+                      "type": "climate-hvac-modes"
+                    },
+                    {
+                      "type": "climate-fan-modes",
+                      "style": "dropdown"
+                    }
+                  ],
+                  "entity": "climate.upstairs_thermostat",
+                  "show_current_as_primary": false
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "detail": 1,
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 2
+                  },
+                  "entity": "sensor.upstairs_thermostat_temperature"
+                },
+                {
+                  "type": "energy-sankey",
+                  "layout": "auto",
+                  "group_by_floor": true,
+                  "group_by_area": true,
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 6
+                  }
+                },
+                {
+                  "type": "energy-date-selection",
+                  "vertical_opening_direction": "up",
+                  "opening_direction": "auto",
+                  "collection_key": "energy_tomorrow",
+                  "disable_compare": true,
+                  "grid_options": {
+                    "rows": "auto",
+                    "columns": "full"
+                  }
+                },
+                {
+                  "type": "energy-solar-graph",
+                  "collection_key": "energy_tomorrow",
+                  "title": "Estimated Solar Production"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:weather-forecast-card",
+                  "show_current": true,
+                  "show_forecast": true,
+                  "default_forecast": "daily",
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "entity": "weather.forecast_home_2",
+                  "show_condition_effects": true,
+                  "forecast": {
+                    "mode": "chart",
+                    "show_sun_times": true,
+                    "use_color_thresholds": true,
+                    "scroll_to_selected": true,
+                    "default_chart_attribute": "temperature_and_precipitation",
+                    "show_attribute_selector": true,
+                    "hourly_group_size": 1
+                  },
+                  "forecast_action": {
+                    "tap_action": {
+                      "action": "toggle-forecast"
+                    },
+                    "hold_action": {
+                      "action": "select-forecast-attribute"
+                    }
+                  },
+                  "current": {
+                    "secondary_info_attribute": "wind_speed"
+                  }
+                },
+                {
+                  "type": "custom:weather-radar-card",
+                  "data_source": "NOAA",
+                  "map_style": "Dark",
+                  "show_recenter": true,
+                  "show_scale": false,
+                  "show_marker": true,
+                  "show_zoom": false,
+                  "show_playback": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "New section"
+                }
+              ],
+              "column_span": 4
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Office Display"
+                },
+                {
+                  "type": "tile",
+                  "entity": "media_player.office_display"
+                }
+              ]
+            }
+          ],
+          "badges": [
+            {
+              "type": "entity",
+              "show_name": true,
+              "show_state": true,
+              "show_icon": true,
+              "entity": "sensor.side_door_battery",
+              "name": {
+                "type": "device"
+              },
+              "show_entity_picture": true
+            },
+            {
+              "type": "entity",
+              "show_name": true,
+              "show_state": true,
+              "show_icon": true,
+              "name": {
+                "type": "device"
+              },
+              "entity": "sensor.shadowfax_battery_state_of_charge",
+              "show_entity_picture": true
+            }
+          ],
+          "header": {
+            "layout": "responsive",
+            "badges_position": "bottom",
+            "badges_wrap": "scroll",
+            "card": {
+              "type": "markdown",
+              "content": "  ",
+              "title": "Home"
+            }
+          },
+          "max_columns": 4,
+          "show_icon_and_title": true,
+          "dense_section_placement": false,
+          "cards": [],
+          "theme": "Frosted Glass Lite",
+          "background": {
+            "opacity": 33,
+            "alignment": "center",
+            "size": "cover",
+            "repeat": "repeat",
+            "attachment": "fixed"
+          },
+          "top_margin": false,
+          "icon": "mdi:home",
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            }
+          ]
+        },
+        {
+          "type": "sections",
+          "path": "media",
+          "max_columns": 4,
+          "title": "Media",
+          "icon": "mdi:play-network",
+          "show_icon_and_title": true,
+          "theme": "ios-dark-mode-blue-red",
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "New section"
+                },
+                {
+                  "type": "custom:mass-player-card",
+                  "entities": [],
+                  "sync_player_across_dashboard": true,
+                  "media_browser": {
+                    "default_section": "recommendations",
+                    "default_enqueue_option": "add_to_queue",
+                    "recommendations": {
+                      "providers": [
+                        "spotify"
+                      ]
+                    }
+                  },
+                  "player": {
+                    "layout": {
+                      "artwork_size": "medium"
+                    }
+                  },
+                  "expressive_scheme": "vibrant",
+                  "default_section": "media_browser",
+                  "panel": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Example",
+                  "heading_style": "title"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "media-player",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "entity": "media_player.jbl_ma510_ce9841_2"
+                }
+              ]
+            }
+          ],
+          "header": {
+            "card": {
+              "type": "markdown",
+              "text_only": true,
+              "content": "# Media"
+            }
+          },
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            }
+          ],
+          "cards": []
+        },
+        {
+          "type": "sections",
+          "path": "officedisplaydash",
+          "cards": [],
+          "title": "Office Display",
+          "icon": "mdi:tablet-dashboard",
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            }
+          ],
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:weather-forecast-card",
+                  "show_current": true,
+                  "show_forecast": true,
+                  "default_forecast": "daily",
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "entity": "weather.forecast_home_2",
+                  "show_condition_effects": true,
+                  "forecast": {
+                    "mode": "chart",
+                    "show_sun_times": true,
+                    "use_color_thresholds": true,
+                    "scroll_to_selected": true,
+                    "default_chart_attribute": "temperature_and_precipitation",
+                    "show_attribute_selector": true,
+                    "hourly_group_size": 1
+                  },
+                  "forecast_action": {
+                    "tap_action": {
+                      "action": "toggle-forecast"
+                    },
+                    "hold_action": {
+                      "action": "select-forecast-attribute"
+                    }
+                  },
+                  "current": {
+                    "secondary_info_attribute": "wind_speed"
+                  }
+                },
+                {
+                  "type": "custom:weather-radar-card",
+                  "data_source": "NOAA",
+                  "map_style": "Dark",
+                  "show_recenter": true,
+                  "show_scale": false,
+                  "show_marker": true,
+                  "show_zoom": false,
+                  "show_playback": false
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:material-users-card",
+                  "is_user_map_enabled": true,
+                  "is_add_button_enabled": false
+                },
+                {
+                  "type": "heading",
+                  "heading": "New section"
+                }
+              ]
+            }
+          ],
+          "max_columns": 4,
+          "show_icon_and_title": true
+        },
+        {
+          "type": "sections",
+          "max_columns": 4,
+          "title": "Remotes",
+          "path": "remotes",
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "icon": "m3o:remote-gen",
+                  "heading": "Primary Bedroom",
+                  "heading_style": "title"
+                },
+                {
+                  "type": "custom:firemote-card",
+                  "entity": "media_player.primary_bed_fire_tv",
+                  "device_family": "amazon-fire",
+                  "device_type": "fire_tv_4_series",
+                  "compatibility_mode": "default"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "icon": "m3o:remote-gen",
+                  "heading": "Speakeasy Main Tv",
+                  "heading_style": "title"
+                },
+                {
+                  "type": "custom:firemote-card",
+                  "entity": "media_player.fire_tv_192_168_68_83",
+                  "device_family": "amazon-fire",
+                  "device_type": "fire_tv_4_series",
+                  "compatibility_mode": "default",
+                  "app_launch_1": "hdmi_3"
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "JBL Amp",
+                  "heading_style": "title",
+                  "icon": "mdi:amplifier"
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "title": "JBL MA510",
+                  "subtitle": "{{ states('sensor.jbl_input') }}  · Vol {{ states('sensor.jbl_volume') }}  · {{ '🔇 Muted' if states('sensor.jbl_mute') == 'muted' else states('sensor.jbl_surround') }}",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 1
+                  }
+                },
+                {
+                  "type": "markdown",
+                  "content": "\n\n\n\n "
+                },
+                {
+                  "type": "button",
+                  "name": "Power On",
+                  "icon": "mdi:power",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_power_on"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Standby",
+                  "icon": "mdi:power-standby",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_power_off"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Mute",
+                  "icon": "mdi:volume-off",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_mute_on"
+                  },
+                  "hold_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_mute_off"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "subtitle": "INPUT",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 1
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "HDMI 1",
+                  "icon": "mdi:hdmi-port",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_input_hdmi1"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Bluetooth",
+                  "icon": "mdi:bluetooth",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_input_bt"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Network",
+                  "icon": "mdi:web",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_input_network"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "subtitle": "VOLUME",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 1
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Vol -",
+                  "icon": "mdi:volume-minus",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_vol_down"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "custom:mushroom-entity-card",
+                  "entity": "sensor.jbl_volume",
+                  "name": "Volume",
+                  "icon": "mdi:volume-high",
+                  "primary_info": "state",
+                  "secondary_info": "name",
+                  "tap_action": {
+                    "action": "none"
+                  },
+                  "grid_options": {
+                    "columns": 4,
+                    "rows": 2
+                  },
+                  "layout": "vertical"
+                },
+                {
+                  "type": "button",
+                  "name": "Vol +",
+                  "icon": "mdi:volume-plus",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_vol_up"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "subtitle": "NAVIGATE",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 1
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Menu",
+                  "icon": "mdi:menu",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_nav_menu"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Up",
+                  "icon": "mdi:chevron-up",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_nav_up"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Back",
+                  "icon": "mdi:arrow-u-left-top",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_nav_back"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Left",
+                  "icon": "mdi:chevron-left",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_nav_left"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "OK",
+                  "icon": "mdi:check-circle-outline",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_nav_ok"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Right",
+                  "icon": "mdi:chevron-right",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_nav_right"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "markdown",
+                  "content": "  ",
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Down",
+                  "icon": "mdi:chevron-down",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_nav_down"
+                  },
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "markdown",
+                  "content": "  ",
+                  "grid_options": {
+                    "columns": 4
+                  }
+                },
+                {
+                  "type": "custom:mushroom-title-card",
+                  "subtitle": "SURROUND",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 1
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Native",
+                  "icon": "mdi:surround-sound",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_surr_native"
+                  },
+                  "grid_options": {
+                    "columns": 3
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Stereo",
+                  "icon": "mdi:speaker-multiple",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_surr_stereo20"
+                  },
+                  "grid_options": {
+                    "columns": 3
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "All Stereo",
+                  "icon": "mdi:speaker-multiple",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_surr_allstereo"
+                  },
+                  "grid_options": {
+                    "columns": 3
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "PL II",
+                  "icon": "mdi:dolby",
+                  "tap_action": {
+                    "action": "perform-action",
+                    "perform_action": "shell_command.jbl_surr_plii"
+                  },
+                  "grid_options": {
+                    "columns": 3
+                  }
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading_style": "title",
+                  "heading": "Speakeasy Second TV"
+                },
+                {
+                  "type": "custom:lg-remote-control",
+                  "entity": "media_player.speakeasy_second_tv",
+                  "colors": {
+                    "background": "#383838"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading_style": "title",
+                  "heading": "Living Room TV (Main Floor)"
+                },
+                {
+                  "type": "custom:lg-remote-control",
+                  "entity": "media_player.living_room_tv",
+                  "colors": {
+                    "background": "#000000"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading_style": "title",
+                  "heading": "Office TV"
+                },
+                {
+                  "type": "custom:lg-remote-control",
+                  "entity": "media_player.office_tv_2",
+                  "av_receiver_family": ""
+                }
+              ]
+            }
+          ],
+          "icon": "m3o:remote-gen",
+          "show_icon_and_title": true,
+          "cards": [],
+          "visible": [
+            {
+              "user": "3418dede5de64644852e0ddb5eba049a"
+            },
+            {
+              "user": "cc7b8461cd144f3a9f882bf3b731dc38"
+            },
+            {
+              "user": "25269374020f4dceb870347e1254f5c6"
+            },
+            {
+              "user": "32b0a65c97ee49be8aa696807b83d4b4"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
