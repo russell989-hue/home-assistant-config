@@ -15482,6 +15482,7 @@ class TimelineLeafletMap {
             subdomains: "abcd",
             minZoom: 0,
             maxZoom: 20,
+            referrerPolicy: "no-referrer-when-downgrade",
         });
         tileLayer.addTo(this._leafletMap);
 
@@ -15513,35 +15514,38 @@ class TimelineLeafletMap {
         this._highlightedStay = null;
     }
 
-    setDaySegments(tracks = [], activeEntityIndex = 0, onTrackClick = null, colors = []) {
-        this._fullDayPaths = tracks.map((track, index) => {
-            const points = [];
-            const segments = Array.isArray(track?.segments) ? track.segments : [];
-            segments.forEach((segment) => {
-                if (segment?.type === "stay" && segment.center) {
-                    points.push({
-                        point: [segment.center.lat, segment.center.lon],
-                        timestamp: segment.start,
-                    });
-                }
-                if (segment?.type === "move" && Array.isArray(segment.points)) {
-                    points.push(...segment.points);
-                }
-            });
+    setDaySegments(tracks = [], activeEntityIndex = 0, onTrackClick = null, colors = [], hideUnselected = false) {
+        this._fullDayPaths = tracks
+            .map((track, index) => {
+                const points = [];
+                const segments = Array.isArray(track?.segments) ? track.segments : [];
+                segments.forEach((segment) => {
+                    if (segment?.type === "stay" && segment.center) {
+                        points.push({
+                            point: [segment.center.lat, segment.center.lon],
+                            timestamp: segment.start,
+                        });
+                    }
+                    if (segment?.type === "move" && Array.isArray(segment.points)) {
+                        points.push(...segment.points);
+                    }
+                });
 
-            return {
-                entityIndex: index,
-                isActive: index === activeEntityIndex,
-                points,
-                color: getTrackColor(index, colors),
-                opacity: index === activeEntityIndex ? 1 : 0.8,
-                weight: 4,
-                borderWeight: 7,
-            };
-        });
+                return {
+                    entityIndex: index,
+                    isActive: index === activeEntityIndex,
+                    points,
+                    color: getTrackColor(index, colors),
+                    opacity: index === activeEntityIndex ? 1 : 0.8,
+                    weight: 4,
+                    borderWeight: 7,
+                };
+            })
+            .filter((path) => !hideUnselected || path.isActive);
 
-        this._fullDayPath = this._fullDayPaths[activeEntityIndex] || {points: []};
-        this._activeTrackColor = this._fullDayPaths[activeEntityIndex]?.color || "var(--primary-color)";
+        const activeTrackPath = this._fullDayPaths.find((path) => path.isActive);
+        this._fullDayPath = activeTrackPath || {points: []};
+        this._activeTrackColor = activeTrackPath?.color || "var(--primary-color)";
         this._onTrackClick = typeof onTrackClick === "function" ? onTrackClick : null;
 
         this._highlightedPath = [];
@@ -15974,6 +15978,7 @@ function getConfigFormSchema() {
                         flatten: true,
                         schema: [
                             {name: "hide_current_location", selector: {boolean: {}}},
+                            {name: "hide_unselected_on_map", selector: {boolean: {}}},
                             {name: "hide_moving", selector: {boolean: {}}},
                             {name: "reverse_timeline_order", selector: {boolean: {}}},
                         ],
@@ -16033,6 +16038,7 @@ const DEFAULT_CONFIG = {
     distance_unit: "metric",
     colors: [],
     hide_current_location: false,
+    hide_unselected_on_map: false,
     hide_moving: false,
     reverse_timeline_order: false,
     collapse_timeline: false,
@@ -16364,6 +16370,7 @@ class TimelineCard extends HTMLElement {
                 this._activeEntityIndex,
                 (entityIndex) => this._setActiveEntityIndex(entityIndex),
                 this._config.colors,
+                this._config.hide_unselected_on_map,
             );
             this._touchStart = null;
 
@@ -16542,6 +16549,8 @@ class TimelineCard extends HTMLElement {
 
         return this._config.entity
             .map(({entity: entityId}, index) => {
+                if (this._config.hide_unselected_on_map && index !== this._activeEntityIndex) return null;
+
                 const state = this._hass?.states?.[entityId];
                 const lat = Number(state?.attributes?.latitude);
                 const lon = Number(state?.attributes?.longitude);

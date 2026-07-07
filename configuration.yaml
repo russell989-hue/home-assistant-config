@@ -18,6 +18,7 @@ frontend:
   themes: !include_dir_merge_named themes
   extra_module_url:
     - /hacsfiles/Bubble-Card/bubble-pop-up-fix.js
+    - /hacsfiles/material-you-utilities/material-you-utilities.min.js
 
 automation: !include automations.yaml
 script: !include scripts.yaml
@@ -703,3 +704,12 @@ logger:
 homeassistant:
   allowlist_external_dirs:
     - "/config"
+
+
+# Material You Utilities configuration panel (color picker)
+panel_custom:
+  - name: material-you-panel
+    url_path: material-you-configuration
+    sidebar_title: Material You
+    sidebar_icon: mdi:palette
+    module_url: /hacsfiles/material-you-utilities/material-you-utilities.min.js

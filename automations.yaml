@@ -1395,3 +1395,35 @@
           - {}
           - media_content_type: music_assistant
             media_content_id: playlists
+- id: doorbell_popup_ipads
+  alias: 'Doorbell: front door popup on iPads'
+  description: When the doorbell rings, show the front door live view on the Living
+    Room and Office iPads for 30 seconds. Requires those browsers to be registered
+    in Browser Mod with IDs living_room_ipad and office_ipad.
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.doorbell_chime
+    - event.front_door_ding
+    not_from:
+    - unknown
+    - unavailable
+    not_to:
+    - unknown
+    - unavailable
+  conditions: []
+  actions:
+  - action: browser_mod.popup
+    data:
+      browser_id:
+      - living_room_ipad
+      - office_ipad
+      title: Front Door
+      size: wide
+      timeout: 30000
+      timeout_action: close
+      content:
+        type: custom:webrtc-camera
+        url: doorbell
+  mode: single
+  max_exceeded: silent
