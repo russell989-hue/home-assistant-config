@@ -10,6 +10,18 @@ substitutions:
   temp_units: °F
 
 ##### My customization - Start #####
+script:
+  - id: !extend refresh_datetime
+    then:
+      - lambda: |-
+          // Override the stacked 3-line screensaver clock on portrait panels
+          if (!id(screensaver_display_time) or current_page_id != get_page_id("screensaver")) return;
+          ESPTime now = id(time_provider).now();
+          if (!now.is_valid()) return;
+          const int hour12 = (now.hour == 0) ? 12 : (now.hour > 12) ? (now.hour - 12) : now.hour;
+          char buf[16];
+          snprintf(buf, sizeof(buf), "%d:%02d\\r%s", hour12, now.minute, now.hour < 12 ? "AM" : "PM");
+          disp1->set_component_text("text", buf);
 ##### My customization - End #####
 
 packages:
