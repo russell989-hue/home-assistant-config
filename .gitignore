@@ -98,3 +98,6 @@ go2rtc-*
 
 # Personal data
 .shopping_list.json
+
+# Backup files (never track)
+*.bak.*

@@ -1,5 +1,5 @@
 blueprint:
-  name: NSPanel Easy Configuration (v2026.6.1)
+  name: NSPanel Easy Configuration (v2026.6.2)
   author: Edward Firmo (https://github.com/edwardtfn)
   description: '# NSPanel Easy Configuration via Blueprint
 
@@ -163,7 +163,10 @@ blueprint:
               sort: false
         temperature_unit:
           name: Temperature Unit
-          description: Select the temperature unit to display.
+          description: "Select the temperature unit for sensors provided by Home Assistant
+            without a pre-defined unit.\n\nIMPORTANT!\nThe panel's embedded sensor
+            is managed locally and requires its own setting as a substitution in your
+            panel's YAML:\n```yaml\nsubstitutions:\n  temp_units: \"°F\"\n\n```"
           default: °C
           selector:
             select:
@@ -171,8 +174,8 @@ blueprint:
               options:
               - °C
               - °F
-              custom_value: false
               sort: false
+              custom_value: false
         decimal_separator:
           name: System settings - Decimal Separator
           description: Choose the decimal separator for displaying numbers.
@@ -185,8 +188,8 @@ blueprint:
                 value: .
               - label: ', (Comma)'
                 value: ','
-              custom_value: false
               sort: false
+              custom_value: false
         compact_unit_display:
           name: Compact unit display
           description: When enabled, numeric values and their units are displayed
@@ -271,8 +274,8 @@ blueprint:
                 value: '5'
               - label: 72px
                 value: '6'
-              custom_value: false
               sort: false
+              custom_value: false
         home_indoor_temp_visible:
           name: Home Page - Indoor Temperature Sensor Visibility
           description: Toggle to display the indoor temperature on the Home page.
@@ -485,8 +488,8 @@ blueprint:
                 value: '7'
               - label: 32px
                 value: '8'
-              custom_value: false
               sort: false
+              custom_value: false
         home_custom_button01:
           name: Home page - Custom button 1 - Entity
           description: 'Entity which should be controlled.
@@ -545,8 +548,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         home_custom_button02:
           name: Home page - Custom button 2 - Entity
           description: 'Entity which should be controlled.
@@ -605,8 +608,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         home_custom_button03:
           name: Home page - Custom button 3 - Entity
           description: 'Entity which should be controlled.
@@ -665,8 +668,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         home_custom_button04:
           name: Home page - Custom button 4 - Entity
           description: 'Entity which should be controlled.
@@ -725,8 +728,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         home_custom_button05:
           name: Home page - Custom button 5 - Entity
           description: 'Entity which should be controlled.
@@ -785,8 +788,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         home_custom_button06:
           name: Home page - Custom button 6 - Entity
           description: 'Entity which should be controlled.
@@ -845,8 +848,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         alarm:
           name: Home page - Custom button 7 - Entity
           description: 'Entity which should be controlled.
@@ -905,8 +908,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
     home_page_general_settings:
       name: Home page - General settings
       icon: mdi:home
@@ -994,8 +997,8 @@ blueprint:
                 value: '7'
               - label: 32px
                 value: '8'
-              custom_value: false
               sort: false
+              custom_value: false
         chip01:
           name: Chip 01 - Entity
           description: 'Entity which should be displayed.
@@ -1347,9 +1350,9 @@ blueprint:
                 value: always
               - label: Never
                 value: never
-              multiple: false
-              custom_value: false
               sort: false
+              custom_value: false
+              multiple: false
     climate_page_settings:
       name: Climate page
       icon: mdi:thermostat-cog
@@ -1371,8 +1374,8 @@ blueprint:
                 value: '8'
               - label: 48px
                 value: '10'
-              custom_value: false
               sort: false
+              custom_value: false
         climate_button08:
           name: Climate page - Custom button 01 - Entity
           description: 'Entity to be controlled.
@@ -1796,8 +1799,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         qrcode_entity:
           name: QR Code content entity
           description: 'Entity containing the value you want to display as QR code.
@@ -1827,8 +1830,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         home_button05_icon:
           name: Home page - QR Code - Icon
           description: Icon which should be displayed (Default mdi:qrcode-scan).
@@ -1915,8 +1918,8 @@ blueprint:
                 value: '67108864'
               - label: Keyboard pop-up page
                 value: '16777216'
-              custom_value: false
               sort: false
+              custom_value: false
         hw_buttons_bar_color_on:
           name: Hardware Buttons - Bar color when `On`
           description: Choose a color for the button's bars when the controlled entity
@@ -2022,8 +2025,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         left_button_hold_select:
           name: Left hardware button hold assignment
           description: Select what should happen on hold.
@@ -2033,9 +2036,9 @@ blueprint:
               options:
               - Default
               - Custom Action
-              multiple: false
-              custom_value: false
               sort: false
+              custom_value: false
+              multiple: false
         left_button_hold_custom_action:
           name: Left hardware button custom hold action
           description: The action(s) to launch on hold.
@@ -2141,8 +2144,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         right_button_hold_select:
           name: Right hardware button hold assignment
           description: Select what should happen on hold.
@@ -2152,9 +2155,9 @@ blueprint:
               options:
               - Default
               - Custom Action
-              multiple: false
-              custom_value: false
               sort: false
+              custom_value: false
+              multiple: false
         right_button_hold_custom_action:
           name: Right hardware button custom hold action
           description: The action(s) to launch on hold.
@@ -2221,8 +2224,8 @@ blueprint:
                 value: '8'
               - label: 48px
                 value: '10'
-              custom_value: false
               sort: false
+              custom_value: false
     button_page_01:
       name: Button page 01
       icon: mdi:gesture-tap-button
@@ -2236,8 +2239,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity01:
           name: Button page 1, Button 1 - Entity
           description: 'Entity to be controlled.
@@ -2280,8 +2283,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity01_icon:
           name: Button page 1, Button 1 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -2353,8 +2356,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity02:
           name: Button page 1, Button 2 - Entity
           description: 'Entity to be controlled.
@@ -2397,8 +2400,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity02_icon:
           name: Button page 1, Button 2 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -2470,8 +2473,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity03:
           name: Button page 1, Button 3 - Entity
           description: 'Entity to be controlled.
@@ -2514,8 +2517,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity03_icon:
           name: Button page 1, Button 3 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -2587,8 +2590,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity04:
           name: Button page 1, Button 4 - Entity
           description: 'Entity to be controlled.
@@ -2631,8 +2634,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity04_icon:
           name: Button page 1, Button 4 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -2704,8 +2707,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity05:
           name: Button page 1, Button 5 - Entity
           description: 'Entity to be controlled.
@@ -2748,8 +2751,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity05_icon:
           name: Button page 1, Button 5 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -2821,8 +2824,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity06:
           name: Button page 1, Button 6 - Entity
           description: 'Entity to be controlled.
@@ -2865,8 +2868,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity06_icon:
           name: Button page 1, Button 6 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -2938,8 +2941,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity07:
           name: Button page 1, Button 7 - Entity
           description: 'Entity to be controlled.
@@ -2982,8 +2985,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity07_icon:
           name: Button page 1, Button 7 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -3055,8 +3058,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity08:
           name: Button page 1, Button 8 - Entity
           description: 'Entity to be controlled.
@@ -3099,8 +3102,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity08_icon:
           name: Button page 1, Button 8 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -3172,8 +3175,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
     button_page_02:
       name: Button page 02
       icon: mdi:gesture-tap-button
@@ -3187,8 +3190,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity09:
           name: Button page 2, Button 1 - Entity
           description: 'Entity to be controlled.
@@ -3231,8 +3234,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity09_icon:
           name: Button page 2, Button 1 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -3304,8 +3307,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity10:
           name: Button page 2, Button 2 - Entity
           description: 'Entity to be controlled.
@@ -3348,8 +3351,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity10_icon:
           name: Button page 2, Button 2 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -3421,8 +3424,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity11:
           name: Button page 2, Button 3 - Entity
           description: 'Entity to be controlled.
@@ -3465,8 +3468,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity11_icon:
           name: Button page 2, Button 3 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -3538,8 +3541,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity12:
           name: Button page 2, Button 4 - Entity
           description: 'Entity to be controlled.
@@ -3582,8 +3585,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity12_icon:
           name: Button page 2, Button 4 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -3655,8 +3658,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity13:
           name: Button page 2, Button 5 - Entity
           description: 'Entity to be controlled.
@@ -3699,8 +3702,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity13_icon:
           name: Button page 2, Button 5 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -3772,8 +3775,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity14:
           name: Button page 2, Button 6 - Entity
           description: 'Entity to be controlled.
@@ -3816,8 +3819,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity14_icon:
           name: Button page 2, Button 6 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -3889,8 +3892,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity15:
           name: Button page 2, Button 7 - Entity
           description: 'Entity to be controlled.
@@ -3933,8 +3936,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity15_icon:
           name: Button page 2, Button 7 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4006,8 +4009,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity16:
           name: Button page 2, Button 8 - Entity
           description: 'Entity to be controlled.
@@ -4050,8 +4053,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity16_icon:
           name: Button page 2, Button 8 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4123,8 +4126,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
     button_page_03:
       name: Button page 03
       icon: mdi:gesture-tap-button
@@ -4138,8 +4141,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity17:
           name: Button page 3, Button 1 - Entity
           description: 'Entity to be controlled.
@@ -4182,8 +4185,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity17_icon:
           name: Button page 3, Button 1 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4255,8 +4258,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity18:
           name: Button page 3, Button 2 - Entity
           description: 'Entity to be controlled.
@@ -4299,8 +4302,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity18_icon:
           name: Button page 3, Button 2 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4372,8 +4375,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity19:
           name: Button page 3, Button 3 - Entity
           description: 'Entity to be controlled.
@@ -4416,8 +4419,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity19_icon:
           name: Button page 3, Button 3 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4489,8 +4492,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity20:
           name: Button page 3, Button 4 - Entity
           description: 'Entity to be controlled.
@@ -4533,8 +4536,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity20_icon:
           name: Button page 3, Button 4 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4606,8 +4609,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity21:
           name: Button page 3, Button 5 - Entity
           description: 'Entity to be controlled.
@@ -4650,8 +4653,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity21_icon:
           name: Button page 3, Button 5 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4723,8 +4726,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity22:
           name: Button page 3, Button 6 - Entity
           description: 'Entity to be controlled.
@@ -4767,8 +4770,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity22_icon:
           name: Button page 3, Button 6 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4840,8 +4843,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity23:
           name: Button page 3, Button 7 - Entity
           description: 'Entity to be controlled.
@@ -4884,8 +4887,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity23_icon:
           name: Button page 3, Button 7 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -4957,8 +4960,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity24:
           name: Button page 3, Button 8 - Entity
           description: 'Entity to be controlled.
@@ -5001,8 +5004,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity24_icon:
           name: Button page 3, Button 8 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -5074,8 +5077,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
     button_page_04:
       name: Button page 04
       icon: mdi:gesture-tap-button
@@ -5089,8 +5092,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity25:
           name: Button page 4, Button 1 - Entity
           description: 'Entity to be controlled.
@@ -5133,8 +5136,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity25_icon:
           name: Button page 4, Button 1 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -5206,8 +5209,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity26:
           name: Button page 4, Button 2 - Entity
           description: 'Entity to be controlled.
@@ -5250,8 +5253,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity26_icon:
           name: Button page 4, Button 2 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -5323,8 +5326,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity27:
           name: Button page 4, Button 3 - Entity
           description: 'Entity to be controlled.
@@ -5367,8 +5370,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity27_icon:
           name: Button page 4, Button 3 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -5440,8 +5443,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity28:
           name: Button page 4, Button 4 - Entity
           description: 'Entity to be controlled.
@@ -5484,8 +5487,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity28_icon:
           name: Button page 4, Button 4 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -5557,8 +5560,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity29:
           name: Button page 4, Button 5 - Entity
           description: 'Entity to be controlled.
@@ -5601,8 +5604,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity29_icon:
           name: Button page 4, Button 5 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -5674,8 +5677,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity30:
           name: Button page 4, Button 6 - Entity
           description: 'Entity to be controlled.
@@ -5718,8 +5721,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity30_icon:
           name: Button page 4, Button 6 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -5791,8 +5794,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity31:
           name: Button page 4, Button 7 - Entity
           description: 'Entity to be controlled.
@@ -5835,8 +5838,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity31_icon:
           name: Button page 4, Button 7 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -5908,8 +5911,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity32:
           name: Button page 4, Button 8 - Entity
           description: 'Entity to be controlled.
@@ -5952,8 +5955,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entity32_icon:
           name: Button page 4, Button 8 - Icon
           description: '***Icon Display:** If not specified, an attribute-defined
@@ -6025,8 +6028,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
     entities_pages:
       name: Entities pages - Overall
       icon: mdi:format-list-bulleted-square
@@ -6069,8 +6072,8 @@ blueprint:
                 value: '1'
               - label: Left
                 value: '2'
-              custom_value: false
               sort: false
+              custom_value: false
         entitypages_show_entities_icons:
           name: Entity Pages - Show Entity Icons
           description: Display icons associated with each entity.
@@ -6090,8 +6093,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity01:
           name: Entity page 1, Row 1 - Entity
           description: 'Choose an entity to display in this position. If left blank,
@@ -6110,8 +6113,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity01_icon:
           name: Entity page 1, Row 1 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6137,8 +6140,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity02_icon:
           name: Entity page 1, Row 2 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6164,8 +6167,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity03_icon:
           name: Entity page 1, Row 3 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6191,8 +6194,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity04_icon:
           name: Entity page 1, Row 4 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6218,8 +6221,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity05_icon:
           name: Entity page 1, Row 5 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6245,8 +6248,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity06_icon:
           name: Entity page 1, Row 6 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6272,8 +6275,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity07_icon:
           name: Entity page 1, Row 7 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6299,8 +6302,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity08_icon:
           name: Entity page 1, Row 8 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6321,8 +6324,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity09:
           name: Entity page 2, Row 1 - Entity
           description: 'Choose an entity to display in this position. If left blank,
@@ -6341,8 +6344,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity09_icon:
           name: Entity page 2, Row 1 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6368,8 +6371,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity10_icon:
           name: Entity page 2, Row 2 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6395,8 +6398,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity11_icon:
           name: Entity page 2, Row 3 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6422,8 +6425,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity12_icon:
           name: Entity page 2, Row 4 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6449,8 +6452,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity13_icon:
           name: Entity page 2, Row 5 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6476,8 +6479,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity14_icon:
           name: Entity page 2, Row 6 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6503,8 +6506,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity15_icon:
           name: Entity page 2, Row 7 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6530,8 +6533,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity16_icon:
           name: Entity page 2, Row 8 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6552,8 +6555,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity17:
           name: Entity page 3, Row 1 - Entity
           description: 'Choose an entity to display in this position. If left blank,
@@ -6572,8 +6575,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity17_icon:
           name: Entity page 3, Row 1 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6599,8 +6602,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity18_icon:
           name: Entity page 3, Row 2 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6626,8 +6629,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity19_icon:
           name: Entity page 3, Row 3 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6653,8 +6656,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity20_icon:
           name: Entity page 3, Row 4 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6680,8 +6683,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity21_icon:
           name: Entity page 3, Row 5 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6707,8 +6710,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity22_icon:
           name: Entity page 3, Row 6 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6734,8 +6737,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity23_icon:
           name: Entity page 3, Row 7 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6761,8 +6764,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity24_icon:
           name: Entity page 3, Row 8 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6783,8 +6786,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity25:
           name: Entity page 4, Row 1 - Entity
           description: 'Choose an entity to display in this position. If left blank,
@@ -6803,8 +6806,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity25_icon:
           name: Entity page 4, Row 1 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6830,8 +6833,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity26_icon:
           name: Entity page 4, Row 2 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6857,8 +6860,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity27_icon:
           name: Entity page 4, Row 3 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6884,8 +6887,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity28_icon:
           name: Entity page 4, Row 4 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6911,8 +6914,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity29_icon:
           name: Entity page 4, Row 5 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6938,8 +6941,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity30_icon:
           name: Entity page 4, Row 6 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6965,8 +6968,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity31_icon:
           name: Entity page 4, Row 7 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -6992,8 +6995,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         entities_entity32_icon:
           name: Entity page 4, Row 8 - Icon
           description: Set a custom icon for this entity. If not set, the entity's
@@ -7045,8 +7048,8 @@ blueprint:
           default: Utilities Dashboard
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_icon:
           name: Utilities page - Icon
           description: Select the icon to be shown in the top left corner of the page.
@@ -7059,8 +7062,8 @@ blueprint:
           default: Home
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_home_icon:
           name: Utilities page - Home - Icon
           description: 'Select the icon to be shown in the Home area. (Default: mdi:home-lightning-bolt-outline).'
@@ -7102,8 +7105,8 @@ blueprint:
           default: Grid
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_grid_icon:
           name: Utilities page - Grid - Icon
           description: 'Select the icon to be shown in the Grid area. (Default: mdi:transmission-tower).'
@@ -7168,8 +7171,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_group01_icon:
           name: Utilities page - Group 1 - Icon
           description: Select the icon to be shown in the Group 1 area.
@@ -7232,8 +7235,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_group02_icon:
           name: Utilities page - Group 2 - Icon
           description: Select the icon to be shown in the Group 2 area.
@@ -7296,8 +7299,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_group03_icon:
           name: Utilities page - Group 3 - Icon
           description: Select the icon to be shown in the Group 3 area.
@@ -7360,8 +7363,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_group04_icon:
           name: Utilities page - Group 4 - Icon
           description: Select the icon to be shown in the Group 4 area.
@@ -7424,8 +7427,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_group05_icon:
           name: Utilities page - Group 5 - Icon
           description: Select the icon to be shown in the Group 5 area.
@@ -7488,8 +7491,8 @@ blueprint:
           default: ''
           selector:
             text:
-              multiple: false
               multiline: false
+              multiple: false
         utilities_page01_group06_icon:
           name: Utilities page - Group 6 - Icon
           description: Select the icon to be shown in the Group 6 area.
@@ -7620,8 +7623,8 @@ blueprint:
                 value: '11'
               - label: 192px
                 value: '12'
-              custom_value: false
               sort: false
+              custom_value: false
         screensaver_display_time_font_color:
           name: Screen saver - Display time font color
           description: Font color to be used when displaying the time while sleeping
@@ -7755,8 +7758,8 @@ blueprint:
                 value: '8'
               - label: 48px
                 value: '10'
-              custom_value: false
               sort: false
+              custom_value: false
         delay:
           name: Command Delay
           description: 'Small delay between sequential Home Assistant action calls
@@ -7810,8 +7813,8 @@ blueprint:
                 value: toggle
               - label: Trigger
                 value: trigger
-              custom_value: false
               sort: false
+              custom_value: false
         device_name_override:
           name: Action Prefix Override
           description: '**USE WITH CAUTION**
@@ -7885,7 +7888,7 @@ trigger_variables:
   sun_is_up: "{{\n  sun_state_list | first == \"above_horizon\"\n  if sun_state_list
     | length > 0\n  else true\n}}\n"
 variables:
-  blueprint_version: 2026.6.1
+  blueprint_version: 2026.6.2
   pages:
     current: '{{ states(currentpage) }}'
     alarm: alarm

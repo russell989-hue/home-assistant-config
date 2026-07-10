@@ -610,7 +610,6 @@
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
       entity02: switch.speakeasy_light_panel_relay_stairwell_light
-      indoortemp: sensor.office_panel_temperature_f
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779597970275'
   alias: Front Door Light Switch
