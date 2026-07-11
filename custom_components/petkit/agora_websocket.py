@@ -202,7 +202,7 @@ class AgoraWebSocketHandler:
                 await websocket.close()
                 self._websocket = None
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 LOGGER.warning("WebSocket connection timeout for %s", ws_url)
                 await self.disconnect()
                 continue
@@ -246,7 +246,7 @@ class AgoraWebSocketHandler:
                         if answer:
                             return answer
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             if (
                 self._pending_answer_ortc is not None
                 and self._pending_offer_info is not None

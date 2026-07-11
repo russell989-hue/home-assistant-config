@@ -46,15 +46,30 @@ class PetkitTextDesc(PetKitDescSensorBase, TextEntityDescription):
 
 COMMON_ENTITIES = []
 
+
+def _valid_manual_feed_values(device: PetkitDevices) -> list[int]:
+    """Return supported manual feed amounts for a feeder model."""
+    device_type = device.device_nfo.device_type
+
+    if device_type == FEEDER:
+        return list(range(0, 401, 20))
+    if device_type in [D4, D4H]:
+        return [10, 20, 30, 40, 50]
+    if device_type == FEEDER_MINI:
+        return list(range(0, 51, 5))
+    if device_type == D3:
+        return list(range(5, 201))
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+
 TEXT_MAPPING: dict[type[PetkitDevices], list[PetkitTextDesc]] = {
     Feeder: [
         *COMMON_ENTITIES,
         PetkitTextDesc(
             key="Manual feed single",
             translation_key="manual_feed_single",
-            value=lambda device: device.settings.light_mode,
             native_min=1,
-            native_max=2,
+            native_max=3,
             pattern=INPUT_FEED_PATTERN,
             native_value="0",
             action=lambda api, device, amount_value: api.send_api_request(
@@ -65,7 +80,6 @@ TEXT_MAPPING: dict[type[PetkitDevices], list[PetkitTextDesc]] = {
         PetkitTextDesc(
             key="Manual feed dual h1",
             translation_key="manual_feed_dual_h1",
-            value=lambda device: device.settings.light_mode,
             native_min=1,
             native_max=2,
             pattern=INPUT_FEED_PATTERN,
@@ -80,7 +94,6 @@ TEXT_MAPPING: dict[type[PetkitDevices], list[PetkitTextDesc]] = {
         PetkitTextDesc(
             key="Manual feed dual h2",
             translation_key="manual_feed_dual_h2",
-            value=lambda device: device.settings.light_mode,
             native_min=1,
             native_max=2,
             pattern=INPUT_FEED_PATTERN,
@@ -172,25 +185,14 @@ class PetkitText(PetkitEntity, TextEntity):
     def available(self) -> bool:
         """Return if this button is available or not."""
         device_data = self.coordinator.data.get(self.device.id)
-        if hasattr(device_data.state, "pim"):
+        if device_data and hasattr(device_data.state, "pim"):
             return device_data.state.pim in POWER_ONLINE_STATE
         return True
 
     async def async_set_value(self, value: str) -> None:
         """Set manual feeding amount."""
 
-        if self.device.device_nfo.device_type in [D4, D4H]:
-            # D4/D4H => 10,20,30,40,50
-            valid_values = [10, 20, 30, 40, 50]
-        elif self.device.device_nfo.device_type == FEEDER_MINI:
-            # FeederMini => 0,5,10,15,20,25,30,35,40,45,50
-            valid_values = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-        elif self.device.device_nfo.device_type == D3:
-            # D3 => 5 to 200
-            valid_values = list(range(5, 201))
-        else:
-            # Other, D4sh => 1,2,3,4,5,7,8,9,10
-            valid_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        valid_values = _valid_manual_feed_values(self.device)
 
         if int(value) not in valid_values:
             raise ValueError(

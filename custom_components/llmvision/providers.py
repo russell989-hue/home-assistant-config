@@ -1016,11 +1016,17 @@ class Anthropic(Provider):
             "messages": [{"role": "user", "content": []}],
             "max_tokens": call.max_tokens,
             "temperature": default_parameters.get("temperature"),
-            "thinking": {
-                "type": "enabled",
-                "budget_tokens": default_parameters.get("thinking_budget", 0),
-            },
         }
+
+        # Only enable thinking when a valid budget is set (Anthropic requires
+        # an integer >= 1024 and temperature=1 when thinking is enabled)
+        _thinking_budget = int(default_parameters.get("thinking_budget") or 0)
+        if _thinking_budget >= 1024:
+            payload["thinking"] = {
+                "type": "enabled",
+                "budget_tokens": _thinking_budget,
+            }
+            payload["temperature"] = 1
 
         # Add structured output support using tools
         if call.response_format == "json" and call.structure:
@@ -1093,11 +1099,17 @@ class Anthropic(Provider):
             ],
             "max_tokens": call.max_tokens,
             "temperature": default_parameters.get("temperature"),
-            "thinking": {
-                "type": "enabled",
-                "budget_tokens": default_parameters.get("thinking_budget", 0),
-            },
         }
+
+        # Only enable thinking when a valid budget is set (Anthropic requires
+        # an integer >= 1024 and temperature=1 when thinking is enabled)
+        _thinking_budget = int(default_parameters.get("thinking_budget") or 0)
+        if _thinking_budget >= 1024:
+            payload["thinking"] = {
+                "type": "enabled",
+                "budget_tokens": _thinking_budget,
+            }
+            payload["temperature"] = 1
 
         # Add structured output support using tools
         if call.response_format == "json" and call.structure:

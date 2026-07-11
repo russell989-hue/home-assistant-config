@@ -77,3 +77,14 @@ secure_shadowfax:
         entity_id: 
           - cover.shadowfax_front_trunk
           - cover.shadowfax_liftgate
+save_last_recording:
+  alias: "Save Last Recording"
+  icon: mdi:content-save
+  fields:
+    camera:
+      description: "Camera folder name (doorbell, side_door, garage, alley)"
+      example: doorbell
+  sequence:
+    - action: shell_command.save_last_recording
+      data:
+        camera: "{{ camera }}"

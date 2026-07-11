@@ -304,11 +304,12 @@ class PetkitIotMqttListener:
         paho_client.will_set(
             f"{base}/update", payload='{"status":"offline"}', qos=0, retain=False
         )
-        paho_client.reconnect_delay_set(min_delay=1, max_delay=30)
+        paho_client.reconnect_delay_set(min_delay=10, max_delay=300)
 
         paho_client.on_connect = self._on_connect
         paho_client.on_disconnect = self._on_disconnect
         paho_client.on_message = self._on_message
+        paho_client.on_subscribe = self._on_subscribe
 
         self._mqtt_client = paho_client
         self._connection_status = MqttConnectionStatus.CONNECTING
@@ -349,13 +350,13 @@ class PetkitIotMqttListener:
 
         try:
             client.disconnect()
-        except Exception:  # noqa: BLE001
-            LOGGER.debug("Disconnect raised", exc_info=True)
+        except Exception as err:  # noqa: BLE001
+            LOGGER.debug("Disconnect raised: %s", err, exc_info=True)
 
         try:
             client.loop_stop()
-        except Exception:  # noqa: BLE001
-            LOGGER.debug("Loop_stop raised", exc_info=True)
+        except Exception as err:  # noqa: BLE001
+            LOGGER.debug("Loop_stop raised: %s", err, exc_info=True)
 
         self._connection_status = MqttConnectionStatus.DISCONNECTED
         LOGGER.debug("Listener stopped")
@@ -367,26 +368,36 @@ class PetkitIotMqttListener:
             LOGGER.warning("connect failed (reason_code=%s)", reason_code)
             self._connection_status = MqttConnectionStatus.FAILED
             return
-        self._connection_status = MqttConnectionStatus.CONNECTED
-        self.hass.loop.call_soon_threadsafe(
-            self._set_polling_interval, SCAN_INTERVAL_SLOW
-        )
-        self.hass.loop.call_soon_threadsafe(self._update_coordinator_mqtt_state, True)
         if not topics:
             LOGGER.warning("connected but subscribe topics are missing")
             return
         try:
             for topic in topics:
                 client.subscribe(topic, qos=0)
-            LOGGER.info("Subscribed to %s", topics)
-        except Exception:  # noqa: BLE001
-            LOGGER.warning("Subscribe failed", exc_info=True)
+        except Exception as err:  # noqa: BLE001
+            LOGGER.warning("Subscribe failed: %s", err, exc_info=True)
+
+    def _on_subscribe(self, client, userdata, mid, reason_code_list, properties):
+        """Handle subscribe callback."""
+        if reason_code_list[0].is_failure:
+            LOGGER.warning("Broker rejected you subscription: %s", reason_code_list[0])
+        else:
+            LOGGER.info("Subscribed to %s", self._subscribe_topics)
+
+            self._connection_status = MqttConnectionStatus.CONNECTED
+            self.hass.loop.call_soon_threadsafe(
+                self._set_polling_interval, SCAN_INTERVAL_SLOW
+            )
+            self.hass.loop.call_soon_threadsafe(
+                self._update_coordinator_mqtt_state, True
+            )
 
     def _on_disconnect(self, client, userdata, flags, reason_code, properties) -> None:
         """Handle a MQTT disconnect."""
         if reason_code != 0:
             LOGGER.warning("Disconnected unexpectedly (reason_code=%s)", reason_code)
             self._connection_status = MqttConnectionStatus.DISCONNECTED
+            client.reconnect_delay_set(min_delay=60, max_delay=300)
         else:
             LOGGER.info("Disconnected")
             self._connection_status = MqttConnectionStatus.DISCONNECTED

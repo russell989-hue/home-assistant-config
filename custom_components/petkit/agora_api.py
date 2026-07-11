@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 import hashlib
 import json
@@ -421,11 +420,7 @@ class AgoraAPIClient:
                         request_payload,
                         proxy_server,
                     )
-                except (
-                    aiohttp.ClientError,
-                    asyncio.TimeoutError,
-                    ValueError,
-                ) as err:
+                except (TimeoutError, aiohttp.ClientError, ValueError) as err:
                     LOGGER.debug("Agora endpoint %s failed: %s", domain, err)
                     continue
 

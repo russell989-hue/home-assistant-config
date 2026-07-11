@@ -72,7 +72,7 @@ class PetkitMediaSource(MediaSource):
         file_path = self.media_path / Path(item.identifier)
         if not file_path.exists():
             raise ValueError(f"File not found: {file_path}")
-        LOGGER.debug(f"Media Source: Resolving media {file_path}")
+        LOGGER.debug("Media Source: Resolving media %s", file_path)
         # Convert absolute FS path to URL under /media/local/<relative>.
         # This only works for files stored under /media; paths outside /media
         # (e.g. /config/...) cannot be served via HA's media browser URL.
@@ -103,7 +103,7 @@ class PetkitMediaSource(MediaSource):
 
         if not current_path.exists() or not current_path.is_dir():
             raise ValueError(f"Invalid path: {current_path}")
-        LOGGER.debug(f"Media Source: Browsing {current_path}")
+        LOGGER.debug("Media Source: Browsing %s", current_path)
 
         children = await asyncio.to_thread(self._get_children_from_path, current_path)
 
@@ -122,7 +122,7 @@ class PetkitMediaSource(MediaSource):
         """Get children from a path."""
         children = []
         for child in sorted(path.iterdir()):
-            LOGGER.debug(f"Media Source: Processing child {child.name} in {path}")
+            LOGGER.debug("Media Source: Processing child %s in %s", child.name, path)
             if child.is_dir():
                 title = self.get_device_name_from_data(
                     self.convert_date(child.name)

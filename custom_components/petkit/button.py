@@ -21,10 +21,13 @@ from pypetkitapi import (
     T5,
     T6,
     T7,
+    W7H,
     DeviceAction,
     DeviceCommand,
     Feeder,
     FeederCommand,
+    FountainActionWIFI,
+    FountainCommand,
     LBCommand,
     Litter,
     LitterCommand,
@@ -98,7 +101,7 @@ BUTTON_MAPPING: dict[type[PetkitDevices], list[PetKitButtonDesc]] = {
             action=lambda api, device: api.send_api_request(
                 device.id, FeederCommand.PLAY_SOUND, device.settings.selected_sound
             ),
-            only_for_types=[D3, D4H, D4SH],
+            only_for_types=[D4H, D4SH],
         ),
     ],
     Litter: [
@@ -195,15 +198,26 @@ BUTTON_MAPPING: dict[type[PetkitDevices], list[PetKitButtonDesc]] = {
             is_available=lambda device: device.state.work_state is not None,
         ),
         PetKitButtonDesc(
-            # For T3/T4 only
-            key="Deodorize T3 T4",
+            # For T3 only
+            key="Deodorize T3",
             translation_key="deodorize",
             action=lambda api, device: api.send_api_request(
                 device.id,
                 DeviceCommand.CONTROL_DEVICE,
                 {DeviceAction.START: LBCommand.ODOR_REMOVAL},
             ),
-            only_for_types=[T3, T4],
+            force_add=[T3],
+        ),
+        PetKitButtonDesc(
+            # For T4 only
+            key="Deodorize T4",
+            translation_key="deodorize",
+            action=lambda api, device: api.send_api_request(
+                device.id,
+                DeviceCommand.CONTROL_DEVICE,
+                {DeviceAction.START: LBCommand.ODOR_REMOVAL},
+            ),
+            only_for_types=[T4],
             value=lambda device: device.k3_device,
         ),
         PetKitButtonDesc(
@@ -258,6 +272,7 @@ BUTTON_MAPPING: dict[type[PetkitDevices], list[PetKitButtonDesc]] = {
                 device.id, FountainAction.RESET_FILTER
             ),
             only_for_types=DEVICES_WATER_FOUNTAIN,
+            ignore_types=[W7H],
         ),
         PetKitButtonDesc(
             key="Pause",
@@ -272,6 +287,7 @@ BUTTON_MAPPING: dict[type[PetkitDevices], list[PetKitButtonDesc]] = {
                 and device.status.run_status > 0
                 and device.status.power_status == 1
             ),
+            ignore_types=[W7H],
         ),
         PetKitButtonDesc(
             key="Resume",
@@ -286,6 +302,56 @@ BUTTON_MAPPING: dict[type[PetkitDevices], list[PetKitButtonDesc]] = {
                 and device.status.run_status == 0
                 and device.status.power_status == 1
             ),
+            ignore_types=[W7H],
+        ),
+        PetKitButtonDesc(
+            key="Refill",
+            translation_key="refill",
+            action=lambda api, device: api.send_api_request(
+                device.id,
+                DeviceCommand.CONTROL_DEVICE,
+                {DeviceAction.START: FountainActionWIFI.REFILL},
+            ),
+            only_for_types=[W7H],
+        ),
+        PetKitButtonDesc(
+            key="Drain",
+            translation_key="drain",
+            action=lambda api, device: api.send_api_request(
+                device.id,
+                DeviceCommand.CONTROL_DEVICE,
+                {DeviceAction.START: FountainActionWIFI.DRAIN},
+            ),
+            only_for_types=[W7H],
+        ),
+        PetKitButtonDesc(
+            key="Drain and flush",
+            translation_key="drain_and_flush",
+            action=lambda api, device: api.send_api_request(
+                device.id,
+                DeviceCommand.CONTROL_DEVICE,
+                {DeviceAction.START: FountainActionWIFI.DRAIN_AND_FLUSH},
+            ),
+            only_for_types=[W7H],
+        ),
+        PetKitButtonDesc(
+            key="Reset filter",
+            translation_key="reset_filter",
+            action=lambda api, device: api.send_api_request(
+                device.id,
+                FountainCommand.RESET_FILTER,
+            ),
+            only_for_types=[W7H],
+        ),
+        PetKitButtonDesc(
+            key="Deep clean",
+            translation_key="deep_clean",
+            action=lambda api, device: api.send_api_request(
+                device.id,
+                DeviceCommand.CONTROL_DEVICE,
+                {DeviceAction.START: FountainActionWIFI.DEEP_CLEAN},
+            ),
+            only_for_types=[W7H],
         ),
     ],
     Purifier: [*COMMON_ENTITIES],
@@ -398,6 +464,8 @@ class PetkitButton(PetkitEntity, ButtonEntity):
         """Only make available if device is online."""
 
         device_data = self.coordinator.data.get(self.device.id)
+        if device_data is None:
+            return False
         try:
             if device_data.state.pim not in POWER_ONLINE_STATE:
                 return False

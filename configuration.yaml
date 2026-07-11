@@ -490,6 +490,11 @@ template:
 
 input_boolean:
 
+  # ---- Airbnb ----
+  airbnb_guest_downstairs:
+    name: Airbnb Guest Downstairs
+    icon: mdi:door-open
+
   # ---- Modes (whole-house) ----
   guest_mode:
     name: Guest Mode
@@ -617,8 +622,8 @@ influxdb:
   include:
     entities:
       - sensor.shadowfax_trip_data
-      - sensor.shadowfax_battery_level
-      - sensor.shadowfax_total_mileage
+      - sensor.shadowfax_battery_state_of_charge
+      - sensor.shadowfax_odometer
       
 input_datetime:
   basement_last_inside_signal:
@@ -634,6 +639,8 @@ input_datetime:
     icon: mdi:door-open
 
 shell_command:
+  cleanup_recordings: find /media/recordings -type f -name '*.mp4' -mtime +15 -delete
+  save_last_recording: 'mkdir -p /media/saved && f=$(ls -t /media/recordings/{{ camera }}/*.mp4 2>/dev/null | head -1) && cp "$f" "/media/saved/{{ camera }}_$(basename $f)"'
   keep_streams_alive: /config/scripts/keep_streams_alive.sh
   # --- JBL MA510 IP Control ---
   jbl_power_on:        "python3 /config/scripts/jbl_ma510.py power_on"
@@ -674,27 +681,27 @@ command_line:
   - sensor:
       name: "JBL Power"
       unique_id: jbl_ma510_power
-      command: "python3 /config/scripts/jbl_ma510.py power_status"
+      command: "python3 /config/scripts/jbl_ma510.py power_status 2>/dev/null || echo unavailable"
       scan_interval: 30
   - sensor:
       name: "JBL Input"
       unique_id: jbl_ma510_input
-      command: "python3 /config/scripts/jbl_ma510.py input_status"
+      command: "python3 /config/scripts/jbl_ma510.py input_status 2>/dev/null || echo unavailable"
       scan_interval: 30
   - sensor:
       name: "JBL Volume"
       unique_id: jbl_ma510_volume
-      command: "python3 /config/scripts/jbl_ma510.py volume_status"
+      command: "python3 /config/scripts/jbl_ma510.py volume_status 2>/dev/null || echo unavailable"
       scan_interval: 30
   - sensor:
       name: "JBL Mute"
       unique_id: jbl_ma510_mute
-      command: "python3 /config/scripts/jbl_ma510.py mute_status"
+      command: "python3 /config/scripts/jbl_ma510.py mute_status 2>/dev/null || echo unavailable"
       scan_interval: 30
   - sensor:
       name: "JBL Surround"
       unique_id: jbl_ma510_surround
-      command: "python3 /config/scripts/jbl_ma510.py surr_status"
+      command: "python3 /config/scripts/jbl_ma510.py surr_status 2>/dev/null || echo unavailable"
       scan_interval: 30
 
 # --- LOGGER SETTINGS ---
@@ -704,6 +711,7 @@ logger:
 homeassistant:
   allowlist_external_dirs:
     - "/config"
+    - "/media"
 
 
 # Material You Utilities configuration panel (color picker)

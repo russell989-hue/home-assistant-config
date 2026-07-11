@@ -7,12 +7,12 @@ from typing import Any
 from pypetkitapi import (
     PetkitAuthenticationUnregisteredEmailError,
     PetKitClient,
-    PetkitRegionalServerNotFoundError,
     PetkitSessionError,
-    PetkitSessionExpiredError,
     PetkitTimeoutError,
     PypetkitError,
+    RegionServerGroup,
 )
+from pypetkitapi.exceptions import PetkitAuthenticationError, PetkitServerBusyError
 import voluptuous as vol
 
 from homeassistant import data_entry_flow
@@ -35,6 +35,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import BooleanSelector, BooleanSelectorConfig
 
 from .const import (
+    ADVANCED_SECTION,
     ALL_TIMEZONES_LST,
     BT_SECTION,
     CODE_TO_COUNTRY_DICT,
@@ -127,6 +128,8 @@ class PetkitOptionsFlowHandler(OptionsFlow):
                                             "Dish_before",
                                             "Dish_after",
                                             "Waste_check",
+                                            "Pet_detect",
+                                            "Drink_over",
                                         ],
                                     )
                                 ),
@@ -195,7 +198,7 @@ class PetkitOptionsFlowHandler(OptionsFlow):
 class PetkitFlowHandler(ConfigFlow, domain=DOMAIN):
     """Config flow for Petkit Smart Devices."""
 
-    VERSION = 8
+    VERSION = 9
 
     @staticmethod
     @callback
@@ -218,11 +221,44 @@ class PetkitFlowHandler(ConfigFlow, domain=DOMAIN):
             f"Country code from HA : {self.hass.config.country} Default timezone: {tz_from_ha}"
         )
 
-        if user_input is not None:
-            user_region = (
-                COUNTRY_TO_CODE_DICT.get(user_input.get(CONF_REGION, None))
-                or country_from_ha
+        # PetKit's Chinese cloud uses phone/ID logins; the international cloud
+        # uses email. Tailor the hint based on the user's HA country so the
+        # 99% case isn't shown a confusing "or id if you are a Chinese user".
+        if country_from_ha == "CN":
+            username_hint = "Enter your PetKit account phone number or PetKit ID."
+        else:
+            username_hint = "Enter your PetKit account email."
+
+        # Fetch the live PetKit gateway list so we can render a short server
+        # dropdown (~5 entries) instead of a 200+ country list. If the call
+        # fails we silently fall back to the country list below.
+        servers: list[RegionServerGroup] | None
+        try:
+            servers = await PetKitClient.fetch_region_servers(
+                async_get_clientsession(self.hass)
             )
+        except PypetkitError as exc:
+            LOGGER.debug("Failed to fetch PetKit region servers: %s", exc)
+            servers = None
+
+        if user_input is not None:
+            advanced = user_input.get(ADVANCED_SECTION, {})
+            raw_region = advanced.get(CONF_REGION)
+            # Accept either dropdown shape: server-mode delivers an ISO code
+            # already, country-mode delivers a country name we look up.
+            user_region = (
+                COUNTRY_TO_CODE_DICT.get(raw_region) or raw_region or country_from_ha
+            )
+            user_timezone = advanced.get(CONF_TIME_ZONE) or tz_from_ha
+
+            # Flatten section data for storage so __init__.py keeps reading
+            # CONF_REGION/CONF_TIME_ZONE at the top level of entry.data.
+            entry_data = {
+                CONF_USERNAME: user_input[CONF_USERNAME],
+                CONF_PASSWORD: user_input[CONF_PASSWORD],
+                CONF_REGION: user_region,
+                CONF_TIME_ZONE: user_timezone,
+            }
 
             # Check if the account already exists
             existing_entries = self._async_current_entries()
@@ -236,24 +272,31 @@ class PetkitFlowHandler(ConfigFlow, domain=DOMAIN):
                         username=user_input[CONF_USERNAME],
                         password=user_input[CONF_PASSWORD],
                         region=user_region,
-                        timezone=user_input.get(CONF_TIME_ZONE, tz_from_ha),
+                        timezone=user_timezone,
                     )
-                except (
-                    PetkitTimeoutError,
-                    PetkitSessionError,
-                    PetkitSessionExpiredError,
-                    PetkitAuthenticationUnregisteredEmailError,
-                    PetkitRegionalServerNotFoundError,
-                ) as exception:
-                    LOGGER.error(exception)
-                    _errors["base"] = str(exception)
-                except PypetkitError as exception:
-                    LOGGER.error(exception)
-                    _errors["base"] = "error"
+
+                except PetkitServerBusyError:
+                    _errors["base"] = "server_busy"
+
+                except PetkitAuthenticationError:
+                    _errors["base"] = "invalid_auth"
+
+                except PetkitAuthenticationUnregisteredEmailError:
+                    _errors["base"] = "invalid_region"
+
+                except PetkitTimeoutError:
+                    _errors["base"] = "cannot_connect"
+
+                except PetkitSessionError:
+                    _errors["base"] = "session_error"
+
+                except Exception:  # noqa: BLE001
+                    LOGGER.exception("Unexpected error")
+                    _errors["base"] = "unknown"
                 else:
                     return self.async_create_entry(
                         title=user_input[CONF_USERNAME],
-                        data=user_input,
+                        data=entry_data,
                         options={
                             MEDIA_SECTION: {
                                 CONF_MEDIA_PATH: DEFAULT_MEDIA_PATH,
@@ -275,47 +318,87 @@ class PetkitFlowHandler(ConfigFlow, domain=DOMAIN):
                         },
                     )
 
-        data_schema = {
-            vol.Required(
-                CONF_USERNAME,
-                default=(user_input or {}).get(CONF_USERNAME, vol.UNDEFINED),
-            ): selector.TextSelector(
-                selector.TextSelectorConfig(
-                    type=selector.TextSelectorType.TEXT,
-                ),
-            ),
-            vol.Required(CONF_PASSWORD): selector.TextSelector(
-                selector.TextSelectorConfig(
-                    type=selector.TextSelectorType.PASSWORD,
-                ),
-            ),
-        }
+        prev_advanced = (user_input or {}).get(ADVANCED_SECTION, {})
+        tz_default = prev_advanced.get(CONF_TIME_ZONE) or tz_from_ha
 
-        if _errors:
-            data_schema.update(
-                {
-                    vol.Required(
-                        CONF_REGION,
-                        default=CODE_TO_COUNTRY_DICT.get(
-                            country_from_ha, country_from_ha
-                        ),
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=sorted(CODE_TO_COUNTRY_DICT.values())
-                        ),
-                    ),
-                    vol.Required(
-                        CONF_TIME_ZONE, default=tz_from_ha
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(options=ALL_TIMEZONES_LST),
-                    ),
-                }
+        if servers:
+            region_options = [
+                selector.SelectOptionDict(value=s.representative_country, label=s.label)
+                for s in servers
+            ]
+            valid_region_values = {s.representative_country for s in servers}
+            # Find the server whose country bucket contains the HA country and
+            # default to that server's representative code. If HA's country is
+            # not in any bucket, fall back to the first listed server.
+            auto_server = next(
+                (s for s in servers if country_from_ha in s.countries),
+                servers[0],
             )
+            auto_default = auto_server.representative_country
+            prev_region = prev_advanced.get(CONF_REGION)
+            # Drop a previously selected value if it is from the old country
+            # dropdown so voluptuous doesn't render an empty selector.
+            region_default = (
+                prev_region if prev_region in valid_region_values else auto_default
+            )
+            region_selector = selector.SelectSelector(
+                selector.SelectSelectorConfig(options=region_options)
+            )
+        else:
+            # API unreachable: keep the legacy 200-country dropdown so users
+            # can still complete setup manually.
+            region_default = prev_advanced.get(CONF_REGION) or CODE_TO_COUNTRY_DICT.get(
+                country_from_ha, country_from_ha
+            )
+            region_selector = selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=sorted(CODE_TO_COUNTRY_DICT.values())
+                ),
+            )
+
+        data_schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_USERNAME,
+                    default=(user_input or {}).get(CONF_USERNAME, vol.UNDEFINED),
+                ): selector.TextSelector(
+                    selector.TextSelectorConfig(
+                        type=selector.TextSelectorType.TEXT,
+                    ),
+                ),
+                vol.Required(CONF_PASSWORD): selector.TextSelector(
+                    selector.TextSelectorConfig(
+                        type=selector.TextSelectorType.PASSWORD,
+                    ),
+                ),
+                vol.Required(ADVANCED_SECTION): section(
+                    vol.Schema(
+                        {
+                            vol.Required(
+                                CONF_REGION, default=region_default
+                            ): region_selector,
+                            vol.Required(
+                                CONF_TIME_ZONE, default=tz_default
+                            ): selector.SelectSelector(
+                                selector.SelectSelectorConfig(
+                                    options=ALL_TIMEZONES_LST
+                                ),
+                            ),
+                        }
+                    ),
+                    {"collapsed": True},
+                ),
+            }
+        )
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema(data_schema),
+            data_schema=data_schema,
             errors=_errors,
+            description_placeholders={
+                "username_hint": username_hint,
+                "wiki_url": "https://github.com/Jezza34000/homeassistant_petkit/wiki/Configuration",
+            },
         )
 
     async def _test_credentials(
@@ -329,5 +412,5 @@ class PetkitFlowHandler(ConfigFlow, domain=DOMAIN):
             timezone=timezone,
             session=async_get_clientsession(self.hass),
         )
-        LOGGER.debug(f"Testing credentials for {username}")
+        LOGGER.debug("Testing credentials for %s", username)
         await client.login()

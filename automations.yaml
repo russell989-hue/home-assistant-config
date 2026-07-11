@@ -298,24 +298,23 @@
   triggers:
   - event: start
     trigger: homeassistant
-- alias: AI Camera Events
+- id: '1778371502291'
+  alias: AI Camera Events
   description: ''
-  id: '1778371502291'
   use_blueprint:
     input:
       camera_entities:
-      - camera.doorbell
+      - camera.doorbell_snapshot
       - camera.alley_live_view
-      - camera.garage_camera
-      - camera.side_door_camera
-      - camera.backyard_camera
+      - camera.garage_snapshot
+      - camera.side_door_snapshot
       cooldown:
         hours: 0
         minutes: 5
         seconds: 0
       important: true
-      model: gemini-2.5-flash
-      provider: 01KR7JMHXJHTSC78891A458V37
+      model: claude-haiku-4-5
+      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
       trigger_state: 'on'
     path: valentinfrlch/event_summary.yaml
 - alias: Alley Camera AI
@@ -328,8 +327,8 @@
       - camera.alley_live_view
       condition_notify: []
       important: true
-      model: gemini-2.5-flash
-      provider: 01KR7JMHXJHTSC78891A458V37
+      model: claude-haiku-4-5
+      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
       run_conditions:
       - condition: switch.is_on
         options:
@@ -360,7 +359,7 @@
             media_content_type: music_assistant
           - media_content_id: library://playlist/95
             media_content_type: music
-          thumbnail:
+          thumbnail: null
           title: ABBA
     path: local/music_button.yaml
 - id: '1778690297093'
@@ -384,7 +383,7 @@
             media_content_type: music_assistant
           - media_content_id: library://playlist/97
             media_content_type: music
-          thumbnail:
+          thumbnail: null
           title: Rihanna2
     path: local/music_button.yaml
 - alias: Earth Wind and Fire
@@ -408,27 +407,28 @@
             media_content_type: music_assistant
           - media_content_id: library://playlist/98
             media_content_type: music
-          thumbnail:
+          thumbnail: null
           title: Earth Wind and Fire
     path: local/music_button.yaml
 - actions:
   - action: notify.send_message
     data:
-      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
-        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
-        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
-        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
-        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
-        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
-        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
-        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
-        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
-        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
-        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
-        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
-        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
-        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
-        %}\n        {{ sfx }}"
+      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',\
+        \ 'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail',\
+        \ 'Tornado', 'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm',\
+        \ 'Flood', 'Special Weather Statement'] -%}\n        {%- set matched = alerts\
+        \ | selectattr('Event', 'defined') | selectattr('Event', 'search', keywords\
+        \ | join('|'), true) | list -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',\
+        \ 'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'\
+        \ if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the\
+        \ garage.' if 'zone.home' in zones or 'zone.front_door' in zones else ('❗\
+        \ Shadowfax is on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8\
+        \ Shadowfax is away from home!')) -%}\n\n        {%- for alert in matched\
+        \ %}\n        ⚠️ {{ alert.Event }}\n        {{ alert.Headline | title }}\n\
+        \        {%- if 'HAZARD...' in alert.Description %}\n        ⚡ Hazard: {{\
+        \ alert.Description.split('HAZARD...')[1].split('\\n')[0] | trim | capitalize\
+        \ }}\n        {%- endif %}\n        \n        {% endfor %}\n        {{ sfx\
+        \ }}"
       title: '⚠️ Weather Alert:'
     target:
       entity_id:
@@ -438,21 +438,22 @@
       - notify.office_ipad
   - action: notify.persistent_notification
     data:
-      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
-        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
-        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
-        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
-        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
-        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
-        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
-        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
-        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
-        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
-        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
-        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
-        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
-        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
-        %}\n        {{ sfx }}"
+      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',\
+        \ 'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail',\
+        \ 'Tornado', 'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm',\
+        \ 'Flood', 'Special Weather Statement'] -%}\n        {%- set matched = alerts\
+        \ | selectattr('Event', 'defined') | selectattr('Event', 'search', keywords\
+        \ | join('|'), true) | list -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',\
+        \ 'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'\
+        \ if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the\
+        \ garage.' if 'zone.home' in zones or 'zone.front_door' in zones else ('❗\
+        \ Shadowfax is on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8\
+        \ Shadowfax is away from home!')) -%}\n\n        {%- for alert in matched\
+        \ %}\n        ⚠️ {{ alert.Event }}\n        {{ alert.Headline | title }}\n\
+        \        {%- if 'HAZARD...' in alert.Description %}\n        ⚡ Hazard: {{\
+        \ alert.Description.split('HAZARD...')[1].split('\\n')[0] | trim | capitalize\
+        \ }}\n        {%- endif %}\n        \n        {% endfor %}\n        {{ sfx\
+        \ }}"
       title: '⚠️ Weather Alert:'
     metadata: {}
   alias: NWS Alerts
@@ -485,33 +486,41 @@
       | list | count > 0 }}'
   - action: notify.send_message
     data:
-      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
-        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
-        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
-        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
-        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
-        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
-        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
-        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
-        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
-        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
-        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
-      title: "\U0001F329️ Severe Weather Forecast Today"
+      message: '{%- set bad = [''lightning'', ''lightning-rainy'', ''hail'', ''exceptional'',
+        ''pouring'', ''hurricane'', ''tornado''] -%} {%- set forecast = hourly_forecast[''weather.forecast_home_2''][''forecast''][:12]
+        -%} {%- set hits = forecast | selectattr(''condition'', ''search'', bad |
+        join(''|''), true) | list -%} {%- set zones = state_attr(''device_tracker.shadowfax_location'',
+        ''in_zones'') or [] -%} {%- set sfx = ''✅ Shadowfax is in the garage — protected.''
+        if ''zone.garage'' in zones else (''⚠️ Shadowfax is at home but not in the
+        garage.'' if ''zone.home'' in zones or ''zone.front_door'' in zones else (''❗
+        Shadowfax is on the street — exposed.'' if ''zone.street'' in zones else ''🚨
+        Shadowfax is away from home!'')) -%} {{ hits | count }} hour(s) of severe
+        conditions expected today.
+
+        First: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom(''%-I:%M
+        %p'') }} ({{ hits[0].condition | replace(''-'', '' '') | title }})
+
+        {{ sfx }}'
+      title: 🌩️ Severe Weather Forecast Today
     target:
       entity_id: notify.brian_s_z_flip_7
   - action: persistent_notification.create
     data:
-      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
-        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
-        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
-        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
-        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
-        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
-        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
-        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
-        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
-        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
-        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
+      message: '{%- set bad = [''lightning'', ''lightning-rainy'', ''hail'', ''exceptional'',
+        ''pouring'', ''hurricane'', ''tornado''] -%} {%- set forecast = hourly_forecast[''weather.forecast_home_2''][''forecast''][:12]
+        -%} {%- set hits = forecast | selectattr(''condition'', ''search'', bad |
+        join(''|''), true) | list -%} {%- set zones = state_attr(''device_tracker.shadowfax_location'',
+        ''in_zones'') or [] -%} {%- set sfx = ''✅ Shadowfax is in the garage — protected.''
+        if ''zone.garage'' in zones else (''⚠️ Shadowfax is at home but not in the
+        garage.'' if ''zone.home'' in zones or ''zone.front_door'' in zones else (''❗
+        Shadowfax is on the street — exposed.'' if ''zone.street'' in zones else ''🚨
+        Shadowfax is away from home!'')) -%} {{ hits | count }} hour(s) of severe
+        conditions expected today.
+
+        First: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom(''%-I:%M
+        %p'') }} ({{ hits[0].condition | replace(''-'', '' '') | title }})
+
+        {{ sfx }}'
       title: Morning Forecast Alert
   alias: Weather - Morning Forecast Alert
   conditions: []
@@ -524,17 +533,25 @@
 - actions:
   - action: notify.send_message
     data:
-      message: "{%- set zones = state_attr('device_tracker.shadowfax_location', 'in_zones')
-        or [] -%}\n{%- set sfx = '✅ Shadowfax is in the garage — protected.' if 'zone.garage'
-        in zones else ('⚠️ Shadowfax is at home but not in the garage.' if 'zone.home'
-        in zones or 'zone.front_door' in zones else ('❗ Shadowfax is on the street
-        — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax is away from
-        home!')) -%}\nThunderstorm detected — hail is possible.\n{{ sfx }}"
+      message: '{%- set zones = state_attr(''device_tracker.shadowfax_location'',
+        ''in_zones'') or [] -%}
+
+        {%- set sfx = ''✅ Shadowfax is in the garage — protected.'' if ''zone.garage''
+        in zones else (''⚠️ Shadowfax is at home but not in the garage.'' if ''zone.home''
+        in zones or ''zone.front_door'' in zones else (''❗ Shadowfax is on the street
+        — exposed.'' if ''zone.street'' in zones else ''🚨 Shadowfax is away from home!''))
+        -%}
+
+        Thunderstorm detected — hail is possible.
+
+        {{ sfx }}'
       title: ⛈️ Thunderstorm Conditions Now
     target:
       entity_id: notify.brian_s_z_flip_7
   - action: notify.persistent_notification
-    data: {}
+    data:
+      title: Thunderstorm Conditions Now
+      message: Weather entity reports lightning/thunderstorm conditions in the area.
     metadata: {}
   alias: Weather - Thunderstorm Conditions Now
   conditions: []
@@ -560,7 +577,7 @@
         media_content_type: lovelace
         metadata:
           browse_entity_id: media_player.office_display
-          children_media_class:
+          children_media_class: null
           media_class: app
           navigateIds:
           - {}
@@ -800,13 +817,13 @@
         media_content_id: library://playlist/94
         media_content_type: music
         metadata:
-          children_media_class:
+          children_media_class: null
           media_class: playlist
           navigateIds:
           - {}
           - media_content_id: playlists
             media_content_type: music_assistant
-          thumbnail:
+          thumbnail: null
           title: Led Zeppelin
     path: local/music_button.yaml
 - alias: Queen
@@ -816,13 +833,13 @@
     input:
       button: button_3
       device_id: dc367df1d0f481ab0c91918ed522da4b
-      media_player: media_player.living_room
+      media_player: media_player.living_room_sonos
       playlist:
         entity_id: media_player.living_room_sonos
         media_content_id: library://playlist/104
         media_content_type: music
         metadata:
-          children_media_class:
+          children_media_class: null
           media_class: playlist
           navigateIds:
           - {}
@@ -894,9 +911,9 @@
         media_content_type: music
         metadata:
           title: The Eagles
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -915,9 +932,9 @@
         media_content_type: music
         metadata:
           title: Daft Punk
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -938,9 +955,9 @@
         media_content_type: music
         metadata:
           title: Rihanna2
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -960,31 +977,9 @@
         media_content_type: music
         metadata:
           title: Fleetwood mac
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
-          navigateIds:
-          - {}
-          - media_content_type: music_assistant
-            media_content_id: playlists
-- id: '1780091703042'
-  alias: Fleetwood Mac
-  description: ''
-  use_blueprint:
-    path: local/music_button.yaml
-    input:
-      device_id: 7cc947e58e5035af7b3f0bc369d15985
-      button: button_2
-      media_player: media_player.living_room_sonos
-      playlist:
-        entity_id: media_player.living_room_sonos
-        media_content_id: library://playlist/110
-        media_content_type: music
-        metadata:
-          title: Fleetwood mac
-          thumbnail:
-          media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1004,31 +999,7 @@
         media_content_type: playlist
         metadata:
           title: Lady Gaga
-          thumbnail:
-          media_class: playlist
-          children_media_class: track
-          navigateIds:
-          - {}
-          - media_content_type: music_assistant
-            media_content_id: playlists
-          - media_content_type: music
-            media_content_id: library://playlist/99
-- id: '1780092429497'
-  alias: Lady Gaga
-  description: ''
-  use_blueprint:
-    path: local/music_button.yaml
-    input:
-      device_id: bf03cd594f71ef549b734bc5105ab23e
-      button: button_1
-      media_player: media_player.living_room_sonos
-      playlist:
-        entity_id: media_player.living_room_sonos
-        media_content_id: library://playlist/99
-        media_content_type: playlist
-        metadata:
-          title: Lady Gaga
-          thumbnail:
+          thumbnail: null
           media_class: playlist
           children_media_class: track
           navigateIds:
@@ -1054,7 +1025,7 @@
           title: Tupac
           thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/a6d855d2aef24f0facb069979ad1d220_thumb.jpg&provider=builtin&size=0
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1074,9 +1045,9 @@
         media_content_type: music
         metadata:
           title: Amy Winehouse
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1097,29 +1068,7 @@
           title: Michael Jackson
           thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/afb4ab3bbf5f4f288ccad0ba3be62d1e_thumb.jpg&provider=builtin&size=0
           media_class: playlist
-          children_media_class:
-          navigateIds:
-          - {}
-          - media_content_type: music_assistant
-            media_content_id: playlists
-      device_id: bf03cd594f71ef549b734bc5105ab23e
-- id: '1780092694800'
-  alias: Michael Jackson
-  description: ''
-  use_blueprint:
-    path: local/music_button.yaml
-    input:
-      button: button_3
-      media_player: media_player.living_room_sonos
-      playlist:
-        entity_id: media_player.living_room_sonos
-        media_content_id: library://playlist/102
-        media_content_type: music
-        metadata:
-          title: Michael Jackson
-          thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/afb4ab3bbf5f4f288ccad0ba3be62d1e_thumb.jpg&provider=builtin&size=0
-          media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1142,29 +1091,7 @@
           title: Prince
           thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/255f2cc89718420a95e76c55b4f2cf7a_thumb.jpg&provider=builtin&size=0
           media_class: playlist
-          children_media_class:
-          navigateIds:
-          - {}
-          - media_content_type: music_assistant
-            media_content_id: playlists
-- id: '1780093130973'
-  alias: Prince
-  description: ''
-  use_blueprint:
-    path: local/music_button.yaml
-    input:
-      device_id: b5d09b2832467bf93b17e533033a8389
-      button: button_1
-      media_player: media_player.living_room_sonos
-      playlist:
-        entity_id: media_player.living_room_sonos
-        media_content_id: library://playlist/105
-        media_content_type: music
-        metadata:
-          title: Prince
-          thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/255f2cc89718420a95e76c55b4f2cf7a_thumb.jpg&provider=builtin&size=0
-          media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1184,31 +1111,9 @@
         media_content_type: music
         metadata:
           title: Miley
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
-          navigateIds:
-          - {}
-          - media_content_type: music_assistant
-            media_content_id: playlists
-- id: '1780095145000'
-  alias: Miley Cyrus
-  description: ''
-  use_blueprint:
-    path: local/music_button.yaml
-    input:
-      device_id: b5d09b2832467bf93b17e533033a8389
-      button: button_2
-      media_player: media_player.living_room_sonos
-      playlist:
-        entity_id: media_player.living_room_sonos
-        media_content_id: library://playlist/107
-        media_content_type: music
-        metadata:
-          title: Miley
-          thumbnail:
-          media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1228,9 +1133,9 @@
         media_content_type: music
         metadata:
           title: Band of Horses
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1250,31 +1155,9 @@
         media_content_type: music
         metadata:
           title: Foo Fighters
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
-          navigateIds:
-          - {}
-          - media_content_type: music_assistant
-            media_content_id: playlists
-- id: '1780095360050'
-  alias: Foo Fighters
-  description: ''
-  use_blueprint:
-    path: local/music_button.yaml
-    input:
-      button: button_3
-      device_id: b5d09b2832467bf93b17e533033a8389
-      media_player: media_player.living_room_sonos
-      playlist:
-        entity_id: media_player.living_room_sonos
-        media_content_id: library://playlist/106
-        media_content_type: music
-        metadata:
-          title: Foo Fighters
-          thumbnail:
-          media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1343,9 +1226,9 @@
         media_content_type: music
         metadata:
           title: Florence and the Machine
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1365,9 +1248,9 @@
         media_content_type: music
         metadata:
           title: Johnny Cash
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1387,9 +1270,9 @@
         media_content_type: music
         metadata:
           title: Griz
-          thumbnail:
+          thumbnail: null
           media_class: playlist
-          children_media_class:
+          children_media_class: null
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1426,3 +1309,123 @@
         url: doorbell
   mode: single
   max_exceeded: silent
+- id: llmvision_doorbell_ai
+  alias: AI - Doorbell Motion Summary
+  mode: single
+  max_exceeded: silent
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.doorbell_motion
+    - event.doorbell_chime
+  conditions:
+  - condition: template
+    value_template: "{{ this.attributes.last_triggered is none or\n   (now() - this.attributes.last_triggered).total_seconds()\
+      \ > 120 }}"
+  actions:
+  - action: llmvision.stream_analyzer
+    data:
+      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
+      image_entity:
+      - camera.doorbell_snapshot
+      duration: 5
+      max_frames: 5
+      message: Briefly summarize what is happening at the front door. Focus on people,
+        deliveries, and vehicles.
+      include_filename: false
+      max_tokens: 200
+    response_variable: doorbell_ai
+  - action: notify.mobile_app_brian_s_z_flip_7
+    data:
+      title: Front Door
+      message: '{{ doorbell_ai.response_text }}'
+- id: llmvision_airbnb_door_tracking
+  alias: AI - Airbnb Guest Door Tracking
+  mode: single
+  max_exceeded: silent
+  triggers:
+  - trigger: state
+    entity_id: event.side_door_camera_motion
+  actions:
+  - action: llmvision.stream_analyzer
+    data:
+      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
+      image_entity:
+      - camera.side_door_snapshot
+      duration: 8
+      max_frames: 8
+      message: 'This is the exterior camera at an Airbnb guest entrance door. A person
+        triggered motion. Based on the sequence of frames, determine if the person
+        ENTERED the house (approached and went in through the door) or LEFT the house
+        (came out of the door and walked away). Respond with exactly one word: ENTERING,
+        LEAVING, or UNCLEAR.'
+      include_filename: false
+      max_tokens: 20
+    response_variable: door_ai
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ ''ENTERING'' in (door_ai.response_text | upper) }}'
+      sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.airbnb_guest_downstairs
+      - action: notify.mobile_app_brian_s_z_flip_7
+        data:
+          title: Airbnb
+          message: Guest arrived - entered through the side door.
+    - conditions:
+      - condition: template
+        value_template: '{{ ''LEAVING'' in (door_ai.response_text | upper) }}'
+      sequence:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.airbnb_guest_downstairs
+      - action: notify.mobile_app_brian_s_z_flip_7
+        data:
+          title: Airbnb
+          message: Guest left - exited through the side door.
+- id: camera_event_recording
+  alias: Camera Event Recording (15-day history)
+  mode: parallel
+  max: 10
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.doorbell_motion
+    - event.doorbell_chime
+    - event.side_door_camera_motion
+    - event.garage_camera_motion
+    - event.alley_motion
+    - event.backyard_camera_motion
+  variables:
+    cam_map:
+      event.doorbell_motion: camera.doorbell_snapshot
+      event.doorbell_chime: camera.doorbell_snapshot
+      event.side_door_camera_motion: camera.side_door_snapshot
+      event.garage_camera_motion: camera.garage_snapshot
+      event.alley_motion: camera.alley_live_view
+      event.backyard_camera_motion: camera.backyard_snapshot
+    folder_map:
+      event.doorbell_motion: doorbell
+      event.doorbell_chime: doorbell
+      event.side_door_camera_motion: side_door
+      event.garage_camera_motion: garage
+      event.alley_motion: alley
+      event.backyard_camera_motion: backyard
+  actions:
+  - action: camera.record
+    target:
+      entity_id: '{{ cam_map[trigger.entity_id] }}'
+    data:
+      filename: /media/recordings/{{ folder_map[trigger.entity_id] }}/{{ now().strftime('%Y-%m-%d_%H-%M-%S')
+        }}.mp4
+      duration: 30
+      lookback: 4
+- id: recordings_retention_cleanup
+  alias: Recordings - 15 Day Retention Cleanup
+  triggers:
+  - trigger: time
+    at: 03:00:00
+  actions:
+  - action: shell_command.cleanup_recordings

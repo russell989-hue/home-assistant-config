@@ -43,7 +43,7 @@ FAN_MAPPING: dict[type[PetkitDevices], list[PetkitFanDesc]] = {
             key="Air Purifier Fan",
             translation_key="air_purifier_fan",
             preset_modes=lambda: list(PURIFIER_MODE.values()),
-            current_mode=lambda device: PURIFIER_MODE.get(device.state.mode, 0),
+            current_mode=lambda device: PURIFIER_MODE.get(device.state.mode),
             turn_on=lambda api, device: api.send_api_request(
                 device.id, DeviceCommand.CONTROL_DEVICE, {DeviceAction.POWER: 1}
             ),
@@ -115,7 +115,7 @@ class PetkitFan(PetkitEntity, FanEntity):
     def available(self) -> bool:
         """Return if this button is available or not."""
         device_data = self.coordinator.data.get(self.device.id)
-        if hasattr(device_data.state, "pim"):
+        if device_data and hasattr(device_data.state, "pim"):
             return device_data.state.pim in POWER_ONLINE_STATE
         return True
 
@@ -124,9 +124,9 @@ class PetkitFan(PetkitEntity, FanEntity):
         """Determine if the purifier is On."""
 
         device_data = self.coordinator.data.get(self.device.id)
-        if hasattr(device_data.state, "power"):
+        if device_data and hasattr(device_data.state, "power"):
             return device_data.state.power in POWER_ONLINE_STATE
-        return True
+        return False
 
     @property
     def preset_modes(self) -> list:

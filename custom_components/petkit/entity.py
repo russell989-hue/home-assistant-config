@@ -25,6 +25,35 @@ from .data import PetkitDevices
 _DevicesT = TypeVar("_DevicesT", bound=Feeder | Litter | WaterFountain | Purifier | Pet)
 
 
+def _build_device_info(
+    device: Feeder | Litter | WaterFountain | Purifier | Pet,
+) -> DeviceInfo:
+    """Build a DeviceInfo dict from a Petkit device."""
+
+    device_info = DeviceInfo(
+        identifiers={(DOMAIN, device.sn)},
+        manufacturer="Petkit",
+        model=device.device_nfo.modele_name,
+        model_id=device.device_nfo.device_type.upper(),
+        name=device.name,
+    )
+
+    if not isinstance(device, Pet):
+        if device.mac is not None:
+            device_info["connections"] = {(CONNECTION_NETWORK_MAC, device.mac)}
+
+        if device.firmware is not None:
+            device_info["sw_version"] = str(device.firmware)
+
+        if device.hardware is not None:
+            device_info["hw_version"] = str(device.hardware)
+
+        if device.sn is not None:
+            device_info["serial_number"] = str(device.sn)
+
+    return device_info
+
+
 @dataclass(frozen=True, kw_only=True)
 class PetKitDescSensorBase(EntityDescription):
     """A class that describes sensor entities."""
@@ -47,7 +76,7 @@ class PetKitDescSensorBase(EntityDescription):
 
         device_type = getattr(device.device_nfo, "device_type", None)
         if not device_type:
-            LOGGER.error(f"Entities {device.name} has no type, can't check support")
+            LOGGER.error("Entities %s has no type, can't check support", device.name)
             return False
         device_type = device_type.lower()
 
@@ -65,21 +94,21 @@ class PetKitDescSensorBase(EntityDescription):
     def _is_force_added(self, device_type: str) -> bool:
         """Check if the device is in the force_add list."""
         if self.force_add and device_type in self.force_add:
-            LOGGER.debug(f"{device_type} force add for '{self.key}'")
+            LOGGER.debug("%s force add for '%s'", device_type, self.key)
             return True
         return False
 
     def _is_ignored(self, device_type: str) -> bool:
         """Check if the device is in the ignore_types list."""
         if self.ignore_types and device_type in self.ignore_types:
-            LOGGER.debug(f"{device_type} force ignore for '{self.key}'")
+            LOGGER.debug("%s force ignore for '%s'", device_type, self.key)
             return True
         return False
 
     def _is_not_in_supported_types(self, device_type: str) -> bool:
         """Check if the device is not in the only_for_types list."""
         if self.only_for_types and device_type not in self.only_for_types:
-            LOGGER.debug(f"{device_type} is NOT COMPATIBLE with '{self.key}'")
+            LOGGER.debug("%s is NOT COMPATIBLE with '%s'", device_type, self.key)
             return True
         return False
 
@@ -90,13 +119,17 @@ class PetKitDescSensorBase(EntityDescription):
                 result = self.value(device)
                 if result is None:
                     LOGGER.debug(
-                        f"{device.device_nfo.device_type} DOES NOT support '{self.key}' (value is None)"
+                        "%s DOES NOT support '%s' (value is None)",
+                        device.device_nfo.device_type,
+                        self.key,
                     )
                     return False
-                LOGGER.debug(f"{device.device_nfo.device_type} supports '{self.key}'")
+                LOGGER.debug(
+                    "%s supports '%s'", device.device_nfo.device_type, self.key
+                )
             except AttributeError:
                 LOGGER.debug(
-                    f"{device.device_nfo.device_type} DOES NOT support '{self.key}'"
+                    "%s DOES NOT support '%s'", device.device_nfo.device_type, self.key
                 )
                 return False
         return True
@@ -144,29 +177,7 @@ class PetkitEntity(
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device information."""
-
-        device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.device.sn)},
-            manufacturer="Petkit",
-            model=self.device.device_nfo.modele_name,
-            model_id=self.device.device_nfo.device_type.upper(),
-            name=self.device.name,
-        )
-
-        if not isinstance(self.device, Pet):
-            if self.device.mac is not None:
-                device_info["connections"] = {(CONNECTION_NETWORK_MAC, self.device.mac)}
-
-            if self.device.firmware is not None:
-                device_info["sw_version"] = str(self.device.firmware)
-
-            if self.device.hardware is not None:
-                device_info["hw_version"] = str(self.device.hardware)
-
-            if self.device.sn is not None:
-                device_info["serial_number"] = str(self.device.sn)
-
-        return device_info
+        return _build_device_info(self.device)
 
 
 class PetkitCameraBaseEntity(
@@ -184,7 +195,7 @@ class PetkitCameraBaseEntity(
     def __init__(
         self,
         coordinator: PetkitDataUpdateCoordinator,
-        device: Feeder | Litter,
+        device: Feeder | Litter | WaterFountain,
         key: str,
     ) -> None:
         """Initialize the camera entity."""
@@ -204,25 +215,4 @@ class PetkitCameraBaseEntity(
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device information."""
-
-        device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.device.sn)},
-            manufacturer="Petkit",
-            model=self.device.device_nfo.modele_name,
-            model_id=self.device.device_nfo.device_type.upper(),
-            name=self.device.name,
-        )
-
-        if self.device.mac is not None:
-            device_info["connections"] = {(CONNECTION_NETWORK_MAC, self.device.mac)}
-
-        if self.device.firmware is not None:
-            device_info["sw_version"] = str(self.device.firmware)
-
-        if self.device.hardware is not None:
-            device_info["hw_version"] = str(self.device.hardware)
-
-        if self.device.sn is not None:
-            device_info["serial_number"] = str(self.device.sn)
-
-        return device_info
+        return _build_device_info(self.device)

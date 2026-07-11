@@ -13,7 +13,7 @@ def map_work_state(work_state: WorkState | None) -> str:
     Use the 'litter_state' translation table to map the state to a human-readable string.
     """
 
-    LOGGER.debug(f"Litter map work_state: {work_state}")
+    LOGGER.debug("Litter map work_state: %s", work_state)
 
     if work_state is None:
         return "idle"
@@ -274,7 +274,7 @@ def map_litter_event(litter_event: list[LitterRecord | None]) -> str | None:
         return litter_event.enum_event_type
 
     if event_type not in [5, 6, 7, 8, 10]:
-        LOGGER.debug(f"Unknown event type code: {event_type}")
+        LOGGER.debug("Unknown event type code: %s", event_type)
         return "event_type_unknown"
 
     if event_type == 10:
@@ -294,7 +294,7 @@ def map_litter_event(litter_event: list[LitterRecord | None]) -> str | None:
         return EVENT_MAPPING[event_type][result]
 
     except KeyError:
-        LOGGER.debug(f"Unknown event type result: {event_type}")
+        LOGGER.debug("Unknown event type result: %s", event_type)
         return f"event_type_{event_type}_unknown"
 
 
