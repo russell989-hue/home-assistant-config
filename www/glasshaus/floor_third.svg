@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 522" width="1024" height="522"><defs><style>
+.wall{fill:none;stroke:#54E0C7;stroke-opacity:.55;stroke-width:6;stroke-linejoin:round}
+.room{stroke:#B9C7D2;stroke-opacity:.18;stroke-width:2}
+.r-bed{fill:#8AA6FF;fill-opacity:.07}
+.r-bath{fill:#54E0C7;fill-opacity:.08}
+.r-social{fill:#E88BD0;fill-opacity:.06}
+.r-util{fill:#FFFFFF;fill-opacity:.03}
+.r-garage{fill:#FFFFFF;fill-opacity:.015}
+.lbl{font-family:system-ui,-apple-system,sans-serif;font-size:24px;font-weight:600;letter-spacing:.14em;fill:#8FA3B0}
+.lbs{font-family:system-ui,-apple-system,sans-serif;font-size:18px;font-weight:500;letter-spacing:.10em;fill:#5F7280}
+.fix{fill:none;stroke:#7C8F9C;stroke-opacity:.5;stroke-width:2.4}
+.car{fill:#8AA6FF;fill-opacity:.10;stroke:#8AA6FF;stroke-opacity:.35;stroke-width:2.4}
+</style></defs><rect x="0" y="0" width="1024" height="522" rx="32" fill="#0B1118"/><rect x="28" y="24" width="968" height="474" rx="16" fill="#0E151D"/><rect x="36" y="32" width="176" height="184" class="room r-bath"/><rect x="36" y="216" width="300" height="274" class="room r-bed"/><rect x="336" y="216" width="84" height="274" class="room r-util"/><path d="M212 32H996V490H420V216H212Z" class="room r-social"/><rect x="336" y="50" width="434" height="66" rx="6" class="fix"/><line x1="336" y1="83" x2="770" y2="83" class="fix"/><rect x="432" y="300" width="50" height="178" rx="6" class="fix"/><circle cx="457" cy="340" r="13" class="fix"/><rect x="442" y="420" width="30" height="40" rx="4" class="fix"/><rect x="48" y="44" width="68" height="104" rx="6" class="fix"/><rect x="28" y="24" width="968" height="474" rx="16" class="wall"/><text x="123" y="122" text-anchor="middle" class="lbl">BATH</text><text x="184" y="354" text-anchor="middle" class="lbl">BEDROOM</text><text x="378" y="353" text-anchor="middle" class="lbs" transform="rotate(-90 378 353)">CLOSET</text><text x="500" y="85" text-anchor="middle" class="lbs">STAIRS</text><text x="731" y="290" text-anchor="middle" class="lbl">SPEAKEASY</text><text x="508" y="389" text-anchor="middle" class="lbs" transform="rotate(-90 508 389)">WET BAR</text></svg>

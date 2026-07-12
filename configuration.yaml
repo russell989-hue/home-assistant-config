@@ -26,6 +26,11 @@ scene: !include scenes.yaml
 
 
 template:
+  - sensor:
+      - name: "AirBnB Guest"
+        unique_id: airbnb_guest_status
+        state: "{{ 'Home' if is_state('input_boolean.airbnb_guest_downstairs', 'on') else 'Out' }}"
+        icon: "{{ 'mdi:account' if is_state('input_boolean.airbnb_guest_downstairs', 'on') else 'mdi:account-arrow-right' }}"
   - binary_sensor:
       - name: "Basement Guest Present"
         unique_id: basement_guest_present
@@ -578,6 +583,20 @@ input_boolean:
 
 
 input_number:
+  shadowfax_trip_start_odometer:
+    name: "Shadowfax Trip Start Odometer"
+    min: 0
+    max: 999999
+    step: 0.1
+    mode: box
+
+  shadowfax_trip_start_battery:
+    name: "Shadowfax Trip Start Battery"
+    min: 0
+    max: 100
+    step: 0.1
+    mode: box
+
   decrement:
     name: Decrement Helper
     min: 0
@@ -594,6 +613,10 @@ input_number:
 
 
 input_text:
+  shadowfax_trip_start_location:
+    name: "Shadowfax Trip Start Location"
+    max: 100
+
   set_value:
     name: Set Value Helper
     max: 255
@@ -626,6 +649,12 @@ influxdb:
       - sensor.shadowfax_odometer
       
 input_datetime:
+  shadowfax_trip_start_time:
+    name: "Shadowfax Trip Start Time"
+    has_date: true
+    has_time: true
+    icon: mdi:car-clock
+
   basement_last_inside_signal:
     name: "Basement Last Inside Signal"
     has_date: true

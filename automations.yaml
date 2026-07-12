@@ -316,6 +316,7 @@
       model: claude-haiku-4-5
       provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
       trigger_state: 'on'
+      notification_time: at {{ now().strftime("%-I:%M %p") }}
     path: valentinfrlch/event_summary.yaml
 - alias: Alley Camera AI
   description: ''
@@ -613,7 +614,7 @@
       compact_unit_display: false
       custom_buttons_font_size: '8'
       date_format: '%A, %-m/%-d'
-      entity01: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      entity01: switch.speakeasy_light_panel_relay_stairwell_light
       home_custom_button01: switch.speakeasy_light_panel_relay_stairwell_light
       left_button_entity: switch.office_light_switch_relay_1
       left_button_name: Office Cans
@@ -626,7 +627,9 @@
       temperature_unit: °F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
-      entity02: switch.speakeasy_light_panel_relay_stairwell_light
+      entity02: light.speakeasy_all_cans
+      entity03: switch.upstairs_landing_light_switch_relay_1
+      entity04: script.secure_home
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779597970275'
   alias: Front Door Light Switch
@@ -637,8 +640,7 @@
       compact_unit_display: true
       custom_buttons_font_size: '8'
       date_format: '%A, %-m/%-d'
-      entity01: light.front_door_light_switch_relay_2
-      entity01_name: Front Door Ext.
+      entity01: automation.secure_home_lights_off_doors_locked_shadowfax_check
       left_button_entity: light.living_room
       left_button_name: Living Room
       nspanel_name: 068f64652ba9d4c080235eaaa67edeb3
@@ -650,10 +652,11 @@
       temperature_unit: °F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
-      entity01_icon: mdi:lightbulb
-      entity02: automation.secure_home_lights_off_doors_locked_shadowfax_check
-      entity02_name: Goodnight
-      entity02_icon: m3o:night-shelter
+      entity01_icon: ''
+      entity02: light.living_room
+      entity02_icon: ''
+      entity03: light.dining_cans
+      entity04: switch.kitchen_light_panel_kitchen_cans
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779764879918'
   alias: Downstairs Landing Switch Layout
@@ -672,6 +675,9 @@
       weather_entity: weather.forecast_home_2
       screensaver_display_time: true
       screensaver_display_time_font_size: '11'
+      entity01: light.dining_cans
+      entity02: switch.kitchen_light_panel_hanging_lights
+      entity03: light.living_room
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779773167330'
   alias: Bedroom Light Settings
@@ -848,54 +854,6 @@
           thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/cb2e851c74c042689496e6d8f0b9888a_thumb.jpg&provider=builtin&size=0
           title: Queen
     path: local/music_button.yaml
-- id: ai_agent_auto_1779948159386
-  alias: Secure Home - Lights Off, Doors Locked, Shadowfax Check
-  description: 'Turns off all interior lights, keeps exterior lights on, verifies
-    doors are locked, and checks that '
-  triggers: []
-  conditions: []
-  actions:
-  - target:
-      entity_id:
-      - light.office_light_switch_relay_1
-      - light.front_door_light_switch_relay_1
-      - light.downstairs_landing_light_panel_relay_1
-      - light.dining_room_light_panel_relay_2
-      - light.primary_bed_cans
-      - light.living_room
-      - light.speakeasy_all_cans
-    action: light.turn_off
-    data: {}
-  - condition: or
-    conditions:
-    - condition: state
-      entity_id: lock.front_door_lock
-      state:
-      - unlocked
-      - jammed
-    - condition: state
-      entity_id: lock.garage_lock
-      state: unlocked
-    - condition: state
-      entity_id: lock.side_door
-      state: unlocked
-  - data:
-      message: 'Warning: One or more doors are unlocked!'
-      title: Security Alert
-    action: notify.notify
-  - action: persistent_notification.create
-    data:
-      message: Door Unlocked or Jammed
-  - condition: not
-    conditions:
-    - condition: zone
-      entity_id: device_tracker.shadowfax_location
-      zone: zone.garage
-  - data:
-      message: 'Warning: Shadowfax is not in the garage!'
-      title: Vehicle Alert
-    action: notify.notify
-  mode: single
 - id: '1779984500987'
   alias: Rihanna
   description: ''
@@ -1298,8 +1256,8 @@
   - action: browser_mod.popup
     data:
       browser_id:
-      - living_room_ipad
-      - office_ipad
+      - Office ipad
+      - Office Desktop App
       title: Front Door
       size: wide
       timeout: 30000
@@ -1334,6 +1292,8 @@
         deliveries, and vehicles.
       include_filename: false
       max_tokens: 200
+      store_in_timeline: true
+      generate_title: true
     response_variable: doorbell_ai
   - action: notify.mobile_app_brian_s_z_flip_7
     data:
@@ -1357,15 +1317,19 @@
       message: 'This is the exterior camera at an Airbnb guest entrance door. A person
         triggered motion. Based on the sequence of frames, determine if the person
         ENTERED the house (approached and went in through the door) or LEFT the house
-        (came out of the door and walked away). Respond with exactly one word: ENTERING,
-        LEAVING, or UNCLEAR.'
+        (came out of the door and walked away). Reply with exactly two lines: line
+        1 is one word only - ENTERING, LEAVING, or UNCLEAR. Line 2 is one short factual
+        sentence describing what happened.'
       include_filename: false
-      max_tokens: 20
+      max_tokens: 80
+      store_in_timeline: true
+      generate_title: true
     response_variable: door_ai
   - choose:
     - conditions:
       - condition: template
-        value_template: '{{ ''ENTERING'' in (door_ai.response_text | upper) }}'
+        value_template: '{{ (door_ai.response_text | trim | upper).startswith(''ENTERING'')
+          }}'
       sequence:
       - action: input_boolean.turn_on
         target:
@@ -1376,7 +1340,8 @@
           message: Guest arrived - entered through the side door.
     - conditions:
       - condition: template
-        value_template: '{{ ''LEAVING'' in (door_ai.response_text | upper) }}'
+        value_template: '{{ (door_ai.response_text | trim | upper).startswith(''LEAVING'')
+          }}'
       sequence:
       - action: input_boolean.turn_off
         target:
@@ -1429,3 +1394,107 @@
     at: 03:00:00
   actions:
   - action: shell_command.cleanup_recordings
+- id: '1783743431190'
+  alias: Speakeasy too hot fan
+  description: ''
+  triggers:
+  - trigger: temperature.crossed_threshold
+    target:
+      floor_id: third_floor
+    options:
+      behavior: each
+      threshold:
+        type: above
+        value:
+          active_choice: number
+          unit_of_measurement: °F
+          number: 80
+      for:
+        hours: 0
+        minutes: 20
+        seconds: 0
+  conditions: []
+  actions:
+  - action: nest.set_fan_timer
+    metadata: {}
+    target:
+      device_id: 6e57428903d750f837b2e4eb7a5ea72a
+    data:
+      duration:
+        hours: 0
+        minutes: 30
+        seconds: 0
+  mode: single
+- id: shadowfax_trip_start
+  alias: "Shadowfax: Trip Start Capture"
+  mode: single
+  triggers:
+  - trigger: state
+    entity_id: sensor.shadowfax_gear_selector
+    from: "Park"
+    not_to:
+    - unavailable
+    - unknown
+    - "Park"
+  actions:
+  - action: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.shadowfax_trip_start_time
+    data:
+      timestamp: "{{ now().timestamp() }}"
+  - action: input_number.set_value
+    target:
+      entity_id: input_number.shadowfax_trip_start_odometer
+    data:
+      value: "{{ states('sensor.shadowfax_odometer') }}"
+  - action: input_number.set_value
+    target:
+      entity_id: input_number.shadowfax_trip_start_battery
+    data:
+      value: "{{ states('sensor.shadowfax_battery_state_of_charge') }}"
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.shadowfax_trip_start_location
+    data:
+      value: "{{ states('device_tracker.shadowfax_location') }}"
+
+- id: shadowfax_trip_end
+  alias: "Shadowfax: Trip End Log"
+  mode: single
+  triggers:
+  - trigger: state
+    entity_id: sensor.shadowfax_gear_selector
+    to: "Park"
+    not_from:
+    - unavailable
+    - unknown
+    - "Park"
+  variables:
+    start_odo: "{{ states('input_number.shadowfax_trip_start_odometer') | float(0) }}"
+    end_odo: "{{ states('sensor.shadowfax_odometer') | float(0) }}"
+    distance: "{{ (end_odo - start_odo) | round(1) }}"
+    start_batt: "{{ states('input_number.shadowfax_trip_start_battery') | float(0) }}"
+    end_batt: "{{ states('sensor.shadowfax_battery_state_of_charge') | float(0) }}"
+    batt_used: "{{ (start_batt - end_batt) | round(1) }}"
+    start_time: "{{ states('input_datetime.shadowfax_trip_start_time') }}"
+    start_loc: "{{ states('input_text.shadowfax_trip_start_location') }}"
+    end_loc: "{{ states('device_tracker.shadowfax_location') }}"
+    duration_min: >-
+      {{ ((now() - strptime(start_time, '%Y-%m-%d %H:%M:%S')).total_seconds() / 60) | round(0) if start_time not in ['unknown','unavailable',''] else 0 }}
+  conditions:
+  - condition: template
+    value_template: "{{ distance >= 0.3 and duration_min >= 2 }}"
+  actions:
+  - action: calendar.create_event
+    target:
+      entity_id: calendar.shadowfax_trips
+    data:
+      summary: "{{ start_loc }} → {{ end_loc }} ({{ distance }} mi)"
+      description: >-
+        Distance: {{ distance }} mi
+        Duration: {{ duration_min }} min
+        Avg speed: {{ (distance / (duration_min / 60)) | round(0) if duration_min > 0 else 0 }} mph
+        Battery: {{ start_batt }}% → {{ end_batt }}% (used {{ batt_used }}%)
+        Odometer: {{ start_odo }} → {{ end_odo }} mi
+      start_date_time: "{{ start_time }}"
+      end_date_time: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"

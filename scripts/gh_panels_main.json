@@ -1,0 +1,4024 @@
+{
+  "title": "Glass Haus",
+  "views": [
+    {
+      "title": "Home",
+      "path": "home",
+      "type": "sections",
+      "max_columns": 4,
+      "theme": "Frosted Glass Dark",
+      "sections": [
+        {
+          "type": "grid",
+          "column_span": 4,
+          "cards": [
+            {
+              "type": "custom:mushroom-chips-card",
+              "alignment": "justify",
+              "chips": [
+                {
+                  "type": "template",
+                  "content": "{{ now().strftime('%-I:%M %p') }}",
+                  "icon": "mdi:clock-outline",
+                  "icon_color": "teal"
+                },
+                {
+                  "type": "weather",
+                  "entity": "weather.forecast_home_2",
+                  "show_conditions": true,
+                  "show_temperature": true
+                },
+                {
+                  "type": "template",
+                  "entity": "input_boolean.airbnb_guest_downstairs",
+                  "icon": "mdi:account",
+                  "content": "Guest {{ 'in' if is_state('input_boolean.airbnb_guest_downstairs','on') else 'out' }}",
+                  "icon_color": "{{ 'green' if is_state('input_boolean.airbnb_guest_downstairs','on') else 'grey' }}"
+                },
+                {
+                  "type": "template",
+                  "entity": "alarm_control_panel.alarmo",
+                  "icon": "mdi:shield-check",
+                  "content": "{{ states.lock | selectattr('state','eq','locked') | list | count }} locked",
+                  "icon_color": "green",
+                  "tap_action": {
+                    "action": "more-info",
+                    "entity": "alarm_control_panel.alarmo"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "column_span": 4,
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Third \u00b7 Speakeasy",
+              "icon": "mdi:party-popper",
+              "heading_style": "subtitle"
+            },
+            {
+              "type": "picture-elements",
+              "image": "/local/glasshaus/floor_third.svg",
+              "elements": [
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.speakeasy_light_panel_relay_stairwell_light",
+                  "icon": "mdi:brightness-5",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "16%",
+                    "left": "54%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.speakeasy_light_panel_relay_stairwell_light'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.speakeasy_light_panel_relay_stairwell_light'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.speakeasy_light_panel_relay_stairwell_light'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.speakeasy_tv_light_group",
+                  "icon": "mdi:television-ambient-light",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "12%",
+                    "left": "80%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "Speakeasy TV"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "media_player.speakeasy_second_tv",
+                  "icon": "mdi:television",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "55%",
+                    "left": "90%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "2nd TV"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "media_player.jbl_receiver_amp",
+                  "icon": "mdi:amplifier",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "12%",
+                    "left": "88%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "JBL"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "media_player.br_desktop",
+                  "icon": "mdi:desktop-classic",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "24%",
+                    "left": "88%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "BR Desktop"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.speakeasy_black_lamp",
+                  "icon": "mdi:floor-lamp",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "84%",
+                    "left": "91%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.speakeasy_black_lamp'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.speakeasy_black_lamp'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.speakeasy_black_lamp'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "automation.speakeasy_panel_settings",
+                  "icon": "mdi:tablet-dashboard",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": true,
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/automation/edit/1780266778627"
+                  },
+                  "style": {
+                    "top": "9%",
+                    "left": "30%",
+                    "width": "44px",
+                    "height": "52px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.55)"
+                      },
+                      {
+                        "border-radius": "10px"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,.3)"
+                      },
+                      {
+                        "padding": "2px 0 0 0"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i' 'l'"
+                      },
+                      {
+                        "row-gap": "0px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "18px"
+                      },
+                      {
+                        "color": "#FFFFFF"
+                      }
+                    ],
+                    "label": [
+                      {
+                        "font-size": "11px"
+                      },
+                      {
+                        "color": "#B9C7D2"
+                      },
+                      {
+                        "font-weight": "600"
+                      }
+                    ]
+                  },
+                  "label": "[[[ return Math.round(Number(states['sensor.speakeasy_light_panel_temperature'].state)) + '\u00b0'; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_6",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "27%",
+                    "left": "46.6%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_6'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_6'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_6'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "27%",
+                    "left": "57.9%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_5",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "27%",
+                    "left": "69.2%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_5'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_5'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_5'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_3",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "27%",
+                    "left": "80.4%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_3'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_3'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_3'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_9",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "27%",
+                    "left": "91.7%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_9'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_9'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_9'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_7",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "65%",
+                    "left": "57.9%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_7'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_7'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_7'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_8",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "65%",
+                    "left": "69.2%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_8'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_8'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_8'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_2",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "65%",
+                    "left": "80.4%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_2'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_2'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_2'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.tz3210_dwzfzfjc_ts0505b_4",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "65%",
+                    "left": "91.7%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_4'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_4'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.tz3210_dwzfzfjc_ts0505b_4'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.speakeasy_all_cans",
+                  "icon": "mdi:lightbulb-group",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "46%",
+                    "left": "69.2%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.speakeasy_all_cans'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.speakeasy_all_cans'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.speakeasy_all_cans'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "grid_options": {
+                "rows": "auto",
+                "columns": 36
+              },
+              "card_mod": {
+                "style": "ha-card{border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,0.10);background:transparent}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "column_span": 4,
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Second Floor",
+              "icon": "mdi:home-floor-2",
+              "heading_style": "subtitle"
+            },
+            {
+              "type": "picture-elements",
+              "image": "/local/glasshaus/floor_second.svg",
+              "elements": [
+                {
+                  "type": "custom:button-card",
+                  "entity": "climate.upstairs_thermostat",
+                  "icon": "mdi:thermostat",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "left": "60%",
+                    "top": "27%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "[[[ const c=states['climate.upstairs_thermostat']; const t=c.attributes.current_temperature; const m=c.state; return (t!=null?Math.round(t)+'\u00b0':'\u2014')+' \u00b7 '+m; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "media_player.primary_bed_fire_tv",
+                  "icon": "mdi:television",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "43%",
+                    "left": "21%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "TV"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.front_left",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "57.3%",
+                    "left": "10.8%",
+                    "width": "40px",
+                    "height": "40px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.front_left'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.front_left'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "22px"
+                      },
+                      {
+                        "color": "[[[ return states['light.front_left'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.front_right",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "57.9%",
+                    "left": "25.9%",
+                    "width": "40px",
+                    "height": "40px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.front_right'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.front_right'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "22px"
+                      },
+                      {
+                        "color": "[[[ return states['light.front_right'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.rear_left",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "74.6%",
+                    "left": "11.8%",
+                    "width": "40px",
+                    "height": "40px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.rear_left'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.rear_left'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "22px"
+                      },
+                      {
+                        "color": "[[[ return states['light.rear_left'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.primary_bed_cans",
+                  "icon": "mdi:lightbulb-alert-outline",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "52%",
+                    "left": "31%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "Bed cans"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.rear_right",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "75.2%",
+                    "left": "26.4%",
+                    "width": "40px",
+                    "height": "40px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.rear_right'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.rear_right'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "22px"
+                      },
+                      {
+                        "color": "[[[ return states['light.rear_right'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.primary_bedroom_brian_s_lamp",
+                  "icon": "mdi:lamp",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "88%",
+                    "left": "6%",
+                    "width": "40px",
+                    "height": "40px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.primary_bedroom_brian_s_lamp'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.primary_bedroom_brian_s_lamp'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "22px"
+                      },
+                      {
+                        "color": "[[[ return states['light.primary_bedroom_brian_s_lamp'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.primary_bedroom_nicks_lamp",
+                  "icon": "mdi:lamp",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "89%",
+                    "left": "33.5%",
+                    "width": "40px",
+                    "height": "40px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.primary_bedroom_nicks_lamp'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.primary_bedroom_nicks_lamp'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "22px"
+                      },
+                      {
+                        "color": "[[[ return states['light.primary_bedroom_nicks_lamp'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.speakeasy_tv_light_group",
+                  "icon": "mdi:television-ambient-light",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "80.8%",
+                    "left": "69.1%",
+                    "width": "40px",
+                    "height": "40px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.speakeasy_tv_light_group'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.speakeasy_tv_light_group'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "22px"
+                      },
+                      {
+                        "color": "[[[ return states['light.speakeasy_tv_light_group'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.office_light_switch_relay_1",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "62%",
+                    "left": "81%",
+                    "width": "40px",
+                    "height": "40px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.office_light_switch_relay_1'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.office_light_switch_relay_1'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "22px"
+                      },
+                      {
+                        "color": "[[[ return states['light.office_light_switch_relay_1'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "media_player.office",
+                  "icon": "mdi:desktop-classic",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "59.6%",
+                    "left": "95%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": false
+                },
+                {
+                  "type": "icon",
+                  "style": {
+                    "left": "87%",
+                    "top": "33%"
+                  },
+                  "icon": "m3o:spatial-speaker",
+                  "title": "Office Sonos",
+                  "entity": "media_player.office_sonos"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.primary_bedroom_light_panel_relay_2",
+                  "icon": "mdi:fan",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "66%",
+                    "left": "21%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.primary_bedroom_light_panel_relay_2'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.primary_bedroom_light_panel_relay_2'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.primary_bedroom_light_panel_relay_2'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "automation.upstairs_landing_settings",
+                  "icon": "mdi:tablet-dashboard",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": true,
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/automation/edit/1779819877530"
+                  },
+                  "style": {
+                    "top": "7%",
+                    "left": "32%",
+                    "width": "44px",
+                    "height": "52px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.55)"
+                      },
+                      {
+                        "border-radius": "10px"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,.3)"
+                      },
+                      {
+                        "padding": "2px 0 0 0"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i' 'l'"
+                      },
+                      {
+                        "row-gap": "0px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "18px"
+                      },
+                      {
+                        "color": "#FFFFFF"
+                      }
+                    ],
+                    "label": [
+                      {
+                        "font-size": "11px"
+                      },
+                      {
+                        "color": "#B9C7D2"
+                      },
+                      {
+                        "font-weight": "600"
+                      }
+                    ]
+                  },
+                  "label": "[[[ return Math.round(Number(states['sensor.upstairs_landing_light_switch_temperature'].state)) + '\u00b0'; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "automation.office_light_switch",
+                  "icon": "mdi:tablet-dashboard",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": true,
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/automation/edit/1779593649665"
+                  },
+                  "style": {
+                    "top": "32%",
+                    "left": "65%",
+                    "width": "44px",
+                    "height": "52px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.55)"
+                      },
+                      {
+                        "border-radius": "10px"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,.3)"
+                      },
+                      {
+                        "padding": "2px 0 0 0"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i' 'l'"
+                      },
+                      {
+                        "row-gap": "0px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "18px"
+                      },
+                      {
+                        "color": "#FFFFFF"
+                      }
+                    ],
+                    "label": [
+                      {
+                        "font-size": "11px"
+                      },
+                      {
+                        "color": "#B9C7D2"
+                      },
+                      {
+                        "font-weight": "600"
+                      }
+                    ]
+                  },
+                  "label": "[[[ return Math.round(Number(states['sensor.office_light_switch_temperature'].state)) + '\u00b0'; ]]]"
+                }
+              ],
+              "grid_options": {
+                "columns": 36,
+                "rows": "auto"
+              },
+              "card_mod": {
+                "style": "ha-card{border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,0.10);background:transparent}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "column_span": 4,
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Main Floor",
+              "icon": "mdi:home-floor-1",
+              "heading_style": "subtitle"
+            },
+            {
+              "type": "picture-elements",
+              "image": "/local/glasshaus/floor_main.svg",
+              "elements": [
+                {
+                  "type": "custom:button-card",
+                  "entity": "climate.main_floor",
+                  "icon": "mdi:thermostat",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "22%",
+                    "left": "29%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "[[[ const c=states['climate.main_floor']; const t=c.attributes.current_temperature; return (t!=null?Math.round(t)+'\u00b0':'\u2014')+' \u00b7 '+c.state; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "lock.front_door_lock",
+                  "icon": "mdi:lock",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "11%",
+                    "left": "6%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": false
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "camera.doorbell",
+                  "icon": "mdi:cctv",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "18%",
+                    "left": "2.5%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": false
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "camera.backyard_snapshot",
+                  "icon": "mdi:cctv",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "94%",
+                    "left": "10%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": false
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "camera.garage_interior_live_view",
+                  "icon": "mdi:cctv",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "69%",
+                    "left": "97%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": false
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "camera.alley_live_view",
+                  "icon": "mdi:cctv",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "94%",
+                    "left": "97%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": false
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "media_player.living_room",
+                  "icon": "mdi:television",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "93%",
+                    "left": "15%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "LR TV"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "binary_sensor.shadowfax_charging_status",
+                  "icon": "mdi:ev-station",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "93%",
+                    "left": "82%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": false
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.front_left_can",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "28.1%",
+                    "left": "9.4%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.front_left_can'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.front_left_can'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.front_left_can'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.front_right_can",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "28.1%",
+                    "left": "26.9%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.front_right_can'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.front_right_can'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.front_right_can'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.rear_left_can",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "71.9%",
+                    "left": "9.4%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.rear_left_can'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.rear_left_can'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.rear_left_can'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.rear_right_can",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "71.9%",
+                    "left": "26.9%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.rear_right_can'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.rear_right_can'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.rear_right_can'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.living_room",
+                  "icon": "mdi:lightbulb-group",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "39%",
+                    "left": "18.2%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.living_room'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.living_room'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.living_room'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.dr_nw",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "28.1%",
+                    "left": "37.1%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.dr_nw'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.dr_nw'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.dr_nw'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.dr_ne",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "28.1%",
+                    "left": "45.7%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.dr_ne'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.dr_ne'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.dr_ne'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.dr_sw",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "71.9%",
+                    "left": "37.1%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.dr_sw'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.dr_sw'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.dr_sw'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.dr_se",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "71.9%",
+                    "left": "45.7%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.dr_se'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.dr_se'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.dr_se'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "light.dining_cans",
+                  "icon": "mdi:lightbulb-group",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "39%",
+                    "left": "41.4%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['light.dining_cans'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['light.dining_cans'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['light.dining_cans'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.kitchen_light_panel_kitchen_cans",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "36.9%",
+                    "left": "62.5%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.kitchen_light_panel_kitchen_cans'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.kitchen_light_panel_kitchen_cans'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.kitchen_light_panel_kitchen_cans'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.kitchen_light_panel_hanging_lights",
+                  "icon": "mdi:ceiling-light",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "52.3%",
+                    "left": "57.1%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.kitchen_light_panel_hanging_lights'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.kitchen_light_panel_hanging_lights'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.kitchen_light_panel_hanging_lights'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.kitchen_light_panel_hanging_lights",
+                  "icon": "mdi:ceiling-light",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "68.4%",
+                    "left": "57.1%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.kitchen_light_panel_hanging_lights'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.kitchen_light_panel_hanging_lights'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.kitchen_light_panel_hanging_lights'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.kitchen_light_panel_kitchen_cans",
+                  "icon": "mdi:lightbulb",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "83.8%",
+                    "left": "62.5%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.kitchen_light_panel_kitchen_cans'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.kitchen_light_panel_kitchen_cans'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.kitchen_light_panel_kitchen_cans'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "automation.downstairs_landing_switch_layout",
+                  "icon": "mdi:tablet-dashboard",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": true,
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/automation/edit/1779764879918"
+                  },
+                  "style": {
+                    "top": "8%",
+                    "left": "61%",
+                    "width": "44px",
+                    "height": "52px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.55)"
+                      },
+                      {
+                        "border-radius": "10px"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,.3)"
+                      },
+                      {
+                        "padding": "2px 0 0 0"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i' 'l'"
+                      },
+                      {
+                        "row-gap": "0px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "18px"
+                      },
+                      {
+                        "color": "#FFFFFF"
+                      }
+                    ],
+                    "label": [
+                      {
+                        "font-size": "11px"
+                      },
+                      {
+                        "color": "#B9C7D2"
+                      },
+                      {
+                        "font-weight": "600"
+                      }
+                    ]
+                  },
+                  "label": "[[[ return Math.round(Number(states['sensor.downstairs_landing_light_switch_temperature'].state)) + '\u00b0'; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "automation.kitchen_panel_settings",
+                  "icon": "mdi:tablet-dashboard",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": true,
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/automation/edit/1779823749940"
+                  },
+                  "style": {
+                    "top": "20%",
+                    "left": "69%",
+                    "width": "44px",
+                    "height": "52px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.55)"
+                      },
+                      {
+                        "border-radius": "10px"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,.3)"
+                      },
+                      {
+                        "padding": "2px 0 0 0"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i' 'l'"
+                      },
+                      {
+                        "row-gap": "0px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "18px"
+                      },
+                      {
+                        "color": "#FFFFFF"
+                      }
+                    ],
+                    "label": [
+                      {
+                        "font-size": "11px"
+                      },
+                      {
+                        "color": "#B9C7D2"
+                      },
+                      {
+                        "font-weight": "600"
+                      }
+                    ]
+                  },
+                  "label": "[[[ return Math.round(Number(states['sensor.kitchen_light_panel_temperature'].state)) + '\u00b0'; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "automation.front_door_light_switch",
+                  "icon": "mdi:tablet-dashboard",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": true,
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/automation/edit/1779597970275"
+                  },
+                  "style": {
+                    "top": "40%",
+                    "left": "6%",
+                    "width": "44px",
+                    "height": "52px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.55)"
+                      },
+                      {
+                        "border-radius": "10px"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,.3)"
+                      },
+                      {
+                        "padding": "2px 0 0 0"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i' 'l'"
+                      },
+                      {
+                        "row-gap": "0px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "18px"
+                      },
+                      {
+                        "color": "#FFFFFF"
+                      }
+                    ],
+                    "label": [
+                      {
+                        "font-size": "11px"
+                      },
+                      {
+                        "color": "#B9C7D2"
+                      },
+                      {
+                        "font-weight": "600"
+                      }
+                    ]
+                  },
+                  "label": "[[[ return Math.round(Number(states['sensor.front_door_light_switch_temperature'].state)) + '\u00b0'; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "automation.dining_room_panel_settings",
+                  "icon": "mdi:tablet-dashboard",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": true,
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/automation/edit/1779820074575"
+                  },
+                  "style": {
+                    "top": "90%",
+                    "left": "41.4%",
+                    "width": "44px",
+                    "height": "52px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.55)"
+                      },
+                      {
+                        "border-radius": "10px"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,.3)"
+                      },
+                      {
+                        "padding": "2px 0 0 0"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i' 'l'"
+                      },
+                      {
+                        "row-gap": "0px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "18px"
+                      },
+                      {
+                        "color": "#FFFFFF"
+                      }
+                    ],
+                    "label": [
+                      {
+                        "font-size": "11px"
+                      },
+                      {
+                        "color": "#B9C7D2"
+                      },
+                      {
+                        "font-weight": "600"
+                      }
+                    ]
+                  },
+                  "label": "[[[ return Math.round(Number(states['sensor.dining_room_switch_temperature'].state)) + '\u00b0'; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.front_door_light_switch_relay_2",
+                  "icon": "mdi:lightbulb-outline",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "3%",
+                    "left": "1%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.front_door_light_switch_relay_2'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.front_door_light_switch_relay_2'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.front_door_light_switch_relay_2'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "switch.dining_room_switch_relay_1",
+                  "icon": "mdi:lightbulb-outline",
+                  "show_name": false,
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "top": "97%",
+                    "left": "41.4%",
+                    "width": "36px",
+                    "height": "36px",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "[[[ return states['switch.dining_room_switch_relay_1'].state==='on'?'rgba(84,224,199,0.22)':'rgba(10,14,18,0.55)'; ]]]"
+                      },
+                      {
+                        "border-radius": "50%"
+                      },
+                      {
+                        "box-shadow": "[[[ return states['switch.dining_room_switch_relay_1'].state==='on'?'0 0 16px 3px rgba(84,224,199,0.75)':'none'; ]]]"
+                      },
+                      {
+                        "border": "1px solid rgba(255,255,255,0.10)"
+                      },
+                      {
+                        "transition": "background .4s, box-shadow .4s"
+                      },
+                      {
+                        "padding": "0"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "20px"
+                      },
+                      {
+                        "color": "[[[ return states['switch.dining_room_switch_relay_1'].state==='on'?'#B9F5EA':'#6b7883'; ]]]"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "grid_options": {
+                "columns": 36,
+                "rows": "auto"
+              },
+              "card_mod": {
+                "style": "ha-card{border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,0.10);background:transparent}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "column_span": 4,
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Basement \u00b7 Guest Suite",
+              "icon": "mdi:home-floor-b",
+              "heading_style": "subtitle"
+            },
+            {
+              "type": "picture-elements",
+              "image": "/local/glasshaus/floor_basement.svg",
+              "elements": [
+                {
+                  "type": "custom:button-card",
+                  "entity": "sensor.downstairs_temperature",
+                  "icon": "mdi:thermometer",
+                  "show_state": false,
+                  "show_label": false,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "left": "50%",
+                    "top": "50%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  },
+                  "show_name": true,
+                  "name": "[[[ const v=Number(states['sensor.downstairs_temperature'].state); return isNaN(v)?'\u2014':Math.round(v)+'\u00b0F'; ]]]"
+                },
+                {
+                  "type": "custom:button-card",
+                  "entity": "input_boolean.airbnb_guest_downstairs",
+                  "icon": "mdi:account-check",
+                  "show_state": false,
+                  "show_label": false,
+                  "name": "[[[ return states['input_boolean.airbnb_guest_downstairs'].state==='on' ? 'Guest home (AI)' : 'Guest out (AI)'; ]]]",
+                  "show_name": true,
+                  "tap_action": {
+                    "action": "more-info"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  },
+                  "style": {
+                    "left": "59%",
+                    "top": "25%",
+                    "transform": "translate(-50%,-50%)"
+                  },
+                  "styles": {
+                    "card": [
+                      {
+                        "background": "rgba(10,14,18,0.72)"
+                      },
+                      {
+                        "border": "1px solid rgba(84,224,199,0.35)"
+                      },
+                      {
+                        "border-radius": "999px"
+                      },
+                      {
+                        "padding": "4px 10px"
+                      },
+                      {
+                        "box-shadow": "0 2px 10px rgba(0,0,0,.5)"
+                      }
+                    ],
+                    "grid": [
+                      {
+                        "grid-template-areas": "'i n'"
+                      },
+                      {
+                        "grid-template-columns": "min-content min-content"
+                      },
+                      {
+                        "align-items": "center"
+                      },
+                      {
+                        "gap": "5px"
+                      }
+                    ],
+                    "icon": [
+                      {
+                        "width": "15px"
+                      },
+                      {
+                        "color": "#54E0C7"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "font-size": "12px"
+                      },
+                      {
+                        "font-weight": "600"
+                      },
+                      {
+                        "color": "#EAF1F4"
+                      },
+                      {
+                        "white-space": "nowrap"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "grid_options": {
+                "columns": 36,
+                "rows": "auto"
+              },
+              "card_mod": {
+                "style": "ha-card{border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,0.10);background:transparent}"
+              }
+            }
+          ]
+        }
+      ],
+      "show_icon_and_title": true,
+      "icon": "mdi:home"
+    },
+    {
+      "title": "Sentinel",
+      "path": "sentinel",
+      "type": "sections",
+      "max_columns": 2,
+      "theme": "Frosted Glass Dark",
+      "sections": [
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "AI Sentinel",
+              "icon": "mdi:cctv",
+              "heading_style": "subtitle"
+            },
+            {
+              "type": "custom:stack-in-card",
+              "mode": "vertical",
+              "cards": [
+                {
+                  "type": "grid",
+                  "columns": 4,
+                  "square": true,
+                  "cards": [
+                    {
+                      "type": "picture-entity",
+                      "entity": "camera.doorbell_snapshot",
+                      "name": "Doorbell",
+                      "show_state": false,
+                      "show_name": true,
+                      "tap_action": {
+                        "action": "more-info"
+                      },
+                      "card_mod": {
+                        "style": "ha-card{border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.10)}"
+                      }
+                    },
+                    {
+                      "type": "picture-entity",
+                      "entity": "camera.backyard_snapshot",
+                      "name": "Backyard",
+                      "show_state": false,
+                      "show_name": true,
+                      "tap_action": {
+                        "action": "more-info"
+                      },
+                      "card_mod": {
+                        "style": "ha-card{border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.10)}"
+                      }
+                    },
+                    {
+                      "type": "picture-entity",
+                      "entity": "camera.side_door_snapshot",
+                      "name": "Side door",
+                      "show_state": false,
+                      "show_name": true,
+                      "tap_action": {
+                        "action": "more-info"
+                      },
+                      "card_mod": {
+                        "style": "ha-card{border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.10)}"
+                      }
+                    },
+                    {
+                      "type": "picture-entity",
+                      "entity": "camera.garage_snapshot",
+                      "name": "Garage",
+                      "show_state": false,
+                      "show_name": true,
+                      "tap_action": {
+                        "action": "more-info"
+                      },
+                      "card_mod": {
+                        "style": "ha-card{border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.10)}"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "custom:llmvision-card",
+                  "entity": "calendar.llm_vision_timeline",
+                  "number_of_events": 6,
+                  "title": "What Claude sees"
+                }
+              ],
+              "card_mod": {
+                "style": "ha-card{border-radius:22px;border:1px solid rgba(84,224,199,.22)}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Shadowfax & Climate",
+              "icon": "mdi:car-electric",
+              "heading_style": "subtitle"
+            },
+            {
+              "type": "custom:button-card",
+              "entity": "sensor.shadowfax_battery_state_of_charge",
+              "show_name": false,
+              "show_icon": false,
+              "show_state": false,
+              "tap_action": {
+                "action": "more-info"
+              },
+              "custom_fields": {
+                "ring": "[[[ const s=Math.round(Number(states['sensor.shadowfax_battery_state_of_charge'].state)); const chg=states['binary_sensor.shadowfax_charging_status'].state==='on'; const col=chg?'#F2B45C':'#54E0C7'; const glow=chg?';box-shadow:0 0 18px rgba(242,180,92,.55)':''; return `<div class=\"gh-ring\" style=\"background:conic-gradient(${col} ${s}%, rgba(255,255,255,0.10) 0)${glow}\"><div class=\"gh-rin\">${s}%</div></div>`; ]]]",
+                "main": "[[[ const r=Math.round(Number(states['sensor.shadowfax_range'].state)); const loc=states['device_tracker.shadowfax_location'].state; const chg=states['binary_sensor.shadowfax_charging_status'].state==='on'; const lim=Math.round(Number(states['sensor.shadowfax_battery_state_of_charge_limit'].state)); return `<div class=\"gh-m\"><div class=\"gh-t\">Shadowfax${chg?' \u00b7 charging':''}</div><div class=\"gh-r\">${r}<span> mi range</span></div><div class=\"gh-s\">limit ${lim}% \u00b7 ${loc}</div></div>`; ]]]"
+              },
+              "styles": {
+                "card": [
+                  {
+                    "padding": "18px"
+                  },
+                  {
+                    "border-radius": "20px"
+                  },
+                  {
+                    "border": "1px solid rgba(84,224,199,.22)"
+                  }
+                ],
+                "grid": [
+                  {
+                    "grid-template-areas": "'ring main'"
+                  },
+                  {
+                    "grid-template-columns": "min-content 1fr"
+                  },
+                  {
+                    "align-items": "center"
+                  },
+                  {
+                    "gap": "18px"
+                  }
+                ],
+                "custom_fields": {
+                  "ring": [
+                    {
+                      "width": "84px"
+                    },
+                    {
+                      "height": "84px"
+                    }
+                  ],
+                  "main": [
+                    {
+                      "justify-self": "start"
+                    },
+                    {
+                      "text-align": "left"
+                    }
+                  ]
+                }
+              },
+              "extra_styles": ".gh-ring{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;transition:box-shadow .4s}.gh-rin{width:64px;height:64px;border-radius:50%;background:rgba(10,14,18,.78);color:#EAF1F4;display:grid;place-items:center;font-weight:600;font-size:18px}.gh-t{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#54E0C7}.gh-r{font-size:27px;font-weight:600;color:#EAF1F4;margin-top:2px}.gh-r span{font-size:12px;color:#9DB0BC;font-weight:400}.gh-s{font-size:12px;color:#9DB0BC;margin-top:4px}"
+            },
+            {
+              "type": "custom:mushroom-climate-card",
+              "entity": "climate.main_floor",
+              "name": "Main floor",
+              "hvac_modes": [
+                "off",
+                "cool",
+                "heat",
+                "heat_cool"
+              ],
+              "collapsible_controls": true
+            },
+            {
+              "type": "custom:mushroom-climate-card",
+              "entity": "climate.upstairs_thermostat",
+              "name": "Upstairs",
+              "hvac_modes": [
+                "off",
+                "cool",
+                "heat",
+                "heat_cool"
+              ],
+              "collapsible_controls": true
+            }
+          ]
+        }
+      ],
+      "show_icon_and_title": true,
+      "icon": "mdi:cctv"
+    }
+  ]
+}

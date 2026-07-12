@@ -101,3 +101,6 @@ go2rtc-*
 
 # Backup files (never track)
 *.bak.*
+
+# git PAT store (never commit)
+.git-credentials

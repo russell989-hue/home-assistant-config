@@ -88,3 +88,125 @@ save_last_recording:
     - action: shell_command.save_last_recording
       data:
         camera: "{{ camera }}"
+
+secure_home:
+  alias: "Secure Home"
+  icon: mdi:shield-home
+  description: "Turn off all interior lights (exterior stays on) and lock all doors, with a status notification."
+  sequence:
+    - action: light.turn_off
+      continue_on_error: true
+      target:
+        entity_id:
+          - light.speakeasy_all_cans
+          - light.tz3210_dwzfzfjc_ts0505b
+          - light.tz3210_dwzfzfjc_ts0505b_2
+          - light.tz3210_dwzfzfjc_ts0505b_3
+          - light.tz3210_dwzfzfjc_ts0505b_4
+          - light.tz3210_dwzfzfjc_ts0505b_5
+          - light.tz3210_dwzfzfjc_ts0505b_6
+          - light.tz3210_dwzfzfjc_ts0505b_7
+          - light.tz3210_dwzfzfjc_ts0505b_8
+          - light.tz3210_dwzfzfjc_ts0505b_9
+          - light.speakeasy_tv_light_group
+          - light.primary_bed_cans
+          - light.rear_left
+          - light.front_right
+          - light.rear_right
+          - light.front_left
+          - light.primary_bedroom_brian_s_lamp
+          - light.primary_bedroom_nicks_lamp
+          - light.living_room
+          - light.rear_left_can
+          - light.front_right_can
+          - light.front_left_can
+          - light.rear_right_can
+          - light.office_light_switch_relay_1
+          - light.downstairs_landing_light_panel_relay_1
+          - light.dining_room_light_panel_relay_1
+          - light.dr_sw
+          - light.dr_ne
+          - light.dr_se
+          - light.dr_nw
+          - light.dining_cans
+          - light.front_door_light_switch_relay_1
+    - action: switch.turn_off
+      continue_on_error: true
+      target:
+        entity_id:
+          - switch.speakeasy_black_lamp
+          - switch.upstairs_landing_light_switch_relay_1
+    - action: media_player.turn_off
+      continue_on_error: true
+      target:
+        entity_id:
+          - media_player.fire_tv_192_168_68_83
+          - media_player.lg_webos_tv_uq7590pub
+          - media_player.lg_webos_tv_uq7590pub_2
+          - media_player.nick_s_tv
+          - media_player.speakeasy_main_tv
+          - media_player.speakeasy_second_tv
+    - action: lock.lock
+      continue_on_error: true
+      target:
+        entity_id:
+          - lock.front_door_lock
+          - lock.garage_lock
+          - lock.side_door
+    - delay:
+        seconds: 10
+    - variables:
+        problem_doors: >-
+          {% set ns = namespace(items=[]) -%}
+          {% for e in ['lock.front_door_lock','lock.garage_lock','lock.side_door'] -%}
+            {% if not is_state(e, 'locked') -%}
+              {% set ns.items = ns.items + [state_attr(e, 'friendly_name') ~ ': ' ~ states(e)] -%}
+            {% endif -%}
+          {% endfor -%}
+          {{ ns.items }}
+        shadowfax_away: "{{ not is_state('device_tracker.shadowfax_location', 'garage') }}"
+    - variables:
+        problem_lights: >-
+          {% set ns = namespace(items=[]) -%}
+          {% for e in states.light | selectattr('state','eq','on') | list -%}
+            {% if e.entity_id in [
+              'light.speakeasy_all_cans','light.speakeasy_tv_light_group','light.primary_bed_cans',
+              'light.rear_left','light.front_right','light.rear_right','light.front_left',
+              'light.primary_bedroom_brian_s_lamp','light.primary_bedroom_nicks_lamp','light.living_room',
+              'light.rear_left_can','light.front_right_can','light.front_left_can','light.rear_right_can',
+              'light.office_light_switch_relay_1','light.downstairs_landing_light_panel_relay_1',
+              'light.dining_room_light_panel_relay_1','light.dr_sw','light.dr_ne','light.dr_se','light.dr_nw',
+              'light.dining_cans','light.front_door_light_switch_relay_1'] -%}
+              {% set ns.items = ns.items + [e.attributes.friendly_name or e.entity_id] -%}
+            {% endif -%}
+          {% endfor -%}
+          {{ ns.items }}
+        problems: >-
+          {% set ns2 = namespace(items=[]) -%}
+          {% for x in problem_doors %}{% set ns2.items = ns2.items + ['Not locked - ' ~ x] %}{% endfor -%}
+          {% for x in problem_lights %}{% set ns2.items = ns2.items + ['Still on - ' ~ x] %}{% endfor -%}
+          {{ ns2.items }}
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ problems | length > 0 }}"
+          sequence:
+            - action: persistent_notification.create
+              data:
+                notification_id: secure_home_issues
+                title: "Secure Home - Issues"
+                message: >-
+                  Secure Home ran at {{ now().strftime('%-I:%M %p') }} with problems:
+                  {% for p in problems %}
+                  - {{ p }}{% endfor %}
+            - action: notify.mobile_app_brian_s_z_flip_7
+              data:
+                title: "Secure Home - Action Needed"
+                message: >-
+                  {{ problems | join(', ') }}.
+      default:
+        - action: notify.mobile_app_brian_s_z_flip_7
+          data:
+            title: "Secure Home"
+            message: >-
+              All interior lights off, all doors locked.{{ ' Shadowfax is not in the garage.' if shadowfax_away else '' }}

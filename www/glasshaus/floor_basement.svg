@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 576" width="1024" height="576"><defs><style>
+.wall{fill:none;stroke:#8AA6FF;stroke-opacity:.55;stroke-width:6;stroke-linejoin:round}
+.room{stroke:#B9C7D2;stroke-opacity:.18;stroke-width:2}
+.r-bed{fill:#8AA6FF;fill-opacity:.07}
+.r-bath{fill:#54E0C7;fill-opacity:.08}
+.r-social{fill:#E88BD0;fill-opacity:.06}
+.r-util{fill:#FFFFFF;fill-opacity:.03}
+.r-garage{fill:#FFFFFF;fill-opacity:.015}
+.lbl{font-family:system-ui,-apple-system,sans-serif;font-size:24px;font-weight:600;letter-spacing:.14em;fill:#8FA3B0}
+.lbs{font-family:system-ui,-apple-system,sans-serif;font-size:18px;font-weight:500;letter-spacing:.10em;fill:#5F7280}
+.lbxs{font-family:system-ui,-apple-system,sans-serif;font-size:14px;font-weight:500;letter-spacing:.08em;fill:#5F7280}
+.fix{fill:none;stroke:#7C8F9C;stroke-opacity:.5;stroke-width:2.4}
+.car{fill:#8AA6FF;fill-opacity:.10;stroke:#8AA6FF;stroke-opacity:.35;stroke-width:2.4}
+</style></defs><rect x="0" y="0" width="1024" height="576" rx="32" fill="#0B1118"/><rect x="28" y="24" width="968" height="528" rx="16" fill="#0E151D"/><rect x="36" y="32" width="296" height="128" class="room r-util"/><rect x="36" y="160" width="291" height="383" class="room r-bed"/><rect x="332" y="112" width="296" height="65" class="room r-social"/><rect x="332" y="177" width="120" height="283" class="room r-util"/><rect x="452" y="177" width="275" height="366" class="room r-social"/><rect x="716" y="32" width="280" height="160" class="room r-bath"/><rect x="727" y="192" width="269" height="360" class="room r-social"/><rect x="327" y="460" width="125" height="83" class="room r-util"/><rect x="346" y="120" width="268" height="50" rx="6" class="fix"/><line x1="346" y1="145" x2="614" y2="145" class="fix"/><rect x="264" y="66" width="60" height="60" rx="4" class="fix"/><ellipse cx="920" cy="90" rx="44" ry="30" class="fix"/><rect x="360" y="260" width="46" height="60" rx="4" class="fix"/><circle cx="383" cy="380" r="16" class="fix"/><rect x="480" y="480" width="160" height="40" rx="6" class="fix"/><rect x="28" y="24" width="968" height="528" rx="16" class="wall"/><text x="119" y="106" text-anchor="middle" class="lbl">CLOSET</text><text x="180" y="330" text-anchor="middle" class="lbl">BEDROOM</text><text x="386" y="417" text-anchor="middle" class="lbs">UTIL</text><text x="480" y="135" text-anchor="middle" class="lbs">STAIRS</text><text x="583" y="350" text-anchor="middle" class="lbl">KITCHEN</text><text x="853" y="350" text-anchor="middle" class="lbl">LIVING ROOM</text><text x="855" y="131" text-anchor="middle" class="lbl">BATH</text><text x="851" y="229" text-anchor="middle" class="lbs">TV</text><text x="386" y="505" text-anchor="middle" class="lbs">CLOSET</text><text x="294" y="102" text-anchor="middle" class="lbs">W/D</text></svg>
