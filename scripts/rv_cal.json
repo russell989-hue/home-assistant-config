@@ -1,0 +1,25 @@
+{
+  "title": "Calendar",
+  "views": [
+    {
+      "type": "panel",
+      "path": "my-calendar",
+      "title": "My Calendar",
+      "icon": "m3o:calendar-month",
+      "subview": true,
+      "cards": [
+        {
+          "initial_view": "dayGridMonth",
+          "type": "calendar",
+          "entities": [
+            "calendar.trash_recycling",
+            "calendar.events",
+            "calendar.guests",
+            "calendar.travel"
+          ],
+          "theme": "Frosted Glass Dark Lite"
+        }
+      ]
+    }
+  ]
+}

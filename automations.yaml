@@ -46,25 +46,6 @@
     to: Park
     trigger: state
 - actions:
-  - action: androidtv.adb_command
-    data:
-      command: POWER
-    metadata: {}
-    target:
-      device_id: e7e7e5508cc6cd57f9cc07bf81cda039
-  - action: androidtv.adb_command
-    data:
-      command: HDMI3
-    metadata: {}
-    target:
-      device_id: e7e7e5508cc6cd57f9cc07bf81cda039
-  alias: Turn on Speakeasy TV When Computer On
-  conditions: []
-  description: ''
-  id: '1775969670747'
-  mode: single
-  triggers: []
-- actions:
   - action: switch.turn_off
     data: {}
     metadata: {}
@@ -360,32 +341,8 @@
             media_content_type: music_assistant
           - media_content_id: library://playlist/95
             media_content_type: music
-          thumbnail: null
+          thumbnail:
           title: ABBA
-    path: local/music_button.yaml
-- id: '1778690297093'
-  alias: Rihanna
-  description: ''
-  use_blueprint:
-    input:
-      button: button
-      device_id: 176c7e2dbfd60f2d304a788a0676b326
-      media_player: media_player.living_room_sonos
-      playlist:
-        entity_id: media_player.living_room_sonos
-        media_content_id: library://playlist/97
-        media_content_type: playlist
-        metadata:
-          children_media_class: track
-          media_class: playlist
-          navigateIds:
-          - {}
-          - media_content_id: playlists
-            media_content_type: music_assistant
-          - media_content_id: library://playlist/97
-            media_content_type: music
-          thumbnail: null
-          title: Rihanna2
     path: local/music_button.yaml
 - alias: Earth Wind and Fire
   description: ''
@@ -408,28 +365,27 @@
             media_content_type: music_assistant
           - media_content_id: library://playlist/98
             media_content_type: music
-          thumbnail: null
+          thumbnail:
           title: Earth Wind and Fire
     path: local/music_button.yaml
 - actions:
   - action: notify.send_message
     data:
-      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',\
-        \ 'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail',\
-        \ 'Tornado', 'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm',\
-        \ 'Flood', 'Special Weather Statement'] -%}\n        {%- set matched = alerts\
-        \ | selectattr('Event', 'defined') | selectattr('Event', 'search', keywords\
-        \ | join('|'), true) | list -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',\
-        \ 'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'\
-        \ if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the\
-        \ garage.' if 'zone.home' in zones or 'zone.front_door' in zones else ('❗\
-        \ Shadowfax is on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8\
-        \ Shadowfax is away from home!')) -%}\n\n        {%- for alert in matched\
-        \ %}\n        ⚠️ {{ alert.Event }}\n        {{ alert.Headline | title }}\n\
-        \        {%- if 'HAZARD...' in alert.Description %}\n        ⚡ Hazard: {{\
-        \ alert.Description.split('HAZARD...')[1].split('\\n')[0] | trim | capitalize\
-        \ }}\n        {%- endif %}\n        \n        {% endfor %}\n        {{ sfx\
-        \ }}"
+      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
+        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
+        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
+        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
+        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
+        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
+        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
+        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
+        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
+        %}\n        {{ sfx }}"
       title: '⚠️ Weather Alert:'
     target:
       entity_id:
@@ -439,22 +395,21 @@
       - notify.office_ipad
   - action: notify.persistent_notification
     data:
-      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',\
-        \ 'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail',\
-        \ 'Tornado', 'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm',\
-        \ 'Flood', 'Special Weather Statement'] -%}\n        {%- set matched = alerts\
-        \ | selectattr('Event', 'defined') | selectattr('Event', 'search', keywords\
-        \ | join('|'), true) | list -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',\
-        \ 'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'\
-        \ if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the\
-        \ garage.' if 'zone.home' in zones or 'zone.front_door' in zones else ('❗\
-        \ Shadowfax is on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8\
-        \ Shadowfax is away from home!')) -%}\n\n        {%- for alert in matched\
-        \ %}\n        ⚠️ {{ alert.Event }}\n        {{ alert.Headline | title }}\n\
-        \        {%- if 'HAZARD...' in alert.Description %}\n        ⚡ Hazard: {{\
-        \ alert.Description.split('HAZARD...')[1].split('\\n')[0] | trim | capitalize\
-        \ }}\n        {%- endif %}\n        \n        {% endfor %}\n        {{ sfx\
-        \ }}"
+      message: "{%- set alerts = state_attr('sensor.nws_alerts_gps_REDACTED_nws_alerts_alerts',
+        'Alerts') or [] -%}\n        {%- set keywords = ['Thunderstorm', 'Hail', 'Tornado',
+        'Severe', 'Wind Advisory', 'Winter Storm', 'Blizzard', 'Ice Storm', 'Flood',
+        'Special Weather Statement'] -%}\n        {%- set matched = alerts | selectattr('Event',
+        'defined') | selectattr('Event', 'search', keywords | join('|'), true) | list
+        -%}\n        {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%}\n        {%- set sfx = '✅ Shadowfax is in the garage.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%}\n\n        {%- for alert in matched %}\n        ⚠️
+        {{ alert.Event }}\n        {{ alert.Headline | title }}\n        {%- if 'HAZARD...'
+        in alert.Description %}\n        ⚡ Hazard: {{ alert.Description.split('HAZARD...')[1].split('\\n')[0]
+        | trim | capitalize }}\n        {%- endif %}\n        \n        {% endfor
+        %}\n        {{ sfx }}"
       title: '⚠️ Weather Alert:'
     metadata: {}
   alias: NWS Alerts
@@ -487,41 +442,33 @@
       | list | count > 0 }}'
   - action: notify.send_message
     data:
-      message: '{%- set bad = [''lightning'', ''lightning-rainy'', ''hail'', ''exceptional'',
-        ''pouring'', ''hurricane'', ''tornado''] -%} {%- set forecast = hourly_forecast[''weather.forecast_home_2''][''forecast''][:12]
-        -%} {%- set hits = forecast | selectattr(''condition'', ''search'', bad |
-        join(''|''), true) | list -%} {%- set zones = state_attr(''device_tracker.shadowfax_location'',
-        ''in_zones'') or [] -%} {%- set sfx = ''✅ Shadowfax is in the garage — protected.''
-        if ''zone.garage'' in zones else (''⚠️ Shadowfax is at home but not in the
-        garage.'' if ''zone.home'' in zones or ''zone.front_door'' in zones else (''❗
-        Shadowfax is on the street — exposed.'' if ''zone.street'' in zones else ''🚨
-        Shadowfax is away from home!'')) -%} {{ hits | count }} hour(s) of severe
-        conditions expected today.
-
-        First: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom(''%-I:%M
-        %p'') }} ({{ hits[0].condition | replace(''-'', '' '') | title }})
-
-        {{ sfx }}'
-      title: 🌩️ Severe Weather Forecast Today
+      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
+        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
+        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
+        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
+        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
+        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
+      title: "\U0001F329️ Severe Weather Forecast Today"
     target:
       entity_id: notify.brian_s_z_flip_7
   - action: persistent_notification.create
     data:
-      message: '{%- set bad = [''lightning'', ''lightning-rainy'', ''hail'', ''exceptional'',
-        ''pouring'', ''hurricane'', ''tornado''] -%} {%- set forecast = hourly_forecast[''weather.forecast_home_2''][''forecast''][:12]
-        -%} {%- set hits = forecast | selectattr(''condition'', ''search'', bad |
-        join(''|''), true) | list -%} {%- set zones = state_attr(''device_tracker.shadowfax_location'',
-        ''in_zones'') or [] -%} {%- set sfx = ''✅ Shadowfax is in the garage — protected.''
-        if ''zone.garage'' in zones else (''⚠️ Shadowfax is at home but not in the
-        garage.'' if ''zone.home'' in zones or ''zone.front_door'' in zones else (''❗
-        Shadowfax is on the street — exposed.'' if ''zone.street'' in zones else ''🚨
-        Shadowfax is away from home!'')) -%} {{ hits | count }} hour(s) of severe
-        conditions expected today.
-
-        First: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom(''%-I:%M
-        %p'') }} ({{ hits[0].condition | replace(''-'', '' '') | title }})
-
-        {{ sfx }}'
+      message: "{%- set bad = ['lightning', 'lightning-rainy', 'hail', 'exceptional',
+        'pouring', 'hurricane', 'tornado'] -%} {%- set forecast = hourly_forecast['weather.forecast_home_2']['forecast'][:12]
+        -%} {%- set hits = forecast | selectattr('condition', 'search', bad | join('|'),
+        true) | list -%} {%- set zones = state_attr('device_tracker.shadowfax_location',
+        'in_zones') or [] -%} {%- set sfx = '✅ Shadowfax is in the garage — protected.'
+        if 'zone.garage' in zones else ('⚠️ Shadowfax is at home but not in the garage.'
+        if 'zone.home' in zones or 'zone.front_door' in zones else ('❗ Shadowfax is
+        on the street — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax
+        is away from home!')) -%} {{ hits | count }} hour(s) of severe conditions
+        expected today.\nFirst: {{ hits[0].datetime | as_datetime | as_local | timestamp_custom('%-I:%M
+        %p') }} ({{ hits[0].condition | replace('-', ' ') | title }})\n{{ sfx }}"
       title: Morning Forecast Alert
   alias: Weather - Morning Forecast Alert
   conditions: []
@@ -534,18 +481,12 @@
 - actions:
   - action: notify.send_message
     data:
-      message: '{%- set zones = state_attr(''device_tracker.shadowfax_location'',
-        ''in_zones'') or [] -%}
-
-        {%- set sfx = ''✅ Shadowfax is in the garage — protected.'' if ''zone.garage''
-        in zones else (''⚠️ Shadowfax is at home but not in the garage.'' if ''zone.home''
-        in zones or ''zone.front_door'' in zones else (''❗ Shadowfax is on the street
-        — exposed.'' if ''zone.street'' in zones else ''🚨 Shadowfax is away from home!''))
-        -%}
-
-        Thunderstorm detected — hail is possible.
-
-        {{ sfx }}'
+      message: "{%- set zones = state_attr('device_tracker.shadowfax_location', 'in_zones')
+        or [] -%}\n{%- set sfx = '✅ Shadowfax is in the garage — protected.' if 'zone.garage'
+        in zones else ('⚠️ Shadowfax is at home but not in the garage.' if 'zone.home'
+        in zones or 'zone.front_door' in zones else ('❗ Shadowfax is on the street
+        — exposed.' if 'zone.street' in zones else '\U0001F6A8 Shadowfax is away from
+        home!')) -%}\nThunderstorm detected — hail is possible.\n{{ sfx }}"
       title: ⛈️ Thunderstorm Conditions Now
     target:
       entity_id: notify.brian_s_z_flip_7
@@ -578,7 +519,7 @@
         media_content_type: lovelace
         metadata:
           browse_entity_id: media_player.office_display
-          children_media_class: null
+          children_media_class:
           media_class: app
           navigateIds:
           - {}
@@ -640,7 +581,7 @@
       compact_unit_display: true
       custom_buttons_font_size: '8'
       date_format: '%A, %-m/%-d'
-      entity01: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      entity01: script.secure_home
       left_button_entity: light.living_room
       left_button_name: Living Room
       nspanel_name: 068f64652ba9d4c080235eaaa67edeb3
@@ -702,7 +643,7 @@
       entity03_icon: ''
       button_page01_label: Buttons
       entity02: switch.nicks_lamp
-      entity04: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      entity04: script.secure_home
       home_indoor_temp_visible: true
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779819877530'
@@ -726,7 +667,7 @@
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
       indoortemp: sensor.upstairs_landing_light_switch_temperature
-      entity01: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      entity01: script.secure_home
       entity02: switch.kitchen_light_panel_hanging_lights
       entity03: switch.kitchen_light_panel_kitchen_cans
       entity04: light.living_room
@@ -823,13 +764,13 @@
         media_content_id: library://playlist/94
         media_content_type: music
         metadata:
-          children_media_class: null
+          children_media_class:
           media_class: playlist
           navigateIds:
           - {}
           - media_content_id: playlists
             media_content_type: music_assistant
-          thumbnail: null
+          thumbnail:
           title: Led Zeppelin
     path: local/music_button.yaml
 - alias: Queen
@@ -845,7 +786,7 @@
         media_content_id: library://playlist/104
         media_content_type: music
         metadata:
-          children_media_class: null
+          children_media_class:
           media_class: playlist
           navigateIds:
           - {}
@@ -855,7 +796,7 @@
           title: Queen
     path: local/music_button.yaml
 - id: '1779984500987'
-  alias: Rihanna
+  alias: The Eagles
   description: ''
   use_blueprint:
     path: local/music_button.yaml
@@ -869,15 +810,15 @@
         media_content_type: music
         metadata:
           title: The Eagles
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
             media_content_id: playlists
 - id: '1779984821653'
-  alias: Music Button (Play / Stop / Skip)
+  alias: Daft Punk
   description: ''
   use_blueprint:
     path: local/music_button.yaml
@@ -890,9 +831,9 @@
         media_content_type: music
         metadata:
           title: Daft Punk
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -913,9 +854,9 @@
         media_content_type: music
         metadata:
           title: Rihanna2
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -935,9 +876,9 @@
         media_content_type: music
         metadata:
           title: Fleetwood mac
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -957,7 +898,7 @@
         media_content_type: playlist
         metadata:
           title: Lady Gaga
-          thumbnail: null
+          thumbnail:
           media_class: playlist
           children_media_class: track
           navigateIds:
@@ -983,13 +924,13 @@
           title: Tupac
           thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/a6d855d2aef24f0facb069979ad1d220_thumb.jpg&provider=builtin&size=0
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
             media_content_id: playlists
 - id: '1780092592498'
-  alias: Tupac
+  alias: Amy Winehouse
   description: ''
   use_blueprint:
     path: local/music_button.yaml
@@ -1003,9 +944,9 @@
         media_content_type: music
         metadata:
           title: Amy Winehouse
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1026,7 +967,7 @@
           title: Michael Jackson
           thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/afb4ab3bbf5f4f288ccad0ba3be62d1e_thumb.jpg&provider=builtin&size=0
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1049,7 +990,7 @@
           title: Prince
           thumbnail: http://192.168.68.78:8095/imageproxy?path=/collage/255f2cc89718420a95e76c55b4f2cf7a_thumb.jpg&provider=builtin&size=0
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1069,9 +1010,9 @@
         media_content_type: music
         metadata:
           title: Miley
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1091,9 +1032,9 @@
         media_content_type: music
         metadata:
           title: Band of Horses
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1113,9 +1054,9 @@
         media_content_type: music
         metadata:
           title: Foo Fighters
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1142,7 +1083,7 @@
       entity01_name: Lamp
       button_page01_label: Buttons
       entity02: scene.speakeasy_movie_mode
-      entity03: automation.secure_home_lights_off_doors_locked_shadowfax_check
+      entity03: script.secure_home
       screensaver_display_time: true
       screensaver_display_time_font_size: '11'
 - id: '1782197029408'
@@ -1184,9 +1125,9 @@
         media_content_type: music
         metadata:
           title: Florence and the Machine
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1206,9 +1147,9 @@
         media_content_type: music
         metadata:
           title: Johnny Cash
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1228,9 +1169,9 @@
         media_content_type: music
         metadata:
           title: Griz
-          thumbnail: null
+          thumbnail:
           media_class: playlist
-          children_media_class: null
+          children_media_class:
           navigateIds:
           - {}
           - media_content_type: music_assistant
@@ -1278,8 +1219,8 @@
     - event.doorbell_chime
   conditions:
   - condition: template
-    value_template: "{{ this.attributes.last_triggered is none or\n   (now() - this.attributes.last_triggered).total_seconds()\
-      \ > 120 }}"
+    value_template: "{{ this.attributes.last_triggered is none or\n   (now() - this.attributes.last_triggered).total_seconds()
+      > 120 }}"
   actions:
   - action: llmvision.stream_analyzer
     data:
@@ -1426,75 +1367,76 @@
         seconds: 0
   mode: single
 - id: shadowfax_trip_start
-  alias: "Shadowfax: Trip Start Capture"
+  alias: 'Shadowfax: Trip Start Capture'
   mode: single
   triggers:
   - trigger: state
     entity_id: sensor.shadowfax_gear_selector
-    from: "Park"
+    from: Park
     not_to:
     - unavailable
     - unknown
-    - "Park"
+    - Park
   actions:
   - action: input_datetime.set_datetime
     target:
       entity_id: input_datetime.shadowfax_trip_start_time
     data:
-      timestamp: "{{ now().timestamp() }}"
+      timestamp: '{{ now().timestamp() }}'
   - action: input_number.set_value
     target:
       entity_id: input_number.shadowfax_trip_start_odometer
     data:
-      value: "{{ states('sensor.shadowfax_odometer') }}"
+      value: '{{ states(''sensor.shadowfax_odometer'') }}'
   - action: input_number.set_value
     target:
       entity_id: input_number.shadowfax_trip_start_battery
     data:
-      value: "{{ states('sensor.shadowfax_battery_state_of_charge') }}"
+      value: '{{ states(''sensor.shadowfax_battery_state_of_charge'') }}'
   - action: input_text.set_value
     target:
       entity_id: input_text.shadowfax_trip_start_location
     data:
-      value: "{{ states('device_tracker.shadowfax_location') }}"
-
+      value: '{{ states(''device_tracker.shadowfax_location'') }}'
 - id: shadowfax_trip_end
-  alias: "Shadowfax: Trip End Log"
+  alias: 'Shadowfax: Trip End Log'
   mode: single
   triggers:
   - trigger: state
     entity_id: sensor.shadowfax_gear_selector
-    to: "Park"
+    to: Park
     not_from:
     - unavailable
     - unknown
-    - "Park"
+    - Park
   variables:
-    start_odo: "{{ states('input_number.shadowfax_trip_start_odometer') | float(0) }}"
-    end_odo: "{{ states('sensor.shadowfax_odometer') | float(0) }}"
-    distance: "{{ (end_odo - start_odo) | round(1) }}"
-    start_batt: "{{ states('input_number.shadowfax_trip_start_battery') | float(0) }}"
-    end_batt: "{{ states('sensor.shadowfax_battery_state_of_charge') | float(0) }}"
-    batt_used: "{{ (start_batt - end_batt) | round(1) }}"
-    start_time: "{{ states('input_datetime.shadowfax_trip_start_time') }}"
-    start_loc: "{{ states('input_text.shadowfax_trip_start_location') }}"
-    end_loc: "{{ states('device_tracker.shadowfax_location') }}"
-    duration_min: >-
-      {{ ((now() - strptime(start_time, '%Y-%m-%d %H:%M:%S')).total_seconds() / 60) | round(0) if start_time not in ['unknown','unavailable',''] else 0 }}
+    start_odo: '{{ states(''input_number.shadowfax_trip_start_odometer'') | float(0)
+      }}'
+    end_odo: '{{ states(''sensor.shadowfax_odometer'') | float(0) }}'
+    distance: '{{ (end_odo - start_odo) | round(1) }}'
+    start_batt: '{{ states(''input_number.shadowfax_trip_start_battery'') | float(0)
+      }}'
+    end_batt: '{{ states(''sensor.shadowfax_battery_state_of_charge'') | float(0)
+      }}'
+    batt_used: '{{ (start_batt - end_batt) | round(1) }}'
+    start_time: '{{ states(''input_datetime.shadowfax_trip_start_time'') }}'
+    start_loc: '{{ states(''input_text.shadowfax_trip_start_location'') }}'
+    end_loc: '{{ states(''device_tracker.shadowfax_location'') }}'
+    duration_min: '{{ ((now() - strptime(start_time, ''%Y-%m-%d %H:%M:%S'')).total_seconds()
+      / 60) | round(0) if start_time not in [''unknown'',''unavailable'',''''] else
+      0 }}'
   conditions:
   - condition: template
-    value_template: "{{ distance >= 0.3 and duration_min >= 2 }}"
+    value_template: '{{ distance >= 0.3 and duration_min >= 2 }}'
   actions:
   - action: calendar.create_event
     target:
       entity_id: calendar.shadowfax_trips
     data:
-      summary: "{{ start_loc }} → {{ end_loc }} ({{ distance }} mi)"
-      description: >-
-        Distance: {{ distance }} mi
-        Duration: {{ duration_min }} min
-        Avg speed: {{ (distance / (duration_min / 60)) | round(0) if duration_min > 0 else 0 }} mph
-        Battery: {{ start_batt }}% → {{ end_batt }}% (used {{ batt_used }}%)
-        Odometer: {{ start_odo }} → {{ end_odo }} mi
-      start_date_time: "{{ start_time }}"
-      end_date_time: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+      summary: '{{ start_loc }} → {{ end_loc }} ({{ distance }} mi)'
+      description: 'Distance: {{ distance }} mi Duration: {{ duration_min }} min Avg
+        speed: {{ (distance / (duration_min / 60)) | round(0) if duration_min > 0
+        else 0 }} mph Battery: {{ start_batt }}% → {{ end_batt }}% (used {{ batt_used
+        }}%) Odometer: {{ start_odo }} → {{ end_odo }} mi'
+      start_date_time: '{{ start_time }}'
+      end_date_time: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'

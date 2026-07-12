@@ -792,10 +792,6 @@ command_line:
       command: "python3 /config/scripts/jbl_ma510.py surr_status 2>/dev/null || echo unavailable"
       scan_interval: 30
 
-# --- LOGGER SETTINGS ---
-logger:
-  default: info
-
 homeassistant:
   allowlist_external_dirs:
     - "/config"
@@ -809,3 +805,21 @@ panel_custom:
     sidebar_title: Material You
     sidebar_icon: mdi:palette
     module_url: /hacsfiles/material-you-utilities/material-you-utilities.min.js
+    
+recorder:
+  purge_keep_days: 7
+  exclude:
+    domains:
+      - update        # 123 update trackers, no history value
+      - button
+      - image
+    entity_globs:
+      - sensor.*_browser_*        # browser_mod chatter
+      - sensor.*_last_update_trigger
+      - sensor.sun_next_*
+      - sensor.*_lqi              # zigbee mesh noise
+      - sensor.*_rssi
+
+# and make the quieter logging permanent (already active until restart):
+logger:
+  default: warning
