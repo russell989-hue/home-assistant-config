@@ -1,0 +1,599 @@
+{
+  "title": "Zenobia",
+  "visible": [
+    {
+      "user": "3418dede5de64644852e0ddb5eba049a"
+    },
+    {
+      "user": "25269374020f4dceb870347e1254f5c6"
+    }
+  ],
+  "views": [
+    {
+      "title": "Home",
+      "path": "home",
+      "icon": "mdi:home-variant",
+      "type": "sections",
+      "max_columns": 4,
+      "sections": [
+        {
+          "type": "grid",
+          "column_span": 1,
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Who's home"
+            },
+            {
+              "type": "tile",
+              "entity": "person.brianrussell",
+              "name": "Brian",
+              "color": "amber",
+              "vertical": false,
+              "features_position": "bottom"
+            },
+            {
+              "type": "tile",
+              "entity": "person.nick",
+              "color": "cyan"
+            },
+            {
+              "type": "tile",
+              "entity": "device_tracker.shadowfax_location",
+              "name": "Shadowfax",
+              "icon": "mdi:car-electric",
+              "vertical": false,
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/shadowfax-dashboard"
+              },
+              "features_position": "bottom"
+            },
+            {
+              "type": "custom:mushroom-template-card",
+              "entity": "input_boolean.airbnb_guest_downstairs",
+              "primary": "AirBnB Guest is:",
+              "secondary": "{{ 'Home' if is_state('input_boolean.airbnb_guest_downstairs','on') else 'Out' }}",
+              "icon": "{{ 'mdi:account' if is_state('input_boolean.airbnb_guest_downstairs','on') else 'mdi:account-arrow-right' }}",
+              "icon_color": "{{ 'green' if is_state('input_boolean.airbnb_guest_downstairs','on') else 'blue' }}",
+              "fill_container": false,
+              "tap_action": {
+                "action": "more-info"
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "switch.living_room_sonos_subwoofer_enabled",
+              "name": "Subwoofer",
+              "icon": "m3o:speaker",
+              "vertical": false,
+              "tap_action": {
+                "action": "toggle"
+              },
+              "features_position": "bottom"
+            },
+            {
+              "type": "heading",
+              "heading": "Climate"
+            },
+            {
+              "type": "custom:mushroom-climate-card",
+              "layout": "horizontal",
+              "show_temperature_control": false,
+              "primary_info": "name",
+              "secondary_info": "state",
+              "hvac_modes": [],
+              "tap_action": {
+                "action": "more-info"
+              },
+              "collapsible_controls": false,
+              "grid_options": {
+                "columns": 6,
+                "rows": 1
+              },
+              "entity": "climate.main_floor"
+            },
+            {
+              "type": "custom:mushroom-climate-card",
+              "layout": "horizontal",
+              "show_temperature_control": false,
+              "primary_info": "name",
+              "secondary_info": "state",
+              "hvac_modes": [],
+              "tap_action": {
+                "action": "more-info"
+              },
+              "entity": "climate.upstairs_thermostat",
+              "collapsible_controls": false,
+              "grid_options": {
+                "columns": 6,
+                "rows": 1
+              }
+            },
+            {
+              "type": "heading",
+              "heading": "Weather",
+              "heading_style": "title",
+              "icon": "m3o:partly-cloudy-day",
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/zenobia-home/weather"
+              }
+            },
+            {
+              "type": "custom:weather-forecast-card",
+              "show_current": true,
+              "show_forecast": true,
+              "default_forecast": "daily",
+              "tap_action": {
+                "action": "more-info"
+              },
+              "entity": "weather.forecast_home_2",
+              "forecast": {
+                "mode": "chart",
+                "show_sun_times": true,
+                "use_color_thresholds": true,
+                "scroll_to_selected": true,
+                "show_attribute_selector": true
+              },
+              "forecast_action": {
+                "tap_action": {
+                  "action": "toggle-forecast"
+                },
+                "hold_action": {
+                  "action": "select-forecast-attribute"
+                }
+              },
+              "grid_options": {
+                "rows": 6,
+                "columns": 12
+              }
+            },
+            {
+              "type": "heading",
+              "heading": "Radar",
+              "heading_style": "title",
+              "icon": "mdi:radar"
+            },
+            {
+              "type": "custom:weather-radar-card",
+              "height": "220px",
+              "markers": [
+                {
+                  "entity": "zone.home"
+                }
+              ],
+              "show_alerts": true,
+              "alerts_min_severity": "Moderate",
+              "extra_labels": true,
+              "zoom_level": 8,
+              "data_source": "RainViewer",
+              "map_style": "Light"
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "column_span": 1,
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Lights",
+              "heading_style": "title",
+              "icon": "m3o:light-group"
+            },
+            {
+              "type": "light",
+              "entity": "light.living_room",
+              "grid_options": {
+                "rows": "auto",
+                "columns": 6
+              }
+            },
+            {
+              "type": "light",
+              "entity": "light.dining_cans",
+              "grid_options": {
+                "rows": "auto",
+                "columns": 6
+              }
+            },
+            {
+              "show_name": true,
+              "show_icon": true,
+              "type": "button",
+              "entity": "switch.kitchen_light_panel_kitchen_cans"
+            },
+            {
+              "show_name": true,
+              "show_icon": true,
+              "type": "button",
+              "entity": "switch.kitchen_light_panel_hanging_lights"
+            },
+            {
+              "type": "heading",
+              "heading": "Security",
+              "heading_style": "title",
+              "icon": "mdi:security"
+            },
+            {
+              "type": "tile",
+              "entity": "lock.front_door_lock",
+              "icon": "",
+              "show_entity_picture": true,
+              "vertical": false,
+              "tap_action": {
+                "action": "more-info"
+              },
+              "icon_tap_action": {
+                "action": "more-info"
+              },
+              "features_position": "bottom"
+            },
+            {
+              "type": "tile",
+              "entity": "lock.garage_lock",
+              "icon": "",
+              "show_entity_picture": true,
+              "vertical": false,
+              "tap_action": {
+                "action": "more-info"
+              },
+              "icon_tap_action": {
+                "action": "more-info"
+              },
+              "features_position": "bottom"
+            },
+            {
+              "type": "tile",
+              "entity": "lock.side_door",
+              "icon": "",
+              "show_entity_picture": true,
+              "vertical": false,
+              "tap_action": {
+                "action": "more-info"
+              },
+              "icon_tap_action": {
+                "action": "more-info"
+              },
+              "features_position": "bottom"
+            },
+            {
+              "type": "custom:mushroom-template-card",
+              "primary": "Basement AirBnB",
+              "secondary": "{% if is_state('calendar.zenobia_airbnb', 'on') %}\n  Currently Rented\n{% else %}\n  Vacant\n{% endif %}",
+              "icon": "mdi:home-account",
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/calendar"
+              },
+              "color": "{% if is_state('calendar.zenobia_airbnb', 'on') %}\n  cyan\n{% else %}\n  disabled\n{% endif %}\n",
+              "features_position": "bottom"
+            },
+            {
+              "type": "heading",
+              "heading": "Calendar",
+              "heading_style": "title",
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/zenobia-home/calendar"
+              }
+            },
+            {
+              "maxDaysToShow": 30,
+              "showDate": true,
+              "linkTarget": "_self",
+              "showCalendarName": true,
+              "enableModeChange": true,
+              "firstDayOfWeek": 0,
+              "showEventIcon": true,
+              "hold_action": {
+                "action": "assist",
+                "pipeline_id": "preferred"
+              },
+              "double_tap_action": {
+                "action": "navigate",
+                "navigation_path": "/zenobia-home/calendar"
+              },
+              "type": "custom:atomic-calendar-revive",
+              "name": "Calendar",
+              "entities": [
+                {
+                  "entity": "calendar.events",
+                  "icon": "m3o:event",
+                  "name": "Events",
+                  "color": "orange"
+                },
+                {
+                  "entity": "calendar.guests",
+                  "name": "Guests",
+                  "icon": "mdi:account-multiple-outline",
+                  "color": "green",
+                  "showMultiDay": false
+                },
+                {
+                  "entity": "calendar.travel",
+                  "name": " Travel",
+                  "icon": "mdi:airplane-takeoff",
+                  "color": "blue"
+                },
+                {
+                  "entity": "calendar.trash_recycling",
+                  "name": "Trash & Recycle",
+                  "icon": "m3of:recycling",
+                  "color": "red"
+                }
+              ],
+              "grid_options": {
+                "rows": 7,
+                "columns": "full"
+              }
+            },
+            {
+              "type": "heading",
+              "heading": "Shopping List",
+              "heading_style": "title",
+              "icon": "m3o:event-list"
+            },
+            {
+              "type": "todo-list",
+              "entity": "todo.shopping_list"
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "column_span": 2,
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Music Assistant",
+              "heading_style": "title"
+            },
+            {
+              "type": "custom:mass-player-card",
+              "entities": [
+                "media_player.living_room_sonos",
+                "media_player.office_sonos",
+                "media_player.jbl_ma510_ce9841_2"
+              ],
+              "default_section": "music_player",
+              "grid_options": {
+                "columns": "full"
+              }
+            },
+            {
+              "type": "heading",
+              "heading": "Rooms",
+              "heading_style": "title"
+            },
+            {
+              "square": true,
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:room-summary-card",
+                  "area": "living_room",
+                  "area_name": "Living Room",
+                  "actions": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/mobile-dashboard/living-room"
+                    }
+                  },
+                  "problem": {
+                    "display": "active_only"
+                  },
+                  "entities": [
+                    "light.living_room"
+                  ],
+                  "occupancy": {
+                    "entities": [
+                      "binary_sensor.main_floor_occupancy"
+                    ]
+                  },
+                  "entity": "media_player.living_room_sonos"
+                },
+                {
+                  "type": "custom:room-summary-card",
+                  "area": "kitchen",
+                  "entities": [
+                    "switch.kitchen_light_panel_kitchen_cans",
+                    "switch.kitchen_light_panel_hanging_lights"
+                  ],
+                  "entity": "media_player.kitchen_max_display",
+                  "actions": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/mobile-dashboard/kitchen"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:room-summary-card",
+                  "area": "bedroom",
+                  "entities": [
+                    "light.primary_bed_cans",
+                    "switch.brian_s_lamp",
+                    "switch.nicks_lamp",
+                    "sensor.primary_bedroom_light_switch_detailed_entity"
+                  ],
+                  "entity": "light.primary_bed_cans",
+                  "actions": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/mobile-dashboard/primary-bedroom"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:room-summary-card",
+                  "area": "office",
+                  "entity": "media_player.office_sonos",
+                  "entities": [
+                    "media_player.office_display",
+                    "light.office_light_switch_relay_1",
+                    "media_player.office"
+                  ],
+                  "actions": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/mobile-dashboard/office"
+                    }
+                  },
+                  "lights": [
+                    "light.office_light_switch_relay_1"
+                  ]
+                }
+              ],
+              "columns": 2
+            },
+            {
+              "square": true,
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:room-summary-card",
+                  "area": "speakeasy",
+                  "problem": {
+                    "display": "active_only"
+                  },
+                  "features": [
+                    "full_card_actions"
+                  ],
+                  "slider_style": "filled",
+                  "entities": [
+                    "light.speakeasy_all_cans",
+                    "switch.speakeasy_black_lamp",
+                    "media_player.br_desktop"
+                  ],
+                  "actions": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/mobile-dashboard/speakeasy"
+                    }
+                  },
+                  "entity": "media_player.jbl_ma510_ce9841_2",
+                  "lights": [
+                    "light.speakeasy_all_cans"
+                  ]
+                },
+                {
+                  "type": "custom:room-summary-card",
+                  "area": "garage",
+                  "entity": "sensor.shadowfax_range",
+                  "actions": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/mobile-dashboard/garage"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:room-summary-card",
+                  "area": "outside",
+                  "entity": "sensor.envoy_202504003929_energy_production_today",
+                  "actions": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/mobile-dashboard/backyard"
+                    }
+                  }
+                }
+              ],
+              "columns": 2,
+              "grid_options": {
+                "rows": "auto"
+              }
+            }
+          ]
+        }
+      ],
+      "theme": "Frosted Glass Dark",
+      "cards": [],
+      "visible": [
+        {
+          "user": "3418dede5de64644852e0ddb5eba049a"
+        },
+        {
+          "user": "cc7b8461cd144f3a9f882bf3b731dc38"
+        },
+        {
+          "user": "25269374020f4dceb870347e1254f5c6"
+        },
+        {
+          "user": "32b0a65c97ee49be8aa696807b83d4b4"
+        }
+      ],
+      "header": {},
+      "show_icon_and_title": true
+    },
+    {
+      "title": "Cameras",
+      "path": "cameras",
+      "icon": "mdi:cctv",
+      "type": "sections",
+      "max_columns": 3,
+      "sections": [
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Camera Swipe",
+              "heading_style": "title"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "url": "doorbell"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "url": "side_door",
+              "button": "lock.side_door"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "url": "garage"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "url": "backyard"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "entity": "camera.alley_live_view"
+            }
+          ],
+          "column_span": 3
+        }
+      ],
+      "show_icon_and_title": true
+    },
+    {
+      "type": "sections",
+      "path": "map",
+      "max_columns": 4,
+      "title": "Map",
+      "icon": "m3o:map",
+      "sections": [
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "type": "map",
+              "show_all": true,
+              "theme_mode": "auto",
+              "grid_options": {
+                "columns": "full",
+                "rows": 12
+              }
+            }
+          ],
+          "column_span": 4
+        }
+      ],
+      "show_icon_and_title": true
+    }
+  ]
+}

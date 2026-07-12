@@ -356,6 +356,65 @@ template:
           {% endif %}
 
           {{ ns.count }}
+        attributes:
+          alerts: >
+            {% set ns = namespace(items=[]) %}
+            {% if states('sensor.front_door_battery_2') | float(100) < 20 %}
+              {% set ns.items = ns.items + ['Front door lock battery low (' ~ states('sensor.front_door_battery_2') ~ '%)'] %}
+            {% endif %}
+            {% if states('sensor.side_door_battery') | float(100) < 20 %}
+              {% set ns.items = ns.items + ['Side door lock battery low (' ~ states('sensor.side_door_battery') ~ '%)'] %}
+            {% endif %}
+            {% if states('sensor.side_door_battery_2') | float(100) < 20 %}
+              {% set ns.items = ns.items + ['Side door keypad battery low (' ~ states('sensor.side_door_battery_2') ~ '%)'] %}
+            {% endif %}
+            {% if states('zone.home') | int(0) == 0 %}
+              {% if is_state('lock.front_door', 'unlocked')
+                    or is_state('lock.side_door', 'unlocked')
+                    or is_state('lock.side_door_2', 'unlocked') %}
+                {% set ns.items = ns.items + ['A door is unlocked and nobody is home'] %}
+              {% endif %}
+            {% endif %}
+            {% if is_state('input_boolean.rubbish', 'on') %}
+              {% set ns.items = ns.items + ['Trash night — take bins out'] %}
+            {% endif %}
+            {% if is_state('input_boolean.recycle', 'on') %}
+              {% set ns.items = ns.items + ['Recycling night — take bins out'] %}
+            {% endif %}
+            {% if is_state('sensor.ge_washer_d828c9a07203_d828c9a07203_laundry_machine_state', 'Run') %}
+              {% set ns.items = ns.items + ['Washer running'] %}
+            {% endif %}
+            {% if is_state('sensor.ge_dryer_av102747g_av102747g_laundry_machine_state', 'Run') %}
+              {% set ns.items = ns.items + ['Dryer running'] %}
+            {% endif %}
+            {% if is_state('binary_sensor.ge_washer_d828c9a07203_d828c9a07203_laundry_end_of_cycle', 'on') %}
+              {% set ns.items = ns.items + ['Washer finished — unload it'] %}
+            {% endif %}
+            {% if is_state('binary_sensor.ge_dryer_av102747g_av102747g_laundry_end_of_cycle', 'on') %}
+              {% set ns.items = ns.items + ['Dryer finished — unload it'] %}
+            {% endif %}
+            {% if is_state('binary_sensor.petkit_puramax_wastebin_filled', 'on') %}
+              {% set ns.items = ns.items + ['Litter box waste bin full'] %}
+            {% endif %}
+            {% if states('sensor.petkit_puramax_litter_level') | float(100) < 20 %}
+              {% set ns.items = ns.items + ['Litter level low (' ~ states('sensor.petkit_puramax_litter_level') ~ '%)'] %}
+            {% endif %}
+            {% if states('sensor.air_smart_spray_liquid_level') | float(100) < 15 %}
+              {% set ns.items = ns.items + ['Smart spray liquid low'] %}
+            {% endif %}
+            {% if states('sensor.shadowfax_battery_state_of_charge') | float(100) < 25 %}
+              {% set ns.items = ns.items + ['Shadowfax charge low (' ~ states('sensor.shadowfax_battery_state_of_charge') ~ '%)'] %}
+            {% endif %}
+            {% if is_state('binary_sensor.be5000_wan_status', 'off') %}
+              {% set ns.items = ns.items + ['Internet is down'] %}
+            {% endif %}
+            {% if states('sensor.brians_ipad_783_battery_level') | float(100) < 25 %}
+              {% set ns.items = ns.items + ["Brian's iPad battery low (" ~ states('sensor.brians_ipad_783_battery_level') ~ '%)'] %}
+            {% endif %}
+            {% if states('sensor.office_ha_display_battery_level') | float(100) < 25 %}
+              {% set ns.items = ns.items + ['Office display battery low (' ~ states('sensor.office_ha_display_battery_level') ~ '%)'] %}
+            {% endif %}
+            {{ ns.items }}
 
   # -------------------------------------------------------------------
   # 3) Hourly + Daily Weather Forecast (TRIGGER-BASED — needs HA restart)
