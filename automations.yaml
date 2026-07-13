@@ -1086,6 +1086,8 @@
       entity03: script.secure_home
       screensaver_display_time: true
       screensaver_display_time_font_size: '11'
+      entity04: button.petkit_puramax_deodorize
+      entity05: switch.office_light_switch_relay_1
 - id: '1782197029408'
   alias: Brian's Lamp Night Timer
   description: ''
@@ -1234,6 +1236,7 @@
       include_filename: false
       max_tokens: 200
       store_in_timeline: true
+      expose_images: true
       generate_title: true
     response_variable: doorbell_ai
   - action: notify.mobile_app_brian_s_z_flip_7
@@ -1264,6 +1267,7 @@
       include_filename: false
       max_tokens: 80
       store_in_timeline: true
+      expose_images: true
       generate_title: true
     response_variable: door_ai
   - choose:
@@ -1319,15 +1323,38 @@
       event.garage_camera_motion: garage
       event.alley_motion: alley
       event.backyard_camera_motion: backyard
+    rec_file: /media/recordings/{{ folder_map[trigger.entity_id] }}/{{ now().strftime('%Y-%m-%d_%H-%M-%S')
+      }}.mp4
   actions:
   - action: camera.record
     target:
       entity_id: '{{ cam_map[trigger.entity_id] }}'
     data:
-      filename: /media/recordings/{{ folder_map[trigger.entity_id] }}/{{ now().strftime('%Y-%m-%d_%H-%M-%S')
-        }}.mp4
+      filename: '{{ rec_file }}'
       duration: 30
       lookback: 4
+  - action: shell_command.fix_recording
+    data:
+      f: '{{ rec_file }}'
+- id: recordings_nightly_archive
+  alias: Recordings - Nightly Archive to Office PC
+  triggers:
+  - trigger: time
+    at: 02:00:00
+  actions:
+  - action: shell_command.archive_recordings
+    response_variable: arch
+  - if:
+    - condition: template
+      value_template: '{{ (arch | default({''returncode'': 0})).returncode | default(0)
+        != 0 }}'
+    then:
+    - action: persistent_notification.create
+      data:
+        notification_id: recordings_archive_failed
+        title: Recording Archive Failed
+        message: 'Nightly archive to the Office PC reported errors (returncode {{
+          arch.returncode }}). Recent output: {{ arch.stdout }}'
 - id: recordings_retention_cleanup
   alias: Recordings - 15 Day Retention Cleanup
   triggers:
@@ -1440,3 +1467,49 @@
         }}%) Odometer: {{ start_odo }} → {{ end_odo }} mi'
       start_date_time: '{{ start_time }}'
       end_date_time: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+- id: '1783902751424'
+  alias: Trash Day Tomorrow Notification
+  description: ''
+  triggers:
+  - trigger: switch.turned_on
+    target:
+      entity_id: input_boolean.rubbish
+    options:
+      behavior: each
+      for: 00:00:00
+  conditions: []
+  actions:
+  - action: notify.notify
+    metadata: {}
+    data:
+      message: Trash Day Tomorrow!
+      title: Trash Day!
+  - action: notify.persistent_notification
+    metadata: {}
+    data:
+      message: Trash Day Tomorrow!
+      title: Trash Day!
+  mode: single
+- id: '1783902956240'
+  alias: Recycling Day
+  description: ''
+  triggers:
+  - trigger: switch.turned_on
+    target:
+      entity_id: input_boolean.recycle
+    options:
+      behavior: each
+      for: 00:00:00
+  conditions: []
+  actions:
+  - action: notify.notify
+    metadata: {}
+    data:
+      message: Recycling Day Tomorrow!
+      title: Recycling Day Tomorrow!
+  - action: notify.persistent_notification
+    metadata: {}
+    data:
+      message: Recycling Day Tomorrow!
+      title: Recycling Day!
+  mode: single

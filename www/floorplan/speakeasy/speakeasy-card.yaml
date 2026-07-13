@@ -1,0 +1,59 @@
+type: custom:floorplan-card
+config:
+  image:
+    location: /local/floorplan/speakeasy/speakeasy.svg
+    cache: true
+  stylesheet:
+    location: /local/floorplan/speakeasy/speakeasy.css
+    cache: true
+
+  defaults:
+    hover_action:
+      action: hover-info
+    tap_action:
+      action: more-info
+
+  rules:
+    # Bedroom lamp — glow the bedroom shape while it's on, tap to toggle
+    - entities:
+        - switch.speakeasy_black_lamp
+      tap_action:
+        action: toggle
+      state_action:
+        service: floorplan.class_set
+        service_data:
+          class: '${(entity.state === "on") ? "room-bed-on" : ""}'
+
+    # Speakeasy cans (light group) — glow the whole social area, tap to toggle
+    - entities:
+        - light.speakeasy_all_cans
+      tap_action:
+        action: toggle
+      state_action:
+        service: floorplan.class_set
+        service_data:
+          class: '${(entity.state === "on") ? "room-social-on" : ""}'
+
+    # Live temperature readout
+    - entity: sensor.speakeasy_sensor_temperature
+      state_action:
+        service: floorplan.text_set
+        service_data:
+          element: sensor.speakeasy_sensor_temperature
+          text: |
+            >
+            return (entity.state !== undefined && entity.state !== "unavailable")
+              ? Math.round(entity.state) + "°F"
+              : "--°F";
+
+    # Live humidity readout
+    - entity: sensor.speakeasy_sensor_humidity
+      state_action:
+        service: floorplan.text_set
+        service_data:
+          element: sensor.speakeasy_sensor_humidity
+          text: |
+            >
+            return (entity.state !== undefined && entity.state !== "unavailable")
+              ? Math.round(entity.state) + "%"
+              : "--%";

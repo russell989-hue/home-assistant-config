@@ -730,6 +730,9 @@ shell_command:
   cleanup_recordings: find /media/recordings -type f -name '*.mp4' -mtime +15 -delete
   save_last_recording: 'mkdir -p /media/saved && f=$(ls -t /media/recordings/{{ camera }}/*.mp4 2>/dev/null | head -1) && cp "$f" "/media/saved/{{ camera }}_$(basename $f)"'
   keep_streams_alive: /config/scripts/keep_streams_alive.sh
+  archive_recordings: sh /config/scripts/archive_recordings.sh
+  fix_recording: nohup sh /config/scripts/fix_recording.sh '{{ f }}' >/dev/null 2>&1 &
+  batch_fix_recordings: nohup sh /config/scripts/batch_fix_recordings.sh >/dev/null 2>&1 &
   # --- JBL MA510 IP Control ---
   jbl_power_on:        "python3 /config/scripts/jbl_ma510.py power_on"
   jbl_power_off:       "python3 /config/scripts/jbl_ma510.py power_off"

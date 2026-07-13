@@ -1,0 +1,42 @@
+/* SVG size */
+
+#floorplan > svg {
+  max-width: 100%;
+}
+
+/* SVG elements */
+
+svg * {
+  vector-effect: non-scaling-stroke !important;
+}
+
+/* Hover over */
+
+.floorplan-shape:hover,
+g.floorplan-hover > :not(text):hover,
+g.floorplan-click > :not(text):hover,
+g.floorplan-long-click > :not(text):hover,
+:not(text).floorplan-hover:hover,
+:not(text).floorplan-click:hover,
+:not(text).floorplan-long-click:hover {
+  stroke: #54E0C7 !important;
+  stroke-width: 2px !important;
+  stroke-opacity: 1 !important;
+  cursor: pointer;
+}
+
+/* Bedroom lamp on */
+
+.room-bed-on {
+  fill: #8AA6FF !important;
+  fill-opacity: .28 !important;
+  filter: drop-shadow(0 0 18px rgba(138, 166, 255, .55));
+}
+
+/* Speakeasy cans on */
+
+.room-social-on {
+  fill: #E88BD0 !important;
+  fill-opacity: .22 !important;
+  filter: drop-shadow(0 0 22px rgba(232, 139, 208, .5));
+}

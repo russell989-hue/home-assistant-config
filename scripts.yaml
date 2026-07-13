@@ -81,40 +81,9 @@ secure_home:
   sequence:
   - action: light.turn_off
     continue_on_error: true
+    data: {}
     target:
-      entity_id:
-      - light.speakeasy_all_cans
-      - light.tz3210_dwzfzfjc_ts0505b
-      - light.tz3210_dwzfzfjc_ts0505b_2
-      - light.tz3210_dwzfzfjc_ts0505b_3
-      - light.tz3210_dwzfzfjc_ts0505b_4
-      - light.tz3210_dwzfzfjc_ts0505b_5
-      - light.tz3210_dwzfzfjc_ts0505b_6
-      - light.tz3210_dwzfzfjc_ts0505b_7
-      - light.tz3210_dwzfzfjc_ts0505b_8
-      - light.tz3210_dwzfzfjc_ts0505b_9
-      - light.speakeasy_tv_light_group
-      - light.primary_bed_cans
-      - light.rear_left
-      - light.front_right
-      - light.rear_right
-      - light.front_left
-      - light.primary_bedroom_brian_s_lamp
-      - light.primary_bedroom_nicks_lamp
-      - light.living_room
-      - light.rear_left_can
-      - light.front_right_can
-      - light.front_left_can
-      - light.rear_right_can
-      - light.office_light_switch_relay_1
-      - light.downstairs_landing_light_panel_relay_1
-      - light.dining_room_light_panel_relay_1
-      - light.dr_sw
-      - light.dr_ne
-      - light.dr_se
-      - light.dr_nw
-      - light.dining_cans
-      - light.front_door_light_switch_relay_1
+      entity_id: light.goodnight_light_group
   - action: switch.turn_off
     continue_on_error: true
     target:
@@ -130,6 +99,7 @@ secure_home:
       - media_player.lg_webos_tv_uq7590pub_2
       - media_player.speakeasy_main_tv
       - media_player.speakeasy_second_tv
+    data: {}
   - action: lock.lock
     continue_on_error: true
     target:
@@ -146,21 +116,20 @@ secure_home:
         endfor -%} {{ ns.items }}"
       shadowfax_away: '{{ ''zone.garage'' not in (state_attr(''device_tracker.shadowfax_location'',''in_zones'')
         or []) }}'
+    continue_on_error: true
   - variables:
       problem_lights: "{% set ns = namespace(items=[]) -%} {% for e in states.light
-        | selectattr('state','eq','on') | list -%}\n  {% if e.entity_id in [\n    'light.speakeasy_all_cans','light.speakeasy_tv_light_group','light.primary_bed_cans',\n
-        \   'light.rear_left','light.front_right','light.rear_right','light.front_left',\n
-        \   'light.primary_bedroom_brian_s_lamp','light.primary_bedroom_nicks_lamp','light.living_room',\n
-        \   'light.rear_left_can','light.front_right_can','light.front_left_can','light.rear_right_can',\n
-        \   'light.office_light_switch_relay_1','light.downstairs_landing_light_panel_relay_1',\n
-        \   'light.dining_room_light_panel_relay_1','light.dr_sw','light.dr_ne','light.dr_se','light.dr_nw',\n
-        \   'light.dining_cans','light.front_door_light_switch_relay_1'] -%}\n    {%
-        set ns.items = ns.items + [e.attributes.friendly_name or e.entity_id] -%}\n
-        \ {% endif -%}\n{% endfor -%} {{ ns.items }}"
+        | selectattr('state','eq','on') | list -%}\n  {% if e.entity_id in [\n    -
+        light.speakeasy_all_cans\n    - light.primary_bed_cans\n    - light.office_light_switch_relay_1\n
+        \   - light.downstairs_landing_light_panel_relay_1\n    - light.dining_cans\n
+        \   - light.front_door_light_switch_relay_1\n    - light.living_room] -%}\n
+        \   {% set ns.items = ns.items + [e.attributes.friendly_name or e.entity_id]
+        -%}\n  {% endif -%}\n{% endfor -%} {{ ns.items }}"
       problems: '{% set ns2 = namespace(items=[]) -%} {% for x in problem_doors %}{%
         set ns2.items = ns2.items + [''Not locked - '' ~ x] %}{% endfor -%} {% for
         x in problem_lights %}{% set ns2.items = ns2.items + [''Still on - '' ~ x]
         %}{% endfor -%} {{ ns2.items }}'
+    continue_on_error: true
   - choose:
     - conditions:
       - condition: template
