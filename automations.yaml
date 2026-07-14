@@ -1239,10 +1239,24 @@
       expose_images: true
       generate_title: true
     response_variable: doorbell_ai
+  - variables:
+      doorbell_key_frame: "{{ (doorbell_ai.key_frame | default('')).replace('/media',
+        '/media/local') }}"
   - action: notify.mobile_app_brian_s_z_flip_7
     data:
-      title: Front Door
+      title: "{{ doorbell_ai.title | default('Front Door', true) }}"
       message: '{{ doorbell_ai.response_text }}'
+      data:
+        image: '{{ doorbell_key_frame }}'
+        clickAction: /mobile-test/cameras
+        url: /mobile-test/cameras
+        tag: doorbell-ai
+        group: cameras
+        alert_once: true
+        actions:
+        - action: URI
+          title: See Snapshot
+          uri: '{{ doorbell_key_frame }}'
 - id: llmvision_airbnb_door_tracking
   alias: AI - Airbnb Guest Door Tracking
   mode: single
@@ -1270,6 +1284,12 @@
       expose_images: true
       generate_title: true
     response_variable: door_ai
+  - variables:
+      door_ai_key_frame: "{{ (door_ai.key_frame | default('')).replace('/media',
+        '/media/local') }}"
+      door_ai_detail: >-
+        {% set lines = door_ai.response_text.split('\n') | map('trim') | reject('eq', '') | list %}
+        {{ lines[1] if lines | length > 1 else '' }}
   - choose:
     - conditions:
       - condition: template
@@ -1282,7 +1302,14 @@
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
           title: Airbnb
-          message: Guest arrived - entered through the side door.
+          message: "Guest arrived - entered through the side door.{{ ' ' ~ door_ai_detail
+            if door_ai_detail else '' }}"
+          data:
+            image: '{{ door_ai_key_frame }}'
+            clickAction: /airbnb-dashboard
+            url: /airbnb-dashboard
+            tag: airbnb-door
+            group: cameras
     - conditions:
       - condition: template
         value_template: '{{ (door_ai.response_text | trim | upper).startswith(''LEAVING'')
@@ -1294,7 +1321,14 @@
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
           title: Airbnb
-          message: Guest left - exited through the side door.
+          message: "Guest left - exited through the side door.{{ ' ' ~ door_ai_detail
+            if door_ai_detail else '' }}"
+          data:
+            image: '{{ door_ai_key_frame }}'
+            clickAction: /airbnb-dashboard
+            url: /airbnb-dashboard
+            tag: airbnb-door
+            group: cameras
 - id: camera_event_recording
   alias: Camera Event Recording (15-day history)
   mode: parallel
