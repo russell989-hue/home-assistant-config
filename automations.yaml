@@ -1231,10 +1231,15 @@
       - camera.doorbell_snapshot
       duration: 5
       max_frames: 5
-      message: Briefly summarize what is happening at the front door. Focus on people,
-        deliveries, and vehicles.
+      message: 'You are writing a phone notification about front door camera activity.
+        Only the first few words are visible, so lead with the single most important
+        fact. Reply with ONE short sentence (max 12 words). Never start with filler
+        like "The image shows", "A sequence of", or "There is" - start directly with
+        the subject and action, e.g. "Amazon driver leaving a package", "Two visitors
+        ringing the doorbell", "Car pulling into the driveway". Focus on people, deliveries,
+        and vehicles. If nothing notable is happening, reply exactly: No activity.'
       include_filename: false
-      max_tokens: 200
+      max_tokens: 60
       store_in_timeline: true
       expose_images: true
       generate_title: true
@@ -1242,6 +1247,9 @@
   - variables:
       doorbell_key_frame: "{{ (doorbell_ai.key_frame | default('')).replace('/media',
         '/media/local') }}"
+  - condition: template
+    value_template: "{{ not (doorbell_ai.response_text | trim | lower).startswith('no
+      activity') }}"
   - action: notify.mobile_app_brian_s_z_flip_7
     data:
       title: "{{ doorbell_ai.title | default('Front Door', true) }}"
@@ -1289,7 +1297,7 @@
         '/media/local') }}"
       door_ai_detail: >-
         {% set lines = door_ai.response_text.split('\n') | map('trim') | reject('eq', '') | list %}
-        {{ lines[1] if lines | length > 1 else '' }}
+        {{- (lines[1] if lines | length > 1 else '') | trim }}
   - choose:
     - conditions:
       - condition: template
@@ -1301,9 +1309,9 @@
           entity_id: input_boolean.airbnb_guest_downstairs
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
-          title: Airbnb
-          message: "Guest arrived - entered through the side door.{{ ' ' ~ door_ai_detail
-            if door_ai_detail else '' }}"
+          title: Airbnb - Guest arrived
+          message: "{{ door_ai_detail if door_ai_detail else 'Guest entered through
+            the side door.' }}"
           data:
             image: '{{ door_ai_key_frame }}'
             clickAction: /airbnb-dashboard
@@ -1320,9 +1328,9 @@
           entity_id: input_boolean.airbnb_guest_downstairs
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
-          title: Airbnb
-          message: "Guest left - exited through the side door.{{ ' ' ~ door_ai_detail
-            if door_ai_detail else '' }}"
+          title: Airbnb - Guest left
+          message: "{{ door_ai_detail if door_ai_detail else 'Guest exited through
+            the side door.' }}"
           data:
             image: '{{ door_ai_key_frame }}'
             clickAction: /airbnb-dashboard
