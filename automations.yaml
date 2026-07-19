@@ -1250,18 +1250,40 @@
       - camera.doorbell_snapshot
       duration: 5
       max_frames: 5
-      message: Briefly summarize what is happening at the front door. Focus on people,
-        deliveries, and vehicles.
+      message: 'You are writing a phone notification about front door camera activity.
+        Only the first few words are visible, so lead with the single most important
+        fact. Reply with ONE short sentence (max 12 words). Never start with filler
+        like "The image shows", "A sequence of", or "There is" - start directly with
+        the subject and action, e.g. "Amazon driver leaving a package", "Two visitors
+        ringing the doorbell", "Car pulling into the driveway". Focus on people, deliveries,
+        and vehicles. If nothing notable is happening, reply exactly: No activity.'
       include_filename: false
-      max_tokens: 200
+      max_tokens: 60
       store_in_timeline: true
       expose_images: true
       generate_title: true
     response_variable: doorbell_ai
+  - variables:
+      doorbell_key_frame: "{{ (doorbell_ai.key_frame | default('')).replace('/media',
+        '/media/local') }}"
+  - condition: template
+    value_template: "{{ not (doorbell_ai.response_text | trim | lower).startswith('no
+      activity') }}"
   - action: notify.mobile_app_brian_s_z_flip_7
     data:
-      title: Front Door
+      title: "{{ doorbell_ai.title | default('Front Door', true) }}"
       message: '{{ doorbell_ai.response_text }}'
+      data:
+        image: '{{ doorbell_key_frame }}'
+        clickAction: /mobile-test/cameras
+        url: /mobile-test/cameras
+        tag: doorbell-ai
+        group: cameras
+        alert_once: true
+        actions:
+        - action: URI
+          title: See Snapshot
+          uri: '{{ doorbell_key_frame }}'
 - id: llmvision_airbnb_door_tracking
   alias: AI - Airbnb Guest Door Tracking
   mode: single
@@ -1289,6 +1311,12 @@
       expose_images: true
       generate_title: true
     response_variable: door_ai
+  - variables:
+      door_ai_key_frame: "{{ (door_ai.key_frame | default('')).replace('/media',
+        '/media/local') }}"
+      door_ai_detail: >-
+        {% set lines = door_ai.response_text.split('\n') | map('trim') | reject('eq', '') | list %}
+        {{- (lines[1] if lines | length > 1 else '') | trim }}
   - choose:
     - conditions:
       - condition: template
@@ -1300,8 +1328,15 @@
           entity_id: input_boolean.airbnb_guest_downstairs
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
-          title: Airbnb
-          message: Guest arrived - entered through the side door.
+          title: Airbnb - Guest arrived
+          message: "{{ door_ai_detail if door_ai_detail else 'Guest entered through
+            the side door.' }}"
+          data:
+            image: '{{ door_ai_key_frame }}'
+            clickAction: /airbnb-dashboard
+            url: /airbnb-dashboard
+            tag: airbnb-door
+            group: cameras
     - conditions:
       - condition: template
         value_template: '{{ (door_ai.response_text | trim | upper).startswith(''LEAVING'')
@@ -1312,8 +1347,15 @@
           entity_id: input_boolean.airbnb_guest_downstairs
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
-          title: Airbnb
-          message: Guest left - exited through the side door.
+          title: Airbnb - Guest left
+          message: "{{ door_ai_detail if door_ai_detail else 'Guest exited through
+            the side door.' }}"
+          data:
+            image: '{{ door_ai_key_frame }}'
+            clickAction: /airbnb-dashboard
+            url: /airbnb-dashboard
+            tag: airbnb-door
+            group: cameras
 - id: camera_event_recording
   alias: Camera Event Recording (15-day history)
   mode: parallel
