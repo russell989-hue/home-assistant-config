@@ -25,6 +25,12 @@ script:
 ota:
   - id: !extend ota_std
     password: "REDACTED"
+
+esp32_ble_tracker:
+
+bluetooth_proxy:
+  active: true
+
 ##### My customization - End #####
 packages:
   remote_package:
