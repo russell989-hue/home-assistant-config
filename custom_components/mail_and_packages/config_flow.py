@@ -57,6 +57,7 @@ from .const import (
     CONF_STORAGE,
     CONF_UPS_CUSTOM_IMG,
     CONF_UPS_CUSTOM_IMG_FILE,
+    CONF_USPS_PLACEHOLDER,
     CONF_VERIFY_SSL,
     CONF_WALMART_CUSTOM_IMG,
     CONF_WALMART_CUSTOM_IMG_FILE,
@@ -89,6 +90,7 @@ from .const import (
     DEFAULT_STORAGE,
     DEFAULT_UPS_CUSTOM_IMG,
     DEFAULT_UPS_CUSTOM_IMG_FILE,
+    DEFAULT_USPS_PLACEHOLDER,
     DEFAULT_WALMART_CUSTOM_IMG,
     DEFAULT_WALMART_CUSTOM_IMG_FILE,
     DOMAIN,
@@ -198,7 +200,9 @@ async def _check_forwarded_emails(user_input: dict[str, Any]) -> list[str]:
     return errors
 
 
-def _validate_path_input(user_input: dict, errors: dict) -> None:
+def _validate_path_input(
+    user_input: dict, errors: dict, hass: HomeAssistant | None = None
+) -> None:
     """Validate path and file inputs."""
     # List of (Toggle Key, File Key, Error Key)
     file_checks = [
@@ -233,11 +237,17 @@ def _validate_path_input(user_input: dict, errors: dict) -> None:
 
     for toggle, file_key, error_key in file_checks:
         if user_input.get(toggle) and file_key in user_input:
-            if not Path(user_input[file_key]).is_file():
+            path = user_input[file_key]
+            if hass:
+                path = hass.config.path(path)
+            if not Path(path).is_file():
                 errors[error_key] = "file_not_found"
 
     if CONF_STORAGE in user_input:
-        if not Path(user_input[CONF_STORAGE]).exists():
+        path = user_input[CONF_STORAGE]
+        if hass:
+            path = hass.config.path(path)
+        if not Path(path).exists():
             errors[CONF_STORAGE] = "path_not_found"
 
 
@@ -275,7 +285,9 @@ async def _validate_forwarded_emails(user_input: dict, errors: dict) -> None:
         errors[CONF_FORWARDED_EMAILS] = status[0]
 
 
-async def _validate_user_input(user_input: dict) -> tuple:
+async def _validate_user_input(
+    user_input: dict, hass: HomeAssistant | None = None
+) -> tuple:
     """Validate user input from config flow.
 
     Returns tuple with error messages and modified user_input
@@ -303,7 +315,7 @@ async def _validate_user_input(user_input: dict) -> tuple:
             errors[CONF_GENERATE_MP4] = "ffmpeg_not_found"
 
     # Validate file paths
-    _validate_path_input(user_input, errors)
+    _validate_path_input(user_input, errors, hass)
 
     # Normalize CONF_FOLDER: if it has exactly 1 folder, store as string
     if CONF_FOLDER in user_input:
@@ -554,6 +566,10 @@ async def _get_schema_step_2(
             vol.Optional(
                 CONF_GENERATE_MP4,
                 default=_get_default(CONF_GENERATE_MP4, False),
+            ): cv.boolean,
+            vol.Optional(
+                CONF_USPS_PLACEHOLDER,
+                default=_get_default(CONF_USPS_PLACEHOLDER, DEFAULT_USPS_PLACEHOLDER),
             ): cv.boolean,
             vol.Optional(
                 CONF_ALLOW_EXTERNAL,
@@ -975,7 +991,7 @@ class MailAndPackagesFlowHandler(
         """Configure form step 2."""
         self._errors = {}
         if user_input is not None:
-            self._errors, user_input = await _validate_user_input(user_input)
+            self._errors, user_input = await _validate_user_input(user_input, self.hass)
             self._data.update(user_input)
             _LOGGER.debug("RESOURCES: %s", self._data[CONF_RESOURCES])
             if len(self._errors) == 0:
@@ -1012,12 +1028,13 @@ class MailAndPackagesFlowHandler(
             CONF_FOLDER: DEFAULT_FOLDER,
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
             CONF_CUSTOM_DAYS: DEFAULT_CUSTOM_DAYS,
-            CONF_PATH: self.hass.config.path() + DEFAULT_PATH,
+            CONF_PATH: self.hass.config.path(DEFAULT_PATH),
             CONF_DURATION: DEFAULT_GIF_DURATION,
             CONF_IMAGE_SECURITY: DEFAULT_IMAGE_SECURITY,
             CONF_IMAP_TIMEOUT: DEFAULT_IMAP_TIMEOUT,
             CONF_GENERATE_GRID: False,
             CONF_GENERATE_MP4: False,
+            CONF_USPS_PLACEHOLDER: DEFAULT_USPS_PLACEHOLDER,
             CONF_ALLOW_EXTERNAL: DEFAULT_ALLOW_EXTERNAL,
             CONF_CUSTOM_IMG: DEFAULT_CUSTOM_IMG,
             CONF_AMAZON_CUSTOM_IMG: DEFAULT_AMAZON_CUSTOM_IMG,
@@ -1045,7 +1062,7 @@ class MailAndPackagesFlowHandler(
         self._errors = {}
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(self._data)
+            self._errors, user_input = await _validate_user_input(self._data, self.hass)
             if len(self._errors) == 0:
                 return await self.async_step_config_storage()
             return await self._show_config_3(user_input)
@@ -1076,7 +1093,7 @@ class MailAndPackagesFlowHandler(
         self._errors = {}
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(self._data)
+            self._errors, user_input = await _validate_user_input(self._data, self.hass)
             if len(self._errors) == 0:
                 if (
                     self._data.get(CONF_CUSTOM_IMG)
@@ -1117,7 +1134,7 @@ class MailAndPackagesFlowHandler(
         self._errors = {}
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(self._data)
+            self._errors, user_input = await _validate_user_input(self._data, self.hass)
             if len(self._errors) == 0:
                 if any(
                     sensor in self._data[CONF_RESOURCES] for sensor in AMAZON_SENSORS
@@ -1150,7 +1167,7 @@ class MailAndPackagesFlowHandler(
         self._errors = {}
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(self._data)
+            self._errors, user_input = await _validate_user_input(self._data, self.hass)
             if len(self._errors) == 0:
                 return self.async_create_entry(
                     title=f"Mail and Packages ({self._data[CONF_HOST]})",
@@ -1254,7 +1271,7 @@ class MailAndPackagesFlowHandler(
         _LOGGER.debug("Loading step 2...")
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(user_input)
+            self._errors, user_input = await _validate_user_input(user_input, self.hass)
             if len(self._errors) == 0:
                 if self._data.get(CONF_ALLOW_FORWARDED_EMAILS, False):
                     return await self.async_step_reconfig_forwarded_emails()
@@ -1300,7 +1317,7 @@ class MailAndPackagesFlowHandler(
         self._errors = {}
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(self._data)
+            self._errors, user_input = await _validate_user_input(self._data, self.hass)
             if len(self._errors) == 0:
                 return await self.async_step_reconfig_storage()
 
@@ -1332,7 +1349,7 @@ class MailAndPackagesFlowHandler(
         self._errors = {}
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(self._data)
+            self._errors, user_input = await _validate_user_input(self._data, self.hass)
             if len(self._errors) == 0:
                 has_custom_image = (
                     self._data.get(CONF_CUSTOM_IMG)
@@ -1375,7 +1392,7 @@ class MailAndPackagesFlowHandler(
         self._errors = {}
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(self._data)
+            self._errors, user_input = await _validate_user_input(self._data, self.hass)
             if len(self._errors) == 0:
                 if any(
                     sensor in self._data.get(CONF_RESOURCES, [])
@@ -1404,7 +1421,7 @@ class MailAndPackagesFlowHandler(
         self._errors = {}
         if user_input is not None:
             self._data.update(user_input)
-            self._errors, user_input = await _validate_user_input(self._data)
+            self._errors, user_input = await _validate_user_input(self._data, self.hass)
             if len(self._errors) == 0:
                 self.hass.config_entries.async_update_entry(
                     self._entry,

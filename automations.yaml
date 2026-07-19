@@ -552,11 +552,10 @@
       button_pages_icon_size: '10'
       chip01: sensor.office_light_switch_temperature
       climate: climate.upstairs_thermostat
-      compact_unit_display: false
+      compact_unit_display: true
       custom_buttons_font_size: '8'
       date_format: '%A, %-m/%-d'
       entity01: switch.speakeasy_light_panel_relay_stairwell_light
-      home_custom_button01: switch.speakeasy_light_panel_relay_stairwell_light
       left_button_entity: switch.office_light_switch_relay_1
       left_button_name: Office Cans
       nspanel_name: ed562eba2e2edd731ef23a91c1e34bbb
@@ -571,6 +570,13 @@
       entity02: light.speakeasy_all_cans
       entity03: switch.upstairs_landing_light_switch_relay_1
       entity04: script.secure_home
+      qrcode_value: WIFI:S:{REDACTED_SSID};T:{wps};P:{REDACTED};;
+      entities_entity01: media_player.office_sonos
+      entity_page01_label: Music Player
+      button_page02_label: Music Player- Button
+      entity09: media_player.office_sonos
+      entity09_state_entity: media_player.office_sonos_speaker
+      home_custom_button01: media_player.office_sonos
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779597970275'
   alias: Front Door Light Switch
@@ -605,7 +611,8 @@
   use_blueprint:
     input:
       compact_unit_display: true
-      date_format: '%A %-m-%-d'
+      button_pages_icon_size: '10'
+      date_format: '%A, %-m/%-d'
       left_button_entity: light.downstairs_landing_light_panel_relay_1
       left_button_name: Stairwell
       nspanel_name: 94e03cf008c33172217cd0c3897b62a1
@@ -616,9 +623,11 @@
       weather_entity: weather.forecast_home_2
       screensaver_display_time: true
       screensaver_display_time_font_size: '11'
-      entity01: light.dining_cans
-      entity02: switch.kitchen_light_panel_hanging_lights
+      entity01: light.kitchen_kitchen_light_panel_relay_2
+      entity02: light.kitchen_kitchen_light_panel_relay_1
       entity03: light.living_room
+      entity04: light.dining_cans
+      entity05: script.secure_home
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779773167330'
   alias: Bedroom Light Settings
@@ -626,7 +635,8 @@
   use_blueprint:
     input:
       compact_unit_display: true
-      date_format: '%A %d %b'
+      button_pages_icon_size: '10'
+      date_format: '%A, %-m/%-d'
       left_button_entity: switch.primary_bedroom_light_panel_relay_2
       left_button_name: Ceiling Fan & Lights
       nspanel_name: a41f11b399db0555f8afc9e093027de5
@@ -645,6 +655,8 @@
       entity02: switch.nicks_lamp
       entity04: script.secure_home
       home_indoor_temp_visible: true
+      custom_buttons_font_size: '8'
+      home_custom_button01: input_button.brian_s_lamp_night_timer
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779819877530'
   alias: Upstairs Landing Settings
@@ -653,7 +665,7 @@
     input:
       button_pages_icon_size: '10'
       climate: climate.upstairs_thermostat
-      compact_unit_display: false
+      compact_unit_display: true
       custom_buttons_font_size: '8'
       date_format: '%A, %-m/%-d'
       left_button_entity: switch.upstairs_landing_light_switch_relay_1
@@ -663,7 +675,7 @@
       right_button_name: Stairwell
       screensaver_display_time: true
       screensaver_display_time_font_size: '11'
-      temperature_unit: F
+      temperature_unit: °F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
       indoortemp: sensor.upstairs_landing_light_switch_temperature
@@ -691,6 +703,7 @@
       temperature_unit: °F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
+      home_custom_button01: media_player.living_room_sonos
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - id: '1779823749940'
   alias: Kitchen Panel Settings
@@ -713,6 +726,11 @@
       temperature_unit: °F
       time_format: '%-I:%M %p'
       weather_entity: weather.forecast_home_2
+      entity01: light.dining_cans
+      entity02: light.living_room
+      entity03: light.front_door_front_door_light_panel_relay_1
+      entity04: script.secure_home
+      home_custom_button01: media_player.living_room
     path: edwardtfn/nspanel_easy_blueprint.yaml
 - actions:
   - device_id: 068f64652ba9d4c080235eaaa67edeb3
@@ -1072,6 +1090,7 @@
       time_format: '%-I:%M %p'
       temperature_unit: °F
       compact_unit_display: true
+      button_pages_icon_size: '10'
       weather_entity: weather.forecast_home_2
       indoortemp: sensor.speakeasy_sensor_temperature
       climate: climate.upstairs_thermostat

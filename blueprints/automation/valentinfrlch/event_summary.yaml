@@ -706,7 +706,7 @@ action:
               - action: notify.{{ repeat.item }}
                 data:
                   title: '{{ label }} {{ notification_time }}'
-                  message: '{{response.response_text}}'
+                  message: '{{ response.response_text | regex_replace("^#+\s*Event Summary\s*\n+", "", ignorecase=True) | trim }}'
                   data:
                     image: '{{response.key_frame.replace(''/media'',''/media/local'')
                       }}'
@@ -744,7 +744,7 @@ action:
               - action: notify.{{ repeat.item }}
                 data:
                   title: '{{ label }} {{ notification_time }}'
-                  message: '{{ response.response_text }}'
+                  message: '{{ response.response_text | regex_replace("^#+\s*Event Summary\s*\n+", "", ignorecase=True) | trim }}'
                   data:
                     entity_id: '{{camera_entity}}'
                     url: !input tap_navigate
@@ -783,7 +783,7 @@ action:
                   ttl: 0
                   priority: high
                   media_stream: !input tts_volume
-                  tts_text: '{{response.response_text}}'
+                  tts_text: '{{ response.response_text | regex_replace("^#+\s*Event Summary\s*\n+", "", ignorecase=True) | trim }}'
 - choose: []
   default: !input additional_actions
 - delay: !input cooldown

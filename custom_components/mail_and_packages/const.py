@@ -12,7 +12,7 @@ from .entity import MailandPackagesBinarySensorEntityDescription
 
 DOMAIN = "mail_and_packages"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.5.13"
+VERSION = "0.5.16"
 ISSUE_URL = "http://github.com/moralmunky/Home-Assistant-Mail-And-Packages"
 PLATFORM = "sensor"
 PLATFORMS = ["binary_sensor", "camera", "sensor"]
@@ -83,6 +83,7 @@ CONF_ALLOW_FORWARDED_EMAILS = "allow_forwarded_emails"
 CONF_FORWARDED_EMAILS = "forwarded_emails"
 CONF_FORWARDING_HEADER = "forwarding_header"
 CONF_CUSTOM_DAYS = "custom_days"
+CONF_USPS_PLACEHOLDER = "usps_placeholder"
 
 # Defaults
 DEFAULT_CAMERA_NAME = "Mail USPS Camera"
@@ -130,6 +131,7 @@ DEFAULT_STORAGE = "custom_components/mail_and_packages/images/"
 DEFAULT_ALLOW_FORWARDED_EMAILS = False
 DEFAULT_FORWARDED_EMAILS = "(none)"
 DEFAULT_FORWARDING_HEADER = "(none)"
+DEFAULT_USPS_PLACEHOLDER = True
 
 # Amazon
 AMAZON_DOMAINS = [
@@ -173,6 +175,9 @@ AMAZON_SHIPMENT_SUBJECT = [
     "Shipped:",
     "Enviado:",
     "Out for delivery:",
+    "Spedito:",
+    "Versandt:",
+    "In Zustellung:",
 ]
 AMAZON_ORDERED_SUBJECT = ["Ordered:", "Pedido efetuado:"]
 AMAZON_EMAIL = [
@@ -218,6 +223,8 @@ AMAZON_TIME_PATTERN = [
     "Chega ",
     "Verwachte bezorgdatum:",
     "Votre date de livraison prévue est :",
+    "In arrivo",
+    "Zustellung:",
 ]
 AMAZON_TIME_PATTERN_END = [
     "Previously expected:",
@@ -239,9 +246,10 @@ AMAZON_TIME_PATTERN_REGEX = [
     "Arriving (\\w+ \\d+)",
     "Arriving (\\w+ ?\\d*)",
     "Arriving (\\w+)",
-    "Zustellung (\\w+ \\d+) - (\\w+ \\d+)",
-    "Zustellung (\\w+ \\d+)",
-    "Zustellung (\\w+ \\d*)",
+    "Zustellung:? (\\w+ \\d+) - (\\w+ \\d+)",
+    "Zustellung:? (\\w+ \\d+)",
+    "Zustellung:? (\\w+ ?\\d*)",
+    "Zustellung:? (\\w+)",
     "Arriverà (\\w+ \\d+) - (\\w+ \\d+)",
     "Arriverà (\\w+ \\d+)",
     "Arriverà (\\w+ \\d*)",
@@ -252,6 +260,10 @@ AMAZON_TIME_PATTERN_REGEX = [
     "Wordt bezorgd op (\\w+ \\d+ \\w+)",
     "Wordt bezorgd op (\\w+ \\d+)",
     "Wordt (\\w+) bezorgd",
+    "In arrivo (\\w+ \\d+) - (\\w+ \\d+)",
+    "In arrivo (\\w+ \\d+)",
+    "In arrivo (\\w+ \\d*)",
+    "In arrivo (\\w+)",
 ]
 AMAZON_EXCEPTION_SUBJECT = "Delivery update:"
 AMAZON_EXCEPTION_BODY = "running late"
@@ -796,6 +808,7 @@ SENSOR_DATA = {
             "notifications@dragonflyshipping.ca",
             "notifications@dragonflyshipping.com",
             "notifications@nl.dragonflyinternational.com",
+            "notifications@ca.dragonflyinternational.com",
         ],
         "subject": [
             "Your order has been delivered!",
@@ -804,6 +817,7 @@ SENSOR_DATA = {
             "Votre commande a été livrée!",
             "Votre colis a été livré!",
             "We hebben je pakket bezorgd!",
+            "Hooray! Your package was delivered!",
         ],
     },
     "intelcom_delivering": {
@@ -812,6 +826,7 @@ SENSOR_DATA = {
             "notifications@dragonflyshipping.ca",
             "notifications@dragonflyshipping.com",
             "notifications@nl.dragonflyinternational.com",
+            "notifications@ca.dragonflyinternational.com",
         ],
         "subject": [
             "Your package is on the way!",
@@ -819,6 +834,8 @@ SENSOR_DATA = {
             "Votre colis est en chemin!",
             "package is on its way",
             "Vandaag bezorgen we je pakket",
+            "Your delivery is scheduled for today",
+            "Your package will be there in the next hour!",
         ],
     },
     "intelcom_packages": {
@@ -827,6 +844,7 @@ SENSOR_DATA = {
             "notifications@dragonflyshipping.ca",
             "notifications@dragonflyshipping.com",
             "notifications@nl.dragonflyinternational.com",
+            "notifications@ca.dragonflyinternational.com",
         ],
         "subject": [
             "Your package has been received!",
@@ -835,7 +853,9 @@ SENSOR_DATA = {
             "Je pakket is bij ons aangekomen",
         ],
     },
-    "intelcom_tracking": {"pattern": ["(NSPRSO[0-9]{10}|AMZNL[0-9]{12})"]},
+    "intelcom_tracking": {
+        "pattern": ["(NSPRSO[0-9]{10}|AMZNL[0-9]{12}|INTLCMI[0-9]+)"]
+    },
     # Walmart
     "walmart_delivering": {
         "email": ["help@walmart.com"],

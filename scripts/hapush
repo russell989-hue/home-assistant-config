@@ -1,0 +1,11 @@
+#!/bin/sh
+# Push Home Assistant config changes to GitHub
+cd /config || exit 1
+git add -A
+if git diff --cached --quiet; then
+  echo "No config changes to push."
+  exit 0
+fi
+git commit -m "Config update $(date '+%Y-%m-%d %H:%M')"
+git push
+echo "Config pushed to GitHub."
