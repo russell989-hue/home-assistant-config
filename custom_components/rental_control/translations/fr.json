@@ -1,0 +1,140 @@
+{
+  "config": {
+    "error": {
+      "bad_code_length": "La longueur du code de verrouillage doit \u00eatre paire et >= 4",
+      "bad_ics": "L'URL n'a pas fourni un calendrier valide",
+      "bad_minimum": "La valeur doit \u00eatre de 1 ou plus",
+      "bad_refresh": "Le rafra\u00eechissement doit \u00eatre compris entre 0 et 1440.",
+      "bad_time": "L'heure d'arriv\u00e9e/d\u00e9part est invalide. Utilisez le format 24 heures",
+      "https_required": "HTTPS requis lorsque la v\u00e9rification SSL est activ\u00e9e",
+      "invalid_path": "Le chemin doit \u00eatre un chemin relatif, non absolu",
+      "invalid_url": "L'URL est mal form\u00e9e ou invalide",
+      "same_name": "Nom d\u00e9j\u00e0 utilis\u00e9",
+      "unknown": "Erreur inattendue, v\u00e9rifiez les journaux pour plus de d\u00e9tails",
+      "bad_max_name_length": "La longueur maximale du nom doit \u00eatre de 4 ou plus",
+      "prefix_too_long_for_trim": "Le pr\u00e9fixe d'\u00e9v\u00e9nement est trop long pour la longueur maximale du nom"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "checkin": "Heure d'arriv\u00e9e par d\u00e9faut",
+          "checkout": "Heure de d\u00e9part par d\u00e9faut",
+          "cleaning_window": "Fen\u00eatre de m\u00e9nage (heures)",
+          "code_generation": "G\u00e9n\u00e9rateur de code de porte",
+          "code_length": "Longueur du code de porte (>= 4 et un nombre pair)",
+          "days": "Nombre maximum de jours \u00e0 l'avance \u00e0 r\u00e9cup\u00e9rer",
+          "event_prefix": "Pr\u00e9fixe pour tous les \u00e9v\u00e9nements (utile si vous liez plus d'une location)",
+          "ignore_non_reserved": "Ignorer les \u00e9v\u00e9nements qui ne sont pas des r\u00e9servations standard",
+          "keymaster_entry_id": "Configuration du Keymaster \u00e0 g\u00e9rer",
+          "max_events": "Nombre de capteurs d'\u00e9v\u00e9nements \u00e0 cr\u00e9er",
+          "name": "Nom du calendrier",
+          "refresh_frequency": "Rafra\u00eechir le calendrier en minutes. 0 - 1440",
+          "start_slot": "Slot de d\u00e9part pour la gestion",
+          "should_update_code": "Pour les codes bas\u00e9s sur la date, mettez \u00e0 jour le code si les \u00e9v\u00e9nements futurs changent les dates de d\u00e9but ou de fin",
+          "honor_event_times": "Utiliser les heures des \u00e9v\u00e9nements du calendrier PMS au lieu des heures de remplacement enregistr\u00e9es",
+          "timezone": "Fuseau horaire du calendrier",
+          "url": "URL du calendrier",
+          "verify_ssl": "V\u00e9rifier les certificats SSL",
+          "trim_names": "Tronquer les noms des cr\u00e9neaux \u00e0 la longueur maximale",
+          "max_name_length": "Longueur maximale du nom de cr\u00e9neau"
+        },
+        "data_description": {
+          "cleaning_window": "Heures de maintien du statut de d\u00e9part avant le retour \u00e0 aucune r\u00e9servation (0,5\u201348)"
+        }
+      }
+    }
+  },
+  "options": {
+    "error": {
+      "bad_code_length": "La longueur du code de verrouillage doit \u00eatre paire et >= 4",
+      "bad_ics": "L'URL n'a pas fourni un calendrier valide",
+      "bad_minimum": "La valeur doit \u00eatre de 1 ou plus",
+      "bad_refresh": "Le rafra\u00eechissement doit \u00eatre compris entre 0 et 1440.",
+      "bad_time": "L'heure d'arriv\u00e9e/d\u00e9part est invalide. Utilisez le format 24 heures",
+      "https_required": "HTTPS requis lorsque la v\u00e9rification SSL est activ\u00e9e",
+      "invalid_path": "Le chemin doit \u00eatre un chemin relatif, non absolu",
+      "invalid_url": "L'URL est mal form\u00e9e ou invalide",
+      "same_name": "Nom d\u00e9j\u00e0 utilis\u00e9",
+      "unknown": "Erreur inattendue, v\u00e9rifiez les journaux pour plus de d\u00e9tails",
+      "bad_max_name_length": "La longueur maximale du nom doit \u00eatre de 4 ou plus",
+      "prefix_too_long_for_trim": "Le pr\u00e9fixe d'\u00e9v\u00e9nement est trop long pour la longueur maximale du nom"
+    },
+    "step": {
+      "init": {
+        "data": {
+          "checkin": "Heure d'arriv\u00e9e par d\u00e9faut",
+          "checkout": "Heure de d\u00e9part par d\u00e9faut",
+          "cleaning_window": "Fen\u00eatre de m\u00e9nage (heures)",
+          "code_generation": "G\u00e9n\u00e9rateur de code de porte",
+          "code_length": "Longueur du code de porte (>= 4 et un nombre pair)",
+          "days": "Nombre maximum de jours \u00e0 l'avance \u00e0 r\u00e9cup\u00e9rer",
+          "event_prefix": "Pr\u00e9fixe pour tous les \u00e9v\u00e9nements (utile si vous liez plus d'une location)",
+          "ignore_non_reserved": "Ignorer les \u00e9v\u00e9nements qui ne sont pas des r\u00e9servations standard",
+          "keymaster_entry_id": "Configuration du Keymaster \u00e0 g\u00e9rer",
+          "max_events": "Nombre de capteurs d'\u00e9v\u00e9nements \u00e0 cr\u00e9er",
+          "name": "Nom du calendrier",
+          "refresh_frequency": "Rafra\u00eechir le calendrier en minutes. 0 - 1440",
+          "start_slot": "Slot de d\u00e9part pour la gestion",
+          "should_update_code": "Pour les codes bas\u00e9s sur la date, mettez \u00e0 jour le code si les \u00e9v\u00e9nements futurs changent les dates de d\u00e9but ou de fin",
+          "honor_event_times": "Utiliser les heures des \u00e9v\u00e9nements du calendrier PMS au lieu des heures de remplacement enregistr\u00e9es",
+          "timezone": "Fuseau horaire du calendrier",
+          "url": "URL du calendrier",
+          "verify_ssl": "V\u00e9rifier les certificats SSL",
+          "trim_names": "Tronquer les noms des cr\u00e9neaux \u00e0 la longueur maximale",
+          "max_name_length": "Longueur maximale du nom de cr\u00e9neau",
+          "enable_keymaster_event_diagnostics": "Activer les diagnostics d'\u00e9v\u00e9nements Keymaster (enregistre les 10 derniers \u00e9v\u00e9nements keymaster_lock_state_changed sur le capteur d'arriv\u00e9e)",
+          "code_buffer_before": "Tampon d'activation du code de verrouillage (minutes avant l'arriv\u00e9e)",
+          "code_buffer_after": "Tampon de d\u00e9sactivation du code de verrouillage (minutes apr\u00e8s le d\u00e9part)"
+        },
+        "data_description": {
+          "cleaning_window": "Heures de maintien du statut de d\u00e9part avant le retour \u00e0 aucune r\u00e9servation (0,5\u201348)",
+          "code_buffer_before": "Minutes avant l'heure d'arriv\u00e9e pour activer le code de verrouillage (0 = pas de tampon)",
+          "code_buffer_after": "Minutes apr\u00e8s l'heure de d\u00e9part pour d\u00e9sactiver le code de verrouillage (0 = pas de tampon)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "checkin": {
+        "name": "Arriv\u00e9e",
+        "state": {
+          "no_reservation": "Aucune r\u00e9servation",
+          "awaiting_checkin": "En attente d'arriv\u00e9e",
+          "checked_in": "Arriv\u00e9",
+          "checked_out": "Parti"
+        }
+      }
+    },
+    "switch": {
+      "keymaster_monitoring": {
+        "name": "Surveillance Keymaster"
+      },
+      "early_checkout_expiry": {
+        "name": "Expiration anticip\u00e9e de d\u00e9part"
+      }
+    }
+  },
+  "services": {
+    "checkout": {
+      "name": "D\u00e9part",
+      "description": "Enregistrer manuellement le d\u00e9part du client actuel.",
+      "fields": {
+        "force": {
+          "name": "Forcer",
+          "description": "Ignorer les gardes de date et de limites. Utiliser lorsque le capteur est bloqu\u00e9 et que vous devez forcer le d\u00e9part."
+        }
+      }
+    },
+    "set_state": {
+      "name": "D\u00e9finir l'\u00e9tat",
+      "description": "Forcer le capteur d'arriv\u00e9e dans n'importe quel \u00e9tat valide. Outil de d\u00e9bogage \u2014 contourne toutes les conditions de garde et ne d\u00e9clenche pas les \u00e9v\u00e9nements personnalis\u00e9s d'arriv\u00e9e/d\u00e9part de l'int\u00e9gration.",
+      "fields": {
+        "state": {
+          "name": "\u00c9tat",
+          "description": "\u00c9tat cible pour le capteur d'arriv\u00e9e."
+        }
+      }
+    }
+  }
+}

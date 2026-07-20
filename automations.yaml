@@ -279,47 +279,6 @@
   triggers:
   - event: start
     trigger: homeassistant
-- id: '1778371502291'
-  alias: AI Camera Events
-  description: ''
-  use_blueprint:
-    input:
-      camera_entities:
-      - camera.doorbell_snapshot
-      - camera.alley_live_view
-      - camera.garage_snapshot
-      - camera.side_door_snapshot
-      cooldown:
-        hours: 0
-        minutes: 5
-        seconds: 0
-      important: true
-      model: claude-haiku-4-5
-      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
-      trigger_state: 'on'
-      notification_time: at {{ now().strftime("%-I:%M %p") }}
-    path: valentinfrlch/event_summary.yaml
-- alias: Alley Camera AI
-  description: ''
-  id: '1778381242657'
-  use_blueprint:
-    input:
-      analysis_mode: Snapshot
-      camera_entities:
-      - camera.alley_live_view
-      condition_notify: []
-      important: true
-      model: claude-haiku-4-5
-      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
-      run_conditions:
-      - condition: switch.is_on
-        options:
-          behavior: any
-          for: 00:00:00
-        target:
-          entity_id: switch.alley_motion_detection
-      trigger_state: 'on'
-    path: valentinfrlch/event_summary.yaml
 - alias: ABBA
   description: ''
   id: '1778689653949'
@@ -1231,8 +1190,6 @@
   max_exceeded: silent
 - id: llmvision_doorbell_ai
   alias: AI - Doorbell Motion Summary
-  mode: single
-  max_exceeded: silent
   triggers:
   - trigger: state
     entity_id:
@@ -1245,18 +1202,37 @@
   actions:
   - action: llmvision.stream_analyzer
     data:
-      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
+      provider: 01KXYBGAGRTST9351Y7WAW94P3
       image_entity:
       - camera.doorbell_snapshot
       duration: 5
       max_frames: 5
-      message: 'You are writing a phone notification about front door camera activity.
-        Only the first few words are visible, so lead with the single most important
-        fact. Reply with ONE short sentence (max 12 words). Never start with filler
-        like "The image shows", "A sequence of", or "There is" - start directly with
-        the subject and action, e.g. "Amazon driver leaving a package", "Two visitors
-        ringing the doorbell", "Car pulling into the driveway". Focus on people, deliveries,
-        and vehicles. If nothing notable is happening, reply exactly: No activity.'
+      use_memory: true
+      message: 'CAMERA CONTEXT: This is the front door camera of a private Denver
+        home. It looks straight down the home''s own front entrance walkway - a narrow
+        concrete path between this house and the neighbor''s white modern building,
+        with a wooden privacy fence and landscaping on the right, ending at the street
+        sidewalk in the distance. A doormat sits at the bottom of the frame. This
+        walkway is NOT an alley - always refer to it as the front door, front walkway,
+        or sidewalk. People moving toward the camera are approaching the front door;
+        people moving away are heading out to the street.
+
+
+        Your memory contains a labeled reference photo of this front door walkway
+        in its normal empty state. Compare the live frames with that reference and
+        report only what is NEW or DIFFERENT. Ignore lighting and shadow differences
+        alone. IMPORTANT: a package, box, envelope, or bag left on or near the doormat
+        or walkway that is not in the reference counts as important activity even
+        if no person is visible - report it, e.g. "Package left on the doormat".
+
+
+        You are writing a phone notification about front door camera activity. Only
+        the first few words are visible, so lead with the single most important fact.
+        Reply with ONE short sentence (max 12 words). Never start with filler like
+        "The image shows", "A sequence of", or "There is" - start directly with the
+        subject and action, e.g. "Amazon driver leaving a package", "Two visitors
+        ringing the doorbell", "Package left on the doormat". Focus on people, deliveries,
+        and vehicles. If nothing is new versus the reference, reply exactly: No activity.'
       include_filename: false
       max_tokens: 60
       store_in_timeline: true
@@ -1264,14 +1240,14 @@
       generate_title: true
     response_variable: doorbell_ai
   - variables:
-      doorbell_key_frame: "{{ (doorbell_ai.key_frame | default('')).replace('/media',
-        '/media/local') }}"
+      doorbell_key_frame: '{{ (doorbell_ai.key_frame | default('''')).replace(''/media'',
+        ''/media/local'') }}'
   - condition: template
-    value_template: "{{ not (doorbell_ai.response_text | trim | lower).startswith('no
-      activity') }}"
+    value_template: '{{ not (doorbell_ai.response_text | trim | lower).startswith(''no
+      activity'') }}'
   - action: notify.mobile_app_brian_s_z_flip_7
     data:
-      title: "{{ doorbell_ai.title | default('Front Door', true) }}"
+      title: '{{ doorbell_ai.title | default(''Front Door'', true) }}'
       message: '{{ doorbell_ai.response_text }}'
       data:
         image: '{{ doorbell_key_frame }}'
@@ -1284,27 +1260,77 @@
         - action: URI
           title: See Snapshot
           uri: '{{ doorbell_key_frame }}'
-- id: llmvision_airbnb_door_tracking
-  alias: AI - Airbnb Guest Door Tracking
+  - action: persistent_notification.create
+    data:
+      title: '{{ doorbell_ai.title | default(''Front Door'', true) }}'
+      message: '{{ doorbell_ai.response_text }} ([view camera](/zenobia-home/camera-doorbell))'
+  - if:
+    - condition: template
+      value_template: '{{ [''package'', ''deliver'', ''parcel'', ''courier'', ''amazon'',
+        ''fedex'', ''usps'', ''dhl'', ''ups '', ''dropping off''] | select(''in'',
+        ((doorbell_ai.title | default('''')) ~ '' '' ~ doorbell_ai.response_text ~
+        '' '') | lower) | list | count > 0 }}'
+    then:
+    - action: notify.mobile_app_nick_iphone
+      data:
+        title: Package at the front door
+        message: '{{ doorbell_ai.response_text }}'
+        data:
+          image: '{{ doorbell_key_frame }}'
+          tag: doorbell-package
+          group: cameras
   mode: single
   max_exceeded: silent
+- id: llmvision_airbnb_door_tracking
+  alias: AI - Airbnb Guest Door Tracking
+  description: 'Reworked 2026-07-20 after a missed guest departure: SDM motion events
+    arrive 15-25s late, so live-stream analysis saw empty frames. Now waits 20s then
+    analyzes the last ~45s of the side_door RING BUFFER (the only source that reliably
+    contains the person). Also triggers from Google Home person notifications via
+    the phone relay, which often beat the SDM event.'
   triggers:
   - trigger: state
     entity_id: event.side_door_camera_motion
+    id: sdm
+  - trigger: state
+    entity_id:
+    - sensor.android_notification_phone_last_notification
+    - sensor.brian_s_z_flip_7_last_notification
+    attribute: post_time
+    id: gh
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.id != ''gh'' or (trigger.to_state is not none and
+      trigger.to_state.attributes.package == ''com.google.android.apps.chromecast.app''
+      and ''side'' in ((trigger.to_state.attributes[''android.title''] | default(''''))
+      ~ '' '' ~ (trigger.to_state.attributes[''android.text''] | default(''''))) |
+      lower and ''person'' in ((trigger.to_state.attributes[''android.title''] | default(''''))
+      ~ '' '' ~ (trigger.to_state.attributes[''android.text''] | default(''''))) |
+      lower) }}'
   actions:
-  - action: llmvision.stream_analyzer
+  - delay: '00:00:20'
+  - action: shell_command.airbnb_ring_clip
+    data: {}
+  - action: llmvision.video_analyzer
     data:
-      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
-      image_entity:
-      - camera.side_door_snapshot
-      duration: 8
-      max_frames: 8
-      message: 'This is the exterior camera at an Airbnb guest entrance door. A person
-        triggered motion. Based on the sequence of frames, determine if the person
-        ENTERED the house (approached and went in through the door) or LEFT the house
-        (came out of the door and walked away). Reply with exactly two lines: line
-        1 is one word only - ENTERING, LEAVING, or UNCLEAR. Line 2 is one short factual
-        sentence describing what happened.'
+      provider: 01KXYBGAGRTST9351Y7WAW94P3
+      video_file: /media/airbnb_check.mp4
+      max_frames: 10
+      message: 'CAMERA CONTEXT: This camera watches the side entrance (the Airbnb
+        guest door) of a private Denver home from above. The fenced side yard holds
+        two air-conditioner units on gravel and a basement egress window; a concrete
+        walkway runs along the bottom of the frame to the side door at the right edge.
+        This is private property, not a public alley - refer to it as the side door
+        or side walkway.
+
+
+        This is the last ~45 seconds of continuous footage from the Airbnb guest
+        entrance camera after motion was detected. Based on the sequence of frames,
+        determine if a person ENTERED the house (approached and went in through the
+        door) or LEFT the house (came out of the door and walked away). Reply with
+        exactly two lines: line 1 is one word only - ENTERING, LEAVING, or UNCLEAR.
+        Line 2 is one short factual sentence describing what happened. If no person
+        appears in any frame, reply UNCLEAR.'
       include_filename: false
       max_tokens: 80
       store_in_timeline: true
@@ -1312,11 +1338,11 @@
       generate_title: true
     response_variable: door_ai
   - variables:
-      door_ai_key_frame: "{{ (door_ai.key_frame | default('')).replace('/media',
-        '/media/local') }}"
-      door_ai_detail: >-
-        {% set lines = door_ai.response_text.split('\n') | map('trim') | reject('eq', '') | list %}
-        {{- (lines[1] if lines | length > 1 else '') | trim }}
+      door_ai_key_frame: '{{ (door_ai.key_frame | default('''')).replace(''/media'',
+        ''/media/local'') }}'
+      door_ai_detail: '{% set lines = door_ai.response_text.split(''\n'') | map(''trim'')
+        | reject(''eq'', '''') | list %} {{- (lines[1] if lines | length > 1 else
+        '''') | trim }}'
   - choose:
     - conditions:
       - condition: template
@@ -1329,14 +1355,19 @@
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
           title: Airbnb - Guest arrived
-          message: "{{ door_ai_detail if door_ai_detail else 'Guest entered through
-            the side door.' }}"
+          message: '{{ door_ai_detail if door_ai_detail else ''Guest entered through
+            the side door.'' }}'
           data:
             image: '{{ door_ai_key_frame }}'
             clickAction: /airbnb-dashboard
             url: /airbnb-dashboard
             tag: airbnb-door
             group: cameras
+      - action: persistent_notification.create
+        data:
+          title: Airbnb - Guest arrived
+          message: '{{ door_ai_detail if door_ai_detail else ''Guest entered through
+            the side door.'' }} ([view camera](/zenobia-home/camera-side-door))'
     - conditions:
       - condition: template
         value_template: '{{ (door_ai.response_text | trim | upper).startswith(''LEAVING'')
@@ -1348,14 +1379,21 @@
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
           title: Airbnb - Guest left
-          message: "{{ door_ai_detail if door_ai_detail else 'Guest exited through
-            the side door.' }}"
+          message: '{{ door_ai_detail if door_ai_detail else ''Guest exited through
+            the side door.'' }}'
           data:
             image: '{{ door_ai_key_frame }}'
             clickAction: /airbnb-dashboard
             url: /airbnb-dashboard
             tag: airbnb-door
             group: cameras
+      - action: persistent_notification.create
+        data:
+          title: Airbnb - Guest left
+          message: '{{ door_ai_detail if door_ai_detail else ''Guest exited through
+            the side door.'' }} ([view camera](/zenobia-home/camera-side-door))'
+  mode: single
+  max_exceeded: silent
 - id: camera_event_recording
   alias: Camera Event Recording (15-day history)
   mode: parallel
@@ -1574,3 +1612,140 @@
       message: Recycling Day Tomorrow!
       title: Recycling Day!
   mode: single
+- id: llmvision_garage_ai
+  alias: AI - Garage Camera Events
+  description: Timeline-only AI summary of garage/back-pad motion. Created 2026-07-19;
+    replaces the garage coverage of the never-firing 'AI Camera Events' blueprint.
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.garage_camera_motion
+  conditions:
+  - condition: template
+    value_template: '{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds()
+      > 300 }}'
+  actions:
+  - action: llmvision.stream_analyzer
+    data:
+      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
+      image_entity:
+      - camera.garage_snapshot
+      duration: 5
+      max_frames: 5
+      use_memory: true
+      message: 'CAMERA CONTEXT: This camera watches the back parking pad and garage
+        entrance behind a private Denver home. The concrete pad and rear walkway in
+        the center belong to this home; the household trash, recycling and compost
+        bins sit among the plants on the right; the paved public alley crosses the
+        top of the frame. People at the bins or on the pad are on this property; people
+        crossing the top of the frame are just passing through the public alley -
+        say so and treat that as routine.
+
+
+        Your memory contains a labeled reference photo of this garage back pad in
+        its normal empty state. Compare the live frames with that reference and report
+        only what is NEW or DIFFERENT. Ignore anything already present in the reference
+        (bins, plants, fixtures) and ignore lighting or shadow differences alone.
+
+
+        Describe the single most important NEW thing in ONE short sentence (max
+        12 words), starting directly with the subject and action, e.g. "Person taking
+        out the trash", "Car pulling onto the back pad", "Jogger passing through the
+        alley". If nothing is new versus the reference, reply exactly: No activity.'
+      include_filename: false
+      max_tokens: 60
+      store_in_timeline: true
+      expose_images: true
+      generate_title: true
+  mode: single
+  max_exceeded: silent
+- id: google_home_package_mirror
+  alias: Package - Mirror Google Home detection to Nick + persistent
+  description: 'Created 2026-07-19. Google''s package detection is exclusive to the
+    Google Home app (not exposed via the SDM API), so this listens to Google Home
+    notifications arriving on Brian''s Z Flip via the companion app''s Last Notification
+    sensor. Requires that sensor to be enabled on the phone with com.google.android.apps.chromecast.app
+    allow-listed.'
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.android_notification_phone_last_notification
+    - sensor.brian_s_z_flip_7_last_notification
+    attribute: post_time
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state is not none and trigger.to_state.attributes.package
+      == ''com.google.android.apps.chromecast.app'' }}'
+  - condition: template
+    value_template: '{{ ''package'' in ((trigger.to_state.attributes[''android.title'']
+      | default('''')) ~ '' '' ~ (trigger.to_state.attributes[''android.text''] |
+      default('''')) ~ '' '' ~ trigger.to_state.state) | lower }}'
+  - condition: template
+    value_template: '{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds()
+      > 120 }}'
+  actions:
+  - variables:
+      gh_title: '{{ trigger.to_state.attributes[''android.title''] | default(''Package
+        update'', true) }}'
+      gh_body: '{{ trigger.to_state.attributes[''android.text''] | default(trigger.to_state.state,
+        true) }}'
+  - action: notify.mobile_app_nick_iphone
+    data:
+      title: '📦 {{ gh_title }}'
+      message: '{{ gh_body }}'
+      data:
+        tag: doorbell-package
+        group: cameras
+  - action: persistent_notification.create
+    data:
+      title: '📦 {{ gh_title }} (Google Home)'
+      message: '{{ gh_body }}'
+  mode: single
+  max_exceeded: silent
+- id: llmvision_backyard_ai
+  alias: AI - Backyard Camera Events
+  description: Timeline-only AI summary of backyard motion. Created 2026-07-19 when
+    the battery cam came back online; uses reference-image comparison like the garage
+    automation.
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.backyard_camera_motion
+  conditions:
+  - condition: template
+    value_template: '{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds()
+      > 300 }}'
+  actions:
+  - action: llmvision.stream_analyzer
+    data:
+      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
+      image_entity:
+      - camera.backyard_snapshot
+      duration: 5
+      max_frames: 5
+      use_memory: true
+      message: 'CAMERA CONTEXT: This camera watches the fenced private backyard of
+        a Denver home. The back patio with a sliding glass door, grill and seating
+        is on the left; a lawn with outdoor furniture fills the right; a wooden privacy
+        fence with a gate runs across the back, with neighboring houses beyond it.
+        Everything inside the fence is private property. People inside the yard are
+        residents or guests unless clearly climbing the fence or forcing the gate.
+
+
+        Your memory contains a labeled reference photo of this backyard in its normal
+        empty state. Compare the live frames with that reference and report only what
+        is NEW or DIFFERENT. Ignore lighting and shadow differences alone, and ignore
+        furniture that has merely moved position.
+
+
+        Describe the single most important NEW thing in ONE short sentence (max
+        12 words), starting directly with the subject and action, e.g. "Person grilling
+        on the patio", "Dog running across the lawn", "Person entering through the
+        back gate". If nothing is new versus the reference, reply exactly: No activity.'
+      include_filename: false
+      max_tokens: 60
+      store_in_timeline: true
+      expose_images: true
+      generate_title: true
+  mode: single
+  max_exceeded: silent

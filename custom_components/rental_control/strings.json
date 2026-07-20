@@ -1,0 +1,142 @@
+{
+  "config": {
+    "error": {
+      "bad_code_length": "Lock code length must be even and >= 4",
+      "bad_ics": "URL did not provide valid calendar",
+      "bad_max_name_length": "Max name length must be 4 or greater",
+      "bad_minimum": "Value must be 1 or greater",
+      "bad_refresh": "Refresh must be between 0 and 1440.",
+      "bad_time": "Check-in/out time is invalid. Use 24 hour time",
+      "https_required": "HTTPS required when SSL verification is enabled",
+      "invalid_path": "Path must be a relative path, not absolute",
+      "invalid_url": "URL is malformed or invalid",
+      "same_name": "Name already in use",
+      "unknown": "Unexpected error, check logs for more details",
+      "prefix_too_long_for_trim": "Event prefix too long for max name length"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "checkin": "Default Check-in time",
+          "checkout": "Default Check-out time",
+          "cleaning_window": "Cleaning Window (hours)",
+          "code_generation": "Door code generator",
+          "code_length": "Door code length (>= 4 and an even number)",
+          "days": "Maximum number of days into the future to fetch",
+          "event_prefix": "Prefix for all events (useful if linking more than one rental)",
+          "ignore_non_reserved": "Ignore events that are not standard reservations",
+          "keymaster_entry_id": "Keymaster configuration to manage",
+          "max_events": "Number of event sensors to create",
+          "name": "Calendar name",
+          "refresh_frequency": "Refresh calendar in minutes. 0 - 1440",
+          "start_slot": "Starting lock slot for management",
+          "should_update_code": "For date based codes, update the code if future events change start or end dates",
+          "honor_event_times": "Honor calendar event times from PMS instead of stored override times",
+          "trim_names": "Trim slot names to maximum length",
+          "max_name_length": "Maximum slot name length",
+          "code_buffer_before": "Lock code activation buffer (minutes before check-in)",
+          "code_buffer_after": "Lock code deactivation buffer (minutes after checkout)",
+          "timezone": "Calendar Timezone",
+          "url": "Calendar URL",
+          "verify_ssl": "Verify SSL certificates"
+        },
+        "data_description": {
+          "cleaning_window": "Hours to keep checkout status before returning to no reservation (0.5–48)"
+        }
+      }
+    }
+  },
+  "options": {
+    "error": {
+      "bad_code_length": "Lock code length must be even and >= 4",
+      "bad_ics": "URL did not provide valid calendar",
+      "bad_max_name_length": "Max name length must be 4 or greater",
+      "bad_minimum": "Value must be 1 or greater",
+      "bad_refresh": "Refresh must be between 0 and 1440.",
+      "bad_time": "Check-in/out time is invalid. Use 24 hour time",
+      "https_required": "HTTPS required when SSL verification is enabled",
+      "invalid_path": "Path must be a relative path, not absolute",
+      "invalid_url": "URL is malformed or invalid",
+      "same_name": "Name already in use",
+      "unknown": "Unexpected error, check logs for more details",
+      "prefix_too_long_for_trim": "Event prefix too long for max name length"
+    },
+    "step": {
+      "init": {
+        "data": {
+          "checkin": "Default Check-in time",
+          "checkout": "Default Check-out time",
+          "cleaning_window": "Cleaning Window (hours)",
+          "code_generation": "Door code generator",
+          "code_length": "Door code length (>= 4 and an even number)",
+          "days": "Maximum number of days into the future to fetch",
+          "event_prefix": "Prefix for all events (useful if linking more than one rental)",
+          "ignore_non_reserved": "Ignore events that are not standard reservations",
+          "keymaster_entry_id": "Keymaster configuration to manage",
+          "max_events": "Number of event sensors to create",
+          "name": "Calendar name",
+          "refresh_frequency": "Refresh calendar in minutes. 0 - 1440",
+          "start_slot": "Starting lock slot for management",
+          "should_update_code": "For date based codes, update the code if future events change start or end dates",
+          "honor_event_times": "Honor calendar event times from PMS instead of stored override times",
+          "trim_names": "Trim slot names to maximum length",
+          "max_name_length": "Maximum slot name length",
+          "code_buffer_before": "Lock code activation buffer (minutes before check-in)",
+          "code_buffer_after": "Lock code deactivation buffer (minutes after checkout)",
+          "timezone": "Calendar Timezone",
+          "url": "Calendar URL",
+          "verify_ssl": "Verify SSL certificates",
+          "enable_keymaster_event_diagnostics": "Enable keymaster event diagnostics (records last 10 keymaster_lock_state_changed events on the check-in sensor)"
+        },
+        "data_description": {
+          "cleaning_window": "Hours to keep checkout status before returning to no reservation (0.5–48)",
+          "code_buffer_before": "Minutes before check-in time to activate the lock code (0 = no buffer)",
+          "code_buffer_after": "Minutes after checkout time to deactivate the lock code (0 = no buffer)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "checkin": {
+        "name": "Check-in",
+        "state": {
+          "no_reservation": "No Reservation",
+          "awaiting_checkin": "Awaiting Check-in",
+          "checked_in": "Checked In",
+          "checked_out": "Checked Out"
+        }
+      }
+    },
+    "switch": {
+      "keymaster_monitoring": {
+        "name": "Keymaster Monitoring"
+      },
+      "early_checkout_expiry": {
+        "name": "Early Checkout Expiry"
+      }
+    }
+  },
+  "services": {
+    "checkout": {
+      "name": "Checkout",
+      "description": "Manually check out the current guest.",
+      "fields": {
+        "force": {
+          "name": "Force",
+          "description": "Bypass date and boundary guards. Use when the sensor is stuck and you need to override."
+        }
+      }
+    },
+    "set_state": {
+      "name": "Set state",
+      "description": "Force the check-in sensor into any valid state. Debug tool — bypasses all guard conditions and does not fire the integration's custom check-in/checkout events.",
+      "fields": {
+        "state": {
+          "name": "State",
+          "description": "Target state for the check-in sensor."
+        }
+      }
+    }
+  }
+}

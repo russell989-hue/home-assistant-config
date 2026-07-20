@@ -730,6 +730,9 @@ shell_command:
   cleanup_recordings: find /media/recordings -type f -name '*.mp4' -mtime +15 -delete
   save_last_recording: 'mkdir -p /media/saved && f=$(ls -t /media/recordings/{{ camera }}/*.mp4 2>/dev/null | head -1) && cp "$f" "/media/saved/{{ camera }}_$(basename $f)"'
   keep_streams_alive: /config/scripts/keep_streams_alive.sh
+  airbnb_ring_clip: sh /config/scripts/airbnb_ring_clip.sh
+  clip_frames: sh -c 'rm -f /config/www/clip_*.jpg; ffmpeg -y -ss {{ ss | default(0) }} -i "{{ f }}" -vf "fps=1,scale=320:-1,tile=8x8" -frames:v 1 /config/www/clip_sheet.jpg -loglevel error'
+  ring_frame: sh -c 'f=$(ls -t /media/recordings/ring/{{ cam }}/*.mp4 | head -1); ffmpeg -y -sseof -5 -i "$f" -frames:v 1 /config/www/ring_frame.jpg -loglevel error; echo "$f" > /config/www/ring_frame.txt'
   archive_recordings: sh /config/scripts/archive_recordings.sh
   fix_recording: nohup sh /config/scripts/fix_recording.sh '{{ f }}' >/dev/null 2>&1 &
   batch_fix_recordings: nohup sh /config/scripts/batch_fix_recordings.sh >/dev/null 2>&1 &

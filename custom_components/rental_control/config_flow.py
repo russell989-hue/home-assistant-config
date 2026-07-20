@@ -1,0 +1,549 @@
+# SPDX-FileCopyrightText: 2021 Andrew Grimberg <tykeal@bardicgrove.org>
+# SPDX-License-Identifier: Apache-2.0
+
+"""Config flow for Rental Control integration."""
+
+import asyncio
+import logging
+from typing import Any
+from zoneinfo import available_timezones
+
+from homeassistant import config_entries
+from homeassistant.const import CONF_NAME
+from homeassistant.const import CONF_URL
+from homeassistant.const import CONF_VERIFY_SSL
+from homeassistant.core import HomeAssistant
+from homeassistant.core import callback
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.selector import SelectOptionDict
+from homeassistant.helpers.selector import SelectSelector
+from homeassistant.helpers.selector import SelectSelectorConfig
+from homeassistant.helpers.selector import SelectSelectorMode
+from homeassistant.util import dt
+import voluptuous as vol
+from voluptuous.schema_builder import ALLOW_EXTRA
+
+from .const import CODE_GENERATORS
+from .const import CONF_CHECKIN
+from .const import CONF_CHECKOUT
+from .const import CONF_CLEANING_WINDOW
+from .const import CONF_CODE_BUFFER_AFTER
+from .const import CONF_CODE_BUFFER_BEFORE
+from .const import CONF_CODE_GENERATION
+from .const import CONF_CODE_LENGTH
+from .const import CONF_CREATION_DATETIME
+from .const import CONF_DAYS
+from .const import CONF_ENABLE_KEYMASTER_EVENT_DIAGNOSTICS
+from .const import CONF_EVENT_PREFIX
+from .const import CONF_GENERATE
+from .const import CONF_HONOR_EVENT_TIMES
+from .const import CONF_IGNORE_NON_RESERVED
+from .const import CONF_LOCK_ENTRY
+from .const import CONF_MAX_EVENTS
+from .const import CONF_MAX_NAME_LENGTH
+from .const import CONF_REFRESH_FREQUENCY
+from .const import CONF_SHOULD_UPDATE_CODE
+from .const import CONF_START_SLOT
+from .const import CONF_TIMEZONE
+from .const import CONF_TRIM_NAMES
+from .const import DEFAULT_CHECKIN
+from .const import DEFAULT_CHECKOUT
+from .const import DEFAULT_CLEANING_WINDOW
+from .const import DEFAULT_CODE_BUFFER_AFTER
+from .const import DEFAULT_CODE_BUFFER_BEFORE
+from .const import DEFAULT_CODE_GENERATION
+from .const import DEFAULT_CODE_LENGTH
+from .const import DEFAULT_DAYS
+from .const import DEFAULT_ENABLE_KEYMASTER_EVENT_DIAGNOSTICS
+from .const import DEFAULT_EVENT_PREFIX
+from .const import DEFAULT_GENERATE
+from .const import DEFAULT_HONOR_EVENT_TIMES
+from .const import DEFAULT_MAX_EVENTS
+from .const import DEFAULT_MAX_NAME_LENGTH
+from .const import DEFAULT_REFRESH_FREQUENCY
+from .const import DEFAULT_SHOULD_UPDATE_CODE
+from .const import DEFAULT_START_SLOT
+from .const import DEFAULT_TRIM_NAMES
+from .const import DOMAIN
+from .const import LOCK_MANAGER
+from .const import MIN_NAME_LENGTH
+from .const import REQUEST_TIMEOUT
+from .util import gen_uuid
+
+# aislop-ignore-file ai-slop/hallucinated-import -- Provided by Home Assistant runtime.
+
+_LOGGER = logging.getLogger(__name__)
+
+sorted_tz = sorted(available_timezones())
+
+
+class RentalControlFlowHandler(  # type: ignore[call-arg]
+    config_entries.ConfigFlow, domain=DOMAIN
+):
+    """Handle the config flow for Rental Control."""
+
+    VERSION = 10
+
+    DEFAULTS = {
+        CONF_CHECKIN: DEFAULT_CHECKIN,
+        CONF_CHECKOUT: DEFAULT_CHECKOUT,
+        CONF_DAYS: DEFAULT_DAYS,
+        CONF_IGNORE_NON_RESERVED: True,
+        CONF_EVENT_PREFIX: DEFAULT_EVENT_PREFIX,
+        CONF_MAX_EVENTS: DEFAULT_MAX_EVENTS,
+        CONF_REFRESH_FREQUENCY: DEFAULT_REFRESH_FREQUENCY,
+        CONF_SHOULD_UPDATE_CODE: DEFAULT_SHOULD_UPDATE_CODE,
+        CONF_HONOR_EVENT_TIMES: DEFAULT_HONOR_EVENT_TIMES,
+        CONF_TRIM_NAMES: DEFAULT_TRIM_NAMES,
+        CONF_MAX_NAME_LENGTH: DEFAULT_MAX_NAME_LENGTH,
+        CONF_CODE_BUFFER_BEFORE: DEFAULT_CODE_BUFFER_BEFORE,
+        CONF_CODE_BUFFER_AFTER: DEFAULT_CODE_BUFFER_AFTER,
+        CONF_TIMEZONE: str(dt.DEFAULT_TIME_ZONE),
+        CONF_VERIFY_SSL: True,
+    }
+
+    def __init__(self):
+        """Setup the RentalControlFlowHandler."""
+        self.created = str(dt.now())
+
+    async def _get_unique_id(self, user_input) -> dict[str, str]:
+        """Generate the unique_id."""
+        existing_entry = await self.async_set_unique_id(
+            gen_uuid(self.created), raise_on_progress=True
+        )
+        if existing_entry:
+            return {CONF_NAME: "same_name"}
+        return {}
+
+    async def async_step_user(self, user_input=None):
+        """Handle the initial step."""
+        return await _start_config_flow(
+            self,
+            "user",
+            user_input[CONF_NAME] if user_input else None,
+            user_input,
+            self.DEFAULTS,
+        )
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry):
+        """Link the Options Flow."""
+        return RentalControlOptionsFlow()
+
+
+class RentalControlOptionsFlow(config_entries.OptionsFlow):
+    """Options flow for Rental Control."""
+
+    async def async_step_init(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> Any:
+        """Handle a flow initialized by the user."""
+        flow_data: dict[str, Any] | None = None
+        if self.config_entry.data:
+            flow_data = dict(self.config_entry.data)
+        return await _start_config_flow(
+            self,
+            "init",
+            "",
+            user_input,
+            flow_data,
+            self.config_entry.entry_id,
+        )
+
+
+def _normalize_lock_entry(value: Any) -> str:
+    """Normalize cleared lock entry values to '(none)'.
+
+    The HA frontend sends None or empty string when the user
+    clears a select field via the X button. Map those to the
+    explicit '(none)' sentinel so vol.In validation passes.
+    """
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return "(none)"
+    return str(value)
+
+
+def _available_lock_managers(
+    hass: HomeAssistant,
+) -> list:
+    """Find lock manager configurations to use."""
+
+    data = ["(none)"]
+    if LOCK_MANAGER not in hass.data:
+        return data
+
+    for entry in hass.config_entries.async_entries(LOCK_MANAGER):
+        data.append(entry.title)
+
+    return data
+
+
+def _code_generators() -> list:
+    """Return list of code genrators available."""
+
+    data = []
+
+    for generator in CODE_GENERATORS:
+        data.append(generator["description"])
+
+    return data
+
+
+def _generator_convert(ident: str, to_type: bool = True) -> str:
+    """Convert between type and description for generators."""
+
+    if to_type:
+        return next(item for item in CODE_GENERATORS if item["description"] == ident)[
+            "type"
+        ]
+    else:
+        return next(item for item in CODE_GENERATORS if item["type"] == ident)[
+            "description"
+        ]
+
+
+def _lock_entry_convert(hass: HomeAssistant, entry: str, to_entity: bool = True) -> str:
+    """Convert between name and entity for lock entries."""
+
+    _LOGGER.debug(
+        "In _lock_entry_convert, entry: '%s', to_entity: '%s'", entry, to_entity
+    )
+
+    if to_entity:
+        _LOGGER.debug("to entity")
+        for lock_entry in hass.config_entries.async_entries(LOCK_MANAGER):
+            if entry == lock_entry.title:
+                _LOGGER.debug("'%s' becomes '%s'", entry, lock_entry.data["lockname"])
+                return str(lock_entry.data["lockname"])
+    else:
+        _LOGGER.debug("from entity")
+        for lock_entry in hass.config_entries.async_entries(LOCK_MANAGER):
+            if entry == lock_entry.data["lockname"]:
+                _LOGGER.debug("'%s' becomes '%s'", entry, lock_entry.title)
+                return str(lock_entry.title)
+
+    _LOGGER.debug("no conversion done")
+    return entry
+
+
+def _get_schema(
+    hass: HomeAssistant,
+    user_input: dict[str, Any] | None,
+    default_dict: dict[str, Any] | None,
+    entry_id: str | None = None,
+) -> vol.Schema:
+    """Gets a schema using the default_dict as a backup."""
+    if user_input is None:
+        user_input = {}
+
+    if default_dict is not None:
+        if (
+            CONF_LOCK_ENTRY in default_dict.keys()
+            and default_dict[CONF_LOCK_ENTRY] is None
+        ):
+            check_dict = default_dict.copy()
+            check_dict.pop(CONF_LOCK_ENTRY, None)
+            default_dict = check_dict
+
+        if (
+            CONF_LOCK_ENTRY in default_dict.keys()
+            and default_dict[CONF_LOCK_ENTRY] is not None
+        ):
+            check_dict = default_dict.copy()
+            convert = _lock_entry_convert(hass, default_dict[CONF_LOCK_ENTRY], False)
+            check_dict[CONF_LOCK_ENTRY] = convert
+            default_dict = check_dict
+
+    def _get_default(key: str, fallback_default: Any = None) -> Any | None:
+        """Gets default value for key."""
+        if default_dict is not None and user_input is not None:
+            return user_input.get(key, default_dict.get(key, fallback_default))
+        else:
+            return None
+
+    schema = vol.Schema(
+        {
+            vol.Required(CONF_NAME, default=_get_default(CONF_NAME)): cv.string,
+            vol.Required(CONF_URL, default=_get_default(CONF_URL)): cv.string,
+            vol.Optional(
+                CONF_REFRESH_FREQUENCY,
+                default=_get_default(CONF_REFRESH_FREQUENCY, DEFAULT_REFRESH_FREQUENCY),
+            ): cv.positive_int,
+            vol.Optional(
+                CONF_TIMEZONE,
+                default=_get_default(CONF_TIMEZONE, str(dt.DEFAULT_TIME_ZONE)),
+            ): vol.In(sorted_tz),
+            vol.Optional(
+                CONF_EVENT_PREFIX,
+                default=_get_default(CONF_EVENT_PREFIX, DEFAULT_EVENT_PREFIX),
+            ): cv.string,
+            vol.Required(
+                CONF_CHECKIN, default=_get_default(CONF_CHECKIN, DEFAULT_CHECKIN)
+            ): cv.string,
+            vol.Required(
+                CONF_CHECKOUT, default=_get_default(CONF_CHECKOUT, DEFAULT_CHECKOUT)
+            ): cv.string,
+            vol.Optional(
+                CONF_DAYS, default=_get_default(CONF_DAYS, DEFAULT_DAYS)
+            ): cv.positive_int,
+            vol.Optional(
+                CONF_LOCK_ENTRY, default=_get_default(CONF_LOCK_ENTRY, "(none)")
+            ): SelectSelector(
+                SelectSelectorConfig(
+                    options=[
+                        SelectOptionDict(value=v, label=v)
+                        for v in _available_lock_managers(hass)
+                    ],
+                    mode=SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Required(
+                CONF_START_SLOT,
+                default=_get_default(CONF_START_SLOT, DEFAULT_START_SLOT),
+            ): cv.positive_int,
+            vol.Required(
+                CONF_MAX_EVENTS,
+                default=_get_default(CONF_MAX_EVENTS, DEFAULT_MAX_EVENTS),
+            ): cv.positive_int,
+            vol.Required(
+                CONF_CODE_LENGTH,
+                default=_get_default(CONF_CODE_LENGTH, DEFAULT_CODE_LENGTH),
+            ): cv.positive_int,
+            vol.Optional(
+                CONF_CODE_GENERATION,
+                default=_generator_convert(
+                    ident=str(
+                        _get_default(CONF_CODE_GENERATION, DEFAULT_CODE_GENERATION)
+                    ),
+                    to_type=False,
+                ),
+            ): vol.In(_code_generators()),
+            vol.Optional(
+                CONF_SHOULD_UPDATE_CODE,
+                default=_get_default(
+                    CONF_SHOULD_UPDATE_CODE, DEFAULT_SHOULD_UPDATE_CODE
+                ),
+            ): cv.boolean,
+            vol.Optional(
+                CONF_HONOR_EVENT_TIMES,
+                default=_get_default(CONF_HONOR_EVENT_TIMES, DEFAULT_HONOR_EVENT_TIMES),
+            ): cv.boolean,
+            vol.Optional(
+                CONF_IGNORE_NON_RESERVED,
+                default=_get_default(CONF_IGNORE_NON_RESERVED, True),
+            ): cv.boolean,
+            vol.Optional(
+                CONF_VERIFY_SSL, default=_get_default(CONF_VERIFY_SSL, True)
+            ): cv.boolean,
+            vol.Optional(
+                CONF_CLEANING_WINDOW,
+                default=_get_default(CONF_CLEANING_WINDOW, DEFAULT_CLEANING_WINDOW),
+            ): vol.All(vol.Coerce(float), vol.Range(min=0.5, max=48.0)),
+            vol.Optional(
+                CONF_TRIM_NAMES,
+                default=_get_default(CONF_TRIM_NAMES, DEFAULT_TRIM_NAMES),
+            ): cv.boolean,
+            vol.Optional(
+                CONF_MAX_NAME_LENGTH,
+                default=_get_default(CONF_MAX_NAME_LENGTH, DEFAULT_MAX_NAME_LENGTH),
+            ): vol.All(vol.Coerce(int), vol.Range(min=MIN_NAME_LENGTH)),
+        },
+        extra=ALLOW_EXTRA,
+    )
+    if entry_id is not None:
+        schema = schema.extend(
+            {
+                vol.Optional(
+                    CONF_ENABLE_KEYMASTER_EVENT_DIAGNOSTICS,
+                    default=_get_default(
+                        CONF_ENABLE_KEYMASTER_EVENT_DIAGNOSTICS,
+                        DEFAULT_ENABLE_KEYMASTER_EVENT_DIAGNOSTICS,
+                    ),
+                ): cv.boolean,
+                vol.Optional(
+                    CONF_CODE_BUFFER_BEFORE,
+                    default=_get_default(
+                        CONF_CODE_BUFFER_BEFORE,
+                        DEFAULT_CODE_BUFFER_BEFORE,
+                    ),
+                ): vol.All(vol.Coerce(int), vol.Range(min=0)),
+                vol.Optional(
+                    CONF_CODE_BUFFER_AFTER,
+                    default=_get_default(
+                        CONF_CODE_BUFFER_AFTER,
+                        DEFAULT_CODE_BUFFER_AFTER,
+                    ),
+                ): vol.All(vol.Coerce(int), vol.Range(min=0)),
+            }
+        )
+    return schema
+
+
+def _show_config_form(
+    cls: RentalControlFlowHandler | RentalControlOptionsFlow,
+    step_id: str,
+    user_input: dict[str, Any] | None,
+    errors: dict[str, str],
+    description_placeholders: dict[str, str],
+    defaults: dict[str, Any] | None = None,
+    entry_id: str | None = None,
+) -> Any:
+    """Show the configuration form to edit data."""
+    return cls.async_show_form(
+        step_id=step_id,
+        data_schema=_get_schema(cls.hass, user_input, defaults, entry_id),
+        errors=errors,
+        description_placeholders=description_placeholders,
+    )
+
+
+async def _start_config_flow(
+    cls: RentalControlFlowHandler | RentalControlOptionsFlow,
+    step_id: str,
+    title: str,
+    user_input: dict[str, Any] | None,
+    defaults: dict[str, Any] | None = None,
+    entry_id: str | None = None,
+):
+    """Start a config flow."""
+    errors: dict[str, str] = {}
+    description_placeholders: dict[str, str] = {}
+
+    if user_input is not None:
+        # Normalize lock entry outside the schema to keep the
+        # schema JSON-serializable for the HA frontend.
+        if CONF_LOCK_ENTRY in user_input:
+            user_input[CONF_LOCK_ENTRY] = _normalize_lock_entry(
+                user_input[CONF_LOCK_ENTRY]
+            )
+
+        # Regular flow has an async function
+        if hasattr(cls, "_get_unique_id"):
+            errors.update(await cls._get_unique_id(user_input))
+
+        try:
+            cv.url(user_input[CONF_URL])
+            # cv.url() only accepts http:// and https:// schemes
+            # Check if HTTP is used when SSL verification is enabled
+            url_lower = user_input[CONF_URL].lower()
+            is_https = url_lower.startswith("https://")
+
+            if not is_https and user_input[CONF_VERIFY_SSL]:
+                # HTTP only allowed when SSL verification is disabled
+                errors[CONF_URL] = "https_required"
+            else:
+                session = async_get_clientsession(
+                    cls.hass, verify_ssl=user_input[CONF_VERIFY_SSL]
+                )
+                async with asyncio.timeout(REQUEST_TIMEOUT):
+                    resp = await session.get(user_input[CONF_URL])
+                if resp.status != 200:
+                    _LOGGER.error(
+                        "%s returned %s - %s",
+                        user_input[CONF_URL],
+                        resp.status,
+                        resp.reason,
+                    )
+                    errors[CONF_URL] = "unknown"
+                else:
+                    # We require text/calendar in the content-type header
+                    if "text/calendar" not in resp.content_type:
+                        errors[CONF_URL] = "bad_ics"
+        except vol.Invalid as err:
+            _LOGGER.exception(err.msg)
+            errors[CONF_URL] = "invalid_url"
+
+        if (
+            user_input[CONF_REFRESH_FREQUENCY] < 0
+            or user_input[CONF_REFRESH_FREQUENCY] > 1440
+        ):
+            errors[CONF_REFRESH_FREQUENCY] = "bad_refresh"
+
+        try:
+            cv.time(user_input[CONF_CHECKIN])
+        except vol.Invalid as err:
+            _LOGGER.exception(err.msg)
+            errors[CONF_CHECKIN] = "bad_time"
+
+        try:
+            cv.time(user_input[CONF_CHECKOUT])
+        except vol.Invalid as err:
+            _LOGGER.exception(err.msg)
+            errors[CONF_CHECKOUT] = "bad_time"
+
+        if user_input[CONF_DAYS] < 1:
+            errors[CONF_DAYS] = "bad_minimum"
+
+        if user_input[CONF_MAX_EVENTS] < 1:
+            errors[CONF_MAX_EVENTS] = "bad_minimum"
+
+        if (
+            user_input[CONF_CODE_LENGTH] < DEFAULT_CODE_LENGTH
+            or (user_input[CONF_CODE_LENGTH] % 2) != 0
+        ):
+            errors[CONF_CODE_LENGTH] = "bad_code_length"
+
+        # Convert code generator to proper type
+        user_input[CONF_CODE_GENERATION] = _generator_convert(
+            ident=user_input[CONF_CODE_GENERATION], to_type=True
+        )
+
+        if (
+            user_input.get(CONF_MAX_NAME_LENGTH, DEFAULT_MAX_NAME_LENGTH)
+            < MIN_NAME_LENGTH
+        ):
+            errors[CONF_MAX_NAME_LENGTH] = "bad_max_name_length"
+
+        # Warn if prefix is too long relative to max name length
+        if user_input.get(CONF_TRIM_NAMES, False) and user_input.get(
+            CONF_EVENT_PREFIX, ""
+        ):
+            # Account for the space separator between prefix and name
+            prefix_len = len(user_input[CONF_EVENT_PREFIX]) + 1
+            max_len = user_input.get(CONF_MAX_NAME_LENGTH, DEFAULT_MAX_NAME_LENGTH)
+            if prefix_len > (max_len - MIN_NAME_LENGTH):
+                errors["base"] = "prefix_too_long_for_trim"
+
+        if not errors:
+            # Only do this conversion if there are no errors and it needs to be
+            # done. Doing this before the errors check will lead to later
+            # validation issues should the user not reset the lock entry
+            # Convert (none) to None
+            if user_input[CONF_LOCK_ENTRY] == "(none)":
+                user_input[CONF_LOCK_ENTRY] = None
+
+            if user_input[CONF_LOCK_ENTRY] is not None:
+                user_input[CONF_LOCK_ENTRY] = _lock_entry_convert(
+                    cls.hass, user_input[CONF_LOCK_ENTRY], True
+                )
+
+            if hasattr(cls, "created"):
+                user_input[CONF_CREATION_DATETIME] = cls.created
+
+            if user_input[CONF_LOCK_ENTRY]:
+                user_input[CONF_GENERATE] = DEFAULT_GENERATE
+
+            return cls.async_create_entry(title=title, data=user_input)
+
+        return _show_config_form(
+            cls,
+            step_id,
+            user_input,
+            errors,
+            description_placeholders,
+            defaults,
+            entry_id,
+        )
+
+    return _show_config_form(
+        cls,
+        step_id,
+        user_input,
+        errors,
+        description_placeholders,
+        defaults,
+        entry_id,
+    )

@@ -104,3 +104,7 @@ go2rtc-*
 
 # git PAT store (never commit)
 .git-credentials
+www/clip_sheet.jpg
+www/ring_frame.jpg
+www/ring_frame.txt
+www/clip_*.jpg
