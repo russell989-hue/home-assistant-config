@@ -1406,7 +1406,8 @@
                   },
                   "distance_unit": "imperial",
                   "map_appearance": "auto",
-                  "timeline_use_entity_color": false
+                  "timeline_use_entity_color": false,
+                  "osm_api_key": "REDACTED@example.com"
                 }
               ],
               "column_span": 2
