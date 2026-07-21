@@ -13,6 +13,16 @@ all_seats_heat:
   - action: switch.turn_on
     target:
       entity_id: switch.shadowfax_steering_wheel_heat
+all_front_seats_cool:
+  alias: All Cool
+  sequence:
+  - action: select.select_option
+    target:
+      entity_id:
+      - select.shadowfax_seat_front_left_vent
+      - select.shadowfax_seat_front_right_vent
+    data:
+      option: Level_3
 all_seats_off:
   alias: All Off
   sequence:
