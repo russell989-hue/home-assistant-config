@@ -25,7 +25,40 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 
 
+input_select:
+  shadowfax_map_lookback:
+    name: "Shadowfax Map Lookback"
+    icon: mdi:map-clock
+    options:
+      - "3 hours"
+      - "12 hours"
+      - "24 hours"
+      - "3 days"
+      - "7 days"
+    initial: "24 hours"
+
+mqtt:
+  device_tracker:
+    - name: "Shadowfax Brian"
+      unique_id: shadowfax_driver_brian
+      state_topic: "shadowfax/brian/state"
+      json_attributes_topic: "shadowfax/brian/attributes"
+      icon: mdi:car-side
+    - name: "Shadowfax Nick"
+      unique_id: shadowfax_driver_nick
+      state_topic: "shadowfax/nick/state"
+      json_attributes_topic: "shadowfax/nick/attributes"
+      icon: mdi:car-sports
+
 template:
+  - binary_sensor:
+      - name: "MA Queue Active"
+        unique_id: ma_queue_active
+        icon: mdi:playlist-music
+        state: >
+          {{ state_attr('media_player.living_room_sonos', 'active_queue') is not none
+             or state_attr('media_player.office_sonos', 'active_queue') is not none
+             or state_attr('media_player.jbl_ma510_ce9841_4', 'active_queue') is not none }}
   - sensor:
       - name: "AirBnB Guest"
         unique_id: airbnb_guest_status
@@ -697,16 +730,6 @@ light:
       - light.tz3210_dwzfzfjc_ts0505b_8
       - light.tz3210_dwzfzfjc_ts0505b_9
 
-influxdb:
-  host: localhost
-  port: 8086
-  database: shadowfaxdb
-  include:
-    entities:
-      - sensor.shadowfax_trip_data
-      - sensor.shadowfax_battery_state_of_charge
-      - sensor.shadowfax_odometer
-      
 input_datetime:
   shadowfax_trip_start_time:
     name: "Shadowfax Trip Start Time"

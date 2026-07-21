@@ -1749,3 +1749,33 @@
       generate_title: true
   mode: single
   max_exceeded: silent
+- id: shadowfax_per_driver_trail
+  alias: Shadowfax - Per-driver GPS trail
+  description: Publishes Shadowfax GPS to per-driver MQTT trackers so the map shows
+    a separate colored trail per driver (replaces Grafana/InfluxDB driver tagging)
+  mode: queued
+  max_exceeded: silent
+  triggers:
+  - trigger: state
+    entity_id: sensor.shadowfax_trip_data
+    attribute: latitude
+  - trigger: state
+    entity_id: sensor.shadowfax_trip_data
+    attribute: longitude
+  conditions:
+  - condition: template
+    value_template: >-
+      {{ states('sensor.shadowfax_trip_data') in ['Brian R.', 'Nick C.']
+         and state_attr('sensor.shadowfax_trip_data', 'latitude') is not none }}
+  actions:
+  - action: mqtt.publish
+    data:
+      topic: >-
+        shadowfax/{{ 'brian' if states('sensor.shadowfax_trip_data') == 'Brian R.' else 'nick' }}/attributes
+      retain: true
+      payload: >-
+        {"latitude": {{ state_attr('sensor.shadowfax_trip_data', 'latitude') }},
+         "longitude": {{ state_attr('sensor.shadowfax_trip_data', 'longitude') }},
+         "gps_accuracy": 0,
+         "speed": {{ state_attr('sensor.shadowfax_trip_data', 'speed') | default(0, true) }},
+         "drive_mode": "{{ state_attr('sensor.shadowfax_trip_data', 'drive_mode') }}"}
