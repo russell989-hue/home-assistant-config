@@ -1,7 +1,5 @@
 """Data parsing for the Nest API."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 import datetime
 import logging
@@ -11,12 +9,14 @@ from typing import Any
 from google.protobuf import duration_pb2, timestamp_pb2
 
 from .enums import (
+    DualFuelBreakpointOverride,
     HotWaterMode,
     LockBoltActor,
     LockBoltState,
     StructureMode,
     TemperatureScale,
     ThermostatHvacMode,
+    ThermostatHvacStage,
     ThermostatHvacState,
 )
 from .models import (
@@ -70,11 +70,11 @@ def _safe_to_seconds(
     """
     try:
         return int(ts.ToSeconds())
-    except (ValueError, OverflowError, AttributeError):
+    except ValueError, OverflowError, AttributeError:
         # Fall back to the raw seconds field, ignoring corrupt nanos
         try:
             return int(ts.seconds)
-        except (AttributeError, TypeError):
+        except AttributeError, TypeError:
             return default
 
 
@@ -84,7 +84,7 @@ def _round_target_temp(temp: Any, scale: TemperatureScale | None) -> float | Non
         return None
     try:
         temp_float = float(temp)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
     if scale == TemperatureScale.FAHRENHEIT:
         temp_f = round(temp_float * 1.8 + 32.0)
@@ -98,7 +98,7 @@ def _round_current_temp(temp: Any) -> float | None:
         return None
     try:
         return float(temp)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
 
 
@@ -233,6 +233,21 @@ class ParsedData:
 
 
 _LOGGER = logging.getLogger(__name__)
+
+_DUAL_FUEL_OVERRIDE_MAP: dict[
+    nest_hvac_pb2.EquipmentSettingsTrait.DualFuelOverride.ValueType,
+    DualFuelBreakpointOverride,
+] = {
+    nest_hvac_pb2.EquipmentSettingsTrait.DualFuelOverride.DUAL_FUEL_OVERRIDE_NONE: (
+        DualFuelBreakpointOverride.NONE
+    ),
+    nest_hvac_pb2.EquipmentSettingsTrait.DualFuelOverride.DUAL_FUEL_OVERRIDE_ALWAYS_ALT: (
+        DualFuelBreakpointOverride.ALWAYS_ALTERNATE_HEAT
+    ),
+    nest_hvac_pb2.EquipmentSettingsTrait.DualFuelOverride.DUAL_FUEL_OVERRIDE_ALWAYS_PRIMARY: (
+        DualFuelBreakpointOverride.NEVER_ALTERNATE_HEAT
+    ),
+}
 
 
 class NestParser:
@@ -532,7 +547,7 @@ class NestParser:
                 if temp_scale_value
                 else TemperatureScale.CELSIUS
             )
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             _LOGGER.warning(
                 "Unsupported value for TemperatureScale: '%s'. Defaulting to Celsius",
                 temp_scale_value,
@@ -770,7 +785,7 @@ class NestParser:
             try:
                 battery_voltage = float(props["rq_battery_battery_volt"])
                 battery_level = _scale_value(battery_voltage, 0.0, 5.4, 0.0, 100.0)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 pass
 
         if "doorbell" in model.lower():
@@ -1093,6 +1108,39 @@ class NestParser:
             hvac_state = ThermostatHvacState.FAN
         return hvac_state
 
+    @staticmethod
+    def _parse_proto_hvac_stage(
+        hvac_trait: nest_hvac_pb2.HvacControlTrait,
+    ) -> ThermostatHvacStage:
+        """Return the stage the equipment is running, OFF when idle.
+
+        The HVAC state collapses every stage into HEATING/COOLING, so the stage
+        is kept separately (issue #66). Stages stack, so the most capable one
+        wins: supplemental heat first, then the highest stage number.
+        """
+        state = hvac_trait.hvacState
+        if state.emergencyHeatActive:
+            return ThermostatHvacStage.EMERGENCY_HEAT
+        if state.auxiliaryHeatActive:
+            return ThermostatHvacStage.AUXILIARY_HEAT
+        if state.alternateHeatStage2Active:
+            return ThermostatHvacStage.ALTERNATE_HEAT_STAGE_2
+        if state.alternateHeatStage1Active:
+            return ThermostatHvacStage.ALTERNATE_HEAT_STAGE_1
+        if state.heatStage3Active:
+            return ThermostatHvacStage.HEAT_STAGE_3
+        if state.heatStage2Active:
+            return ThermostatHvacStage.HEAT_STAGE_2
+        if state.heatStage1Active:
+            return ThermostatHvacStage.HEAT_STAGE_1
+        if state.coolStage3Active:
+            return ThermostatHvacStage.COOL_STAGE_3
+        if state.coolStage2Active:
+            return ThermostatHvacStage.COOL_STAGE_2
+        if state.coolStage1Active:
+            return ThermostatHvacStage.COOL_STAGE_1
+        return ThermostatHvacStage.OFF
+
     def _parse_proto_fan(
         self, traits: dict[str, Any]
     ) -> tuple[bool, bool, int, int, int, int]:
@@ -1221,6 +1269,33 @@ class NestParser:
             has_air_filter,
         )
 
+    def _parse_proto_dual_fuel(
+        self, traits: dict[str, Any]
+    ) -> tuple[bool, float | None, DualFuelBreakpointOverride | None]:
+        """Extract the dual fuel settings from traits."""
+        equipment_trait: nest_hvac_pb2.EquipmentSettingsTrait | None = traits.get(
+            nest_hvac_pb2.EquipmentSettingsTrait.DESCRIPTOR.full_name
+        )
+        if (
+            not equipment_trait
+            or equipment_trait.dualFuelSelected
+            != nest_hvac_pb2.EquipmentSettingsTrait.DualFuelSelection.DUAL_FUEL_SELECTION_DUAL_FUEL
+        ):
+            return False, None, None
+
+        override = _DUAL_FUEL_OVERRIDE_MAP.get(
+            equipment_trait.dualFuelBreakpointOverride
+        )
+        # The thermostat reports a placeholder breakpoint while an override is
+        # active, so only expose the breakpoint when there is no override.
+        breakpoint_celsius = None
+        if override is DualFuelBreakpointOverride.NONE and equipment_trait.HasField(
+            "dualFuelBreakpoint"
+        ):
+            breakpoint_celsius = equipment_trait.dualFuelBreakpoint.value
+
+        return True, breakpoint_celsius, override
+
     def _parse_proto_hot_water(
         self, traits: dict[str, Any], temp_scale: TemperatureScale | None
     ) -> tuple[
@@ -1231,6 +1306,8 @@ class NestParser:
         float | None,
         HotWaterMode,
         bool,
+        bool,
+        int,
         str | None,
         str | None,
         str | None,
@@ -1250,11 +1327,20 @@ class NestParser:
         current_water_temperature = None
         hot_water_mode = HotWaterMode.OFF
         hot_water_away_enabled = False
+        hot_water_away_active = False
+        hot_water_next_transition_time = 0
 
         if hw_trait:
             hot_water_active = hw_trait.boilerActive
             hot_water_control_active = hw_trait.controlActive
-            if hw_trait.HasField("temperature"):
+            hot_water_away_active = hw_trait.awayActive
+            if hw_trait.HasField("nextTransitionTime"):
+                hot_water_next_transition_time = _safe_to_seconds(
+                    hw_trait.nextTransitionTime
+                )
+            # A Heat Link without a hot water sensor still sends the temperature
+            # sub-message, but empty, which decodes to a bogus 0.0; see issue #69.
+            if hw_trait.HasField("temperature") and hw_trait.temperature.value:
                 current_water_temperature = _round_current_temp(
                     hw_trait.temperature.value
                 )
@@ -1300,6 +1386,8 @@ class NestParser:
             current_water_temperature,
             hot_water_mode,
             hot_water_away_enabled,
+            hot_water_away_active,
+            hot_water_next_transition_time,
             heat_link_serial_number,
             heat_link_model,
             heat_link_sw_version,
@@ -1404,6 +1492,15 @@ class NestParser:
         )
         serial_number = identity_trait.serialNumber if identity_trait else key
         software_version = identity_trait.softwareVersion if identity_trait else None
+        product_id_description = (
+            identity_trait.productIdDescription.literal
+            if identity_trait and identity_trait.HasField("productIdDescription")
+            else None
+        )
+        # productRevision has no field presence, so an unset one reads back as 0.
+        product_revision = (
+            (identity_trait.productRevision or None) if identity_trait else None
+        )
 
         model = self._parse_protobuf_thermostat_model(traits)
 
@@ -1523,6 +1620,7 @@ class NestParser:
 
         # HVAC State (using helper)
         hvac_state = self._parse_proto_hvac_state(hvac_trait, fan_state)
+        hvac_stage = self._parse_proto_hvac_stage(hvac_trait)
 
         # Temperature Lock Settings
         lock_trait: nest_hvac_pb2.TemperatureLockSettingsTrait | None = traits.get(
@@ -1535,6 +1633,13 @@ class NestParser:
             nest_hvac_pb2.LeafTrait.DESCRIPTOR.full_name
         )
         leaf = leaf_trait.active if leaf_trait else False
+
+        # Dual Fuel (heat pump with an alternate heat source)
+        (
+            has_dual_fuel,
+            dual_fuel_breakpoint,
+            dual_fuel_breakpoint_override,
+        ) = self._parse_proto_dual_fuel(traits)
 
         # Filter Reminder
         filter_trait: nest_hvac_pb2.FilterReminderTrait | None = traits.get(
@@ -1559,6 +1664,8 @@ class NestParser:
             current_water_temperature,
             hot_water_mode,
             hot_water_away_enabled,
+            hot_water_away_active,
+            hot_water_next_transition_time,
             heat_link_serial_number,
             heat_link_model,
             heat_link_sw_version,
@@ -1597,6 +1704,8 @@ class NestParser:
             location=_get_protobuf_location(traits, wheres_map),
             model=model,
             software_version=software_version,
+            product_id_description=product_id_description,
+            product_revision=product_revision,
             online=online,
             current_temperature=current_temperature,
             backplate_temperature=backplate_temperature,
@@ -1607,6 +1716,7 @@ class NestParser:
             target_humidity=target_humidity,
             hvac_mode=hvac_mode,
             hvac_state=hvac_state,
+            hvac_stage=hvac_stage,
             is_eco_mode=is_eco_mode,
             leaf=leaf,
             fan_state=fan_state,
@@ -1636,6 +1746,8 @@ class NestParser:
             current_water_temperature=current_water_temperature,
             hot_water_mode=hot_water_mode,
             hot_water_away_enabled=hot_water_away_enabled,
+            hot_water_away_active=hot_water_away_active,
+            hot_water_next_transition_time=hot_water_next_transition_time,
             has_dehumidifier=has_dehumidifier,
             dehumidifier_state=dehumidifier_state,
             has_humidifier=has_humidifier,
@@ -1643,6 +1755,9 @@ class NestParser:
             has_air_filter=has_air_filter,
             filter_replacement_needed=filter_replacement_needed,
             filter_runtime=filter_runtime,
+            has_dual_fuel=has_dual_fuel,
+            dual_fuel_breakpoint=dual_fuel_breakpoint,
+            dual_fuel_breakpoint_override=dual_fuel_breakpoint_override,
             battery_level=battery_level,
             battery_voltage=battery_voltage,
             occupancy=occupancy,
@@ -2388,6 +2503,7 @@ class NestParser:
         else:
             mapped_model = "Hot Water Control"
 
+        has_own_serial_number = bool(thermostat.heat_link_serial_number)
         serial_number = (
             thermostat.heat_link_serial_number
             or f"{thermostat.serial_number}-hot-water"
@@ -2396,6 +2512,7 @@ class NestParser:
         return NestHeatLink(
             object_key=f"heatlink.{serial_number}",
             serial_number=serial_number,
+            has_own_serial_number=has_own_serial_number,
             location=thermostat.location,
             name="Heat Link" if thermostat.heat_link_serial_number else "Hot Water",
             model=mapped_model,
@@ -2409,6 +2526,8 @@ class NestParser:
             hot_water_boost_time_to_end=thermostat.hot_water_boost_time_to_end,
             hot_water_mode=thermostat.hot_water_mode,
             hot_water_away_enabled=thermostat.hot_water_away_enabled,
+            hot_water_away_active=thermostat.hot_water_away_active,
+            hot_water_next_transition_time=thermostat.hot_water_next_transition_time,
             current_temperature=thermostat.current_water_temperature,
             target_temperature=thermostat.hot_water_temperature,
             temperature_scale=thermostat.temperature_scale,

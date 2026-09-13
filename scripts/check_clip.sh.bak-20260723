@@ -1,0 +1,32 @@
+#!/bin/sh
+# Generic ring-buffer clip extractor: check_clip.sh <camera> [seconds]
+# Writes the last N seconds (default 60) of a camera's ring buffer to
+# /media/<camera>_check.mp4 for LLM Vision video_analyzer.
+# Generalized 2026-07-20 from airbnb_ring_clip.sh: SDM motion events arrive
+# 15-25s late, so live-stream analysis misses the event; only the continuous
+# ring buffer reliably contains it. Handles the segment-rotation edge by
+# prepending the tail of the previous segment when the newest is too short.
+cam="$1"
+want="${2:-60}"
+[ -n "$cam" ] || exit 1
+d=/media/recordings/ring/$cam
+out=/media/${cam}_check.mp4
+t1=/tmp/rc_${cam}_1.mp4
+t2=/tmp/rc_${cam}_2.mp4
+tl=/tmp/rc_${cam}_list.txt
+newest=$(ls -t "$d"/*.mp4 2>/dev/null | head -1)
+prev=$(ls -t "$d"/*.mp4 2>/dev/null | head -2 | tail -1)
+[ -n "$newest" ] || exit 1
+rm -f "$t1" "$t2" "$tl" "$out"
+dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$newest" 2>/dev/null | cut -d. -f1)
+if [ "${dur:-0}" -ge "$want" ] || [ "$prev" = "$newest" ]; then
+  ffmpeg -y -sseof -"$want" -i "$newest" -c copy "$out" -loglevel error
+else
+  need=$((want - ${dur:-0} + 10))
+  ffmpeg -y -sseof -"$need" -i "$prev" -c copy "$t1" -loglevel error
+  ffmpeg -y -i "$newest" -c copy "$t2" -loglevel error
+  printf "file '%s'\nfile '%s'\n" "$t1" "$t2" > "$tl"
+  ffmpeg -y -f concat -safe 0 -i "$tl" -c copy "$out" -loglevel error
+  rm -f "$t1" "$t2" "$tl"
+fi
+[ -s "$out" ]

@@ -1,0 +1,1467 @@
+{
+  "schema_version": 1,
+  "issuer": "chase",
+  "issuer_name": "Chase",
+  "products": [
+    {
+      "id": "chase_sapphire_reserve",
+      "name": "Sapphire Reserve",
+      "annual_fee": 795,
+      "currency": "ultimate_rewards",
+      "currency_name": "Ultimate Rewards points",
+      "default_point_value": 0.015,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "needs_verification": false,
+      "source_url": "https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve",
+      "benefits": [
+        {
+          "id": "travel_credit",
+          "name": "Annual travel credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 300,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "statement_match": [
+            "TRAVEL CREDIT"
+          ]
+        },
+        {
+          "id": "edit_hotel_credit",
+          "name": "The Edit hotel credit",
+          "type": "statement_credit",
+          "cadence": "semiannual",
+          "amount": 250,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary",
+          "notes": "Up to $250 January to June and again July to December on prepaid two-night stays booked through The Edit, $500 a year.",
+          "statement_match": [
+            "HOTEL CREDIT",
+            "THE EDIT"
+          ]
+        },
+        {
+          "id": "select_hotels_credit",
+          "name": "Select Chase Travel hotels credit (2026)",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 250,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "SELECT HOTEL",
+            "CHASE TRAVEL HOTEL"
+          ],
+          "notes": "Up to $250 through 12/31/2026 on prepaid two-night stays at IHG, Montage, Pendry, Omni, Virgin, Minor and Pan Pacific properties booked through Chase Travel. One year only."
+        },
+        {
+          "id": "dining_credit",
+          "name": "Exclusive Tables dining credit",
+          "type": "statement_credit",
+          "cadence": "semiannual",
+          "amount": 150,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary",
+          "statement_match": [
+            "DINING CREDIT"
+          ],
+          "notes": "Up to $150 January to June and again July to December at Sapphire Exclusive Tables restaurants booked on OpenTable. Activation required."
+        },
+        {
+          "id": "stubhub_credit",
+          "name": "StubHub / viagogo credit",
+          "type": "statement_credit",
+          "cadence": "semiannual",
+          "amount": 150,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": true,
+          "applies_to": "primary",
+          "statement_match": [
+            "STUBHUB",
+            "VIAGOGO"
+          ]
+        },
+        {
+          "id": "doordash_credit",
+          "name": "DoorDash promo credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 25,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": true,
+          "applies_to": "primary",
+          "notes": "A $5 restaurant promo plus two $10 promos each month for DashPass members, through 12/31/2027. Promos, not statement credits: tick off by hand.",
+          "statement_match": [
+            "DOORDASH.*CREDIT"
+          ]
+        },
+        {
+          "id": "lyft_credit",
+          "name": "Lyft credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary",
+          "statement_match": [
+            "LYFT.*CREDIT"
+          ],
+          "notes": "Up to $10 a month in-app, through 9/30/2027."
+        },
+        {
+          "id": "peloton_credit",
+          "name": "Peloton credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary",
+          "statement_match": [
+            "PELOTON.*CREDIT"
+          ],
+          "notes": "Up to $10 a month on eligible memberships, through 12/31/2027."
+        },
+        {
+          "id": "apple_subscriptions",
+          "name": "Apple TV+ and Apple Music",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": true,
+          "applies_to": "primary",
+          "default_value": 250,
+          "notes": "Apple TV+ and Apple Music, about $288 a year, through 6/22/2027 after a one-time activation."
+        },
+        {
+          "id": "priority_pass",
+          "name": "Priority Pass Select",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": true,
+          "applies_to": "au_own_allotment",
+          "default_value": 200,
+          "shared_key": "priority_pass"
+        },
+        {
+          "id": "sapphire_lounge",
+          "name": "Sapphire Lounge by The Club",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "au_own_allotment",
+          "default_value": 150
+        },
+        {
+          "id": "ihg_platinum",
+          "name": "IHG One Rewards Platinum Elite status",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Through 12/31/2027 after linking the IHG account.",
+          "grants_status": [
+            {
+              "program": "IHG One Rewards",
+              "tier": "Platinum Elite"
+            }
+          ]
+        },
+        {
+          "id": "global_entry",
+          "name": "Global Entry / TSA PreCheck credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "notes": "Up to $120 once every four years, and one Global Entry fee is all a person pays, however many cards offer it: valued at $30 a year for the household and split between the cards that carry it. A fee reimbursed on a statement still counts as captured.",
+          "statement_match": [
+            "GLOBAL ENTRY",
+            "TSA PRE"
+          ],
+          "default_value": 30,
+          "shared_key": "global_entry"
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 100000,
+          "unit": "points",
+          "applies_to": "primary",
+          "expires_days_after_open": 90,
+          "spend_required": 5000
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 8,
+          "notes": "All purchases through Chase Travel, including The Edit; purchases covered by the travel or Edit credits earn nothing"
+        },
+        {
+          "category": "flights",
+          "multiplier": 4,
+          "notes": "Flights booked direct"
+        },
+        {
+          "category": "hotels",
+          "multiplier": 4,
+          "notes": "Hotels booked direct"
+        },
+        {
+          "category": "dining",
+          "multiplier": 3,
+          "notes": "Dining worldwide"
+        },
+        {
+          "category": "transit",
+          "multiplier": 5,
+          "notes": "Lyft rides only, through September 30, 2027"
+        },
+        {
+          "category": "other",
+          "multiplier": 1
+        }
+      ],
+      "au_terms": {
+        "fee": 195,
+        "own_lounge_access": true,
+        "notes": "AU gets own Priority Pass and Sapphire Lounge access"
+      }
+    },
+    {
+      "id": "chase_ink_business_preferred",
+      "name": "Ink Business Preferred",
+      "annual_fee": 95,
+      "currency": "ultimate_rewards",
+      "currency_name": "Ultimate Rewards points",
+      "default_point_value": 0.015,
+      "reports_to_personal_credit": false,
+      "last_verified": "2026-09-06",
+      "needs_verification": false,
+      "source_url": "https://creditcards.chase.com/business-credit-cards/ink/business-preferred",
+      "benefits": [
+        {
+          "id": "cell_phone_protection",
+          "name": "Cell phone protection",
+          "type": "insurance",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary_and_au",
+          "default_value": 60,
+          "notes": "Up to $1,000 per claim, three claims a year.",
+          "shared_key": "cell_phone_protection"
+        },
+        {
+          "id": "doordash_credit",
+          "name": "DoorDash grocery and retail credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "DOORDASH.*CREDIT"
+          ],
+          "notes": "Up to $10 a month on non-restaurant DoorDash orders; DashPass included for a year."
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 100000,
+          "unit": "points",
+          "applies_to": "primary",
+          "expires_days_after_open": 90,
+          "spend_required": 8000,
+          "notes": "100,000 points after $8,000 in the first three months."
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "shipping",
+          "multiplier": 3,
+          "notes": "First $150,000 combined across shipping, advertising, internet/cable/phone and travel each account anniversary year, then 1X"
+        },
+        {
+          "category": "advertising",
+          "multiplier": 3,
+          "notes": "Social media and search engine advertising; same $150,000 combined cap each account anniversary year"
+        },
+        {
+          "category": "internet_cable_phone",
+          "multiplier": 3,
+          "notes": "Same $150,000 combined cap each account anniversary year"
+        },
+        {
+          "category": "travel",
+          "multiplier": 3,
+          "notes": "Same $150,000 combined cap each account anniversary year"
+        },
+        {
+          "category": "transit",
+          "multiplier": 5,
+          "notes": "Lyft rides only, through September 30, 2027"
+        },
+        {
+          "category": "other",
+          "multiplier": 1
+        }
+      ],
+      "au_terms": {
+        "fee": 0,
+        "own_lounge_access": false,
+        "notes": "Employee cards free"
+      }
+    },
+    {
+      "id": "chase_southwest_plus",
+      "name": "Southwest Rapid Rewards Plus",
+      "annual_fee": 99,
+      "currency": "rapid_rewards",
+      "currency_name": "Rapid Rewards points",
+      "default_point_value": 0.014,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "needs_verification": false,
+      "source_url": "https://creditcards.chase.com/travel-credit-cards/southwest/plus",
+      "benefits": [
+        {
+          "id": "anniversary_points",
+          "name": "Anniversary points",
+          "type": "earning",
+          "cadence": "per_anniversary",
+          "amount": 3000,
+          "unit": "points",
+          "reset": "cardmember_year",
+          "applies_to": "primary"
+        },
+        {
+          "id": "flight_discount",
+          "name": "10% flight discount code",
+          "type": "perk",
+          "cadence": "per_anniversary",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "One promo code each cardmember year."
+        },
+        {
+          "id": "companion_pass_boost",
+          "name": "10,000 Companion Pass qualifying points boost",
+          "type": "perk",
+          "cadence": "per_anniversary",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Counts toward Companion Pass only, not redeemable points."
+        },
+        {
+          "id": "seat_selection",
+          "name": "Complimentary standard seat selection",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "default_value": 30,
+          "notes": "Standard seat within 48 hours of departure and Group 5 boarding, replacing EarlyBird credits after Southwest moved to assigned seating."
+        },
+        {
+          "id": "free_checked_bag",
+          "name": "Southwest first checked bag free",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Cardholder and up to eight passengers on the same reservation.",
+          "shared_key": "southwest_checked_bag"
+        },
+        {
+          "id": "inflight_rebate",
+          "name": "25% back on inflight purchases",
+          "type": "rebate",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "INFLIGHT"
+          ]
+        },
+        {
+          "id": "doordash_credit",
+          "name": "DoorDash non-restaurant credit",
+          "type": "statement_credit",
+          "cadence": "quarterly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "DOORDASH.*CREDIT"
+          ],
+          "notes": "Up to $10 a quarter on non-restaurant orders; DashPass free for twelve months."
+        },
+        {
+          "id": "instacart_credit",
+          "name": "Instacart credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "INSTACART.*CREDIT"
+          ],
+          "notes": "After three free months of Instacart+."
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 50000,
+          "unit": "points",
+          "applies_to": "primary",
+          "expires_days_after_open": 90,
+          "spend_required": 1000
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "brand_airline",
+          "multiplier": 2,
+          "notes": "Purchases made directly with Southwest Airlines: flights, inflight, gift cards and Getaways by Southwest packages"
+        },
+        {
+          "category": "gas",
+          "multiplier": 2,
+          "notes": "First $5,000 combined at gas stations and grocery stores each account anniversary year, then 1X"
+        },
+        {
+          "category": "groceries",
+          "multiplier": 2,
+          "notes": "First $5,000 combined at gas stations and grocery stores each account anniversary year, then 1X"
+        },
+        {
+          "category": "transit",
+          "multiplier": 2,
+          "notes": "Lyft purchases through the Lyft app only, through December 31, 2027"
+        },
+        {
+          "category": "other",
+          "multiplier": 1
+        }
+      ],
+      "au_terms": {
+        "fee": 0,
+        "own_lounge_access": false
+      }
+    },
+    {
+      "id": "chase_united_explorer",
+      "name": "United Explorer",
+      "annual_fee": 150,
+      "currency": "mileageplus",
+      "currency_name": "United miles",
+      "default_point_value": 0.012,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "needs_verification": false,
+      "source_url": "https://creditcards.chase.com/travel-credit-cards/united/united-explorer",
+      "benefits": [
+        {
+          "id": "club_passes",
+          "name": "United Club one-time passes",
+          "type": "perk",
+          "cadence": "per_anniversary",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "default_value": 118,
+          "notes": "Two passes per anniversary year"
+        },
+        {
+          "id": "hotel_credit",
+          "name": "United Hotels credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 100,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "statement_match": [
+            "RENOWNED.*CREDIT",
+            "HOTEL CREDIT"
+          ],
+          "notes": "Up to $100 each anniversary year on prepaid stays through United Hotels (Renowned Hotels and Resorts)."
+        },
+        {
+          "id": "instacart_credit",
+          "name": "Instacart credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": true,
+          "applies_to": "primary",
+          "statement_match": [
+            "INSTACART.*CREDIT"
+          ],
+          "notes": "Up to $10 a month, $120 a calendar year, through 12/31/2027."
+        },
+        {
+          "id": "rideshare_credit",
+          "name": "Rideshare credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 5,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": true,
+          "applies_to": "primary",
+          "notes": "Up to $60 a calendar year after enrollment.",
+          "statement_match": [
+            "RIDESHARE.*CREDIT"
+          ]
+        },
+        {
+          "id": "jsx_credit",
+          "name": "JSX credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 100,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "statement_match": [
+            "JSX.*CREDIT"
+          ],
+          "notes": "Up to $100 each anniversary year on flights booked directly with JSX."
+        },
+        {
+          "id": "avis_budget_credit",
+          "name": "Avis / Budget credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 50,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "AVIS",
+            "BUDGET"
+          ],
+          "notes": "Up to $50 each anniversary year, paid as United TravelBank cash after a qualifying rental."
+        },
+        {
+          "id": "travel_credit",
+          "name": "United travel credit after $10,000 spend",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 100,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "TRAVELBANK",
+            "UNITED TRAVEL CREDIT"
+          ],
+          "notes": "$100 in TravelBank cash once $10,000 is spent in a calendar year.",
+          "conditional": true,
+          "condition": "Spend $10,000 on the card in the calendar year."
+        },
+        {
+          "id": "global_entry",
+          "name": "Global Entry / TSA PreCheck credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "notes": "Up to $120 once every four years, and one Global Entry fee is all a person pays, however many cards offer it: valued at $30 a year for the household and split between the cards that carry it. A fee reimbursed on a statement still counts as captured.",
+          "statement_match": [
+            "GLOBAL ENTRY",
+            "TSA PRE"
+          ],
+          "default_value": 30,
+          "shared_key": "global_entry"
+        },
+        {
+          "id": "inflight_rebate",
+          "name": "25% back on United inflight and club purchases",
+          "type": "rebate",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary",
+          "notes": "Statement credit for food, drinks and Wi-Fi on United-operated flights and premium drinks in United Club. Uncapped, so nothing to forfeit; the credit posts under the primary account.",
+          "statement_match": [
+            "UA INFLIGHT",
+            "INFLIGHT.*CREDIT",
+            "INCLUB CREDIT"
+          ]
+        },
+        {
+          "id": "free_checked_bag",
+          "name": "United first checked bag free",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary",
+          "default_value": 80,
+          "shared_key": "united_checked_bags"
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 60000,
+          "unit": "miles",
+          "applies_to": "primary",
+          "expires_days_after_open": 90,
+          "spend_required": 3000
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "brand_airline",
+          "multiplier": 3,
+          "notes": "The card's share on United flights (9X total with the 6X MileagePlus members earn; less on Basic Economy) and on all other eligible United purchases"
+        },
+        {
+          "category": "hotels",
+          "multiplier": 2,
+          "notes": "Hotel stays booked with the hotel"
+        },
+        {
+          "category": "dining",
+          "multiplier": 2,
+          "notes": "Including eligible delivery services"
+        },
+        {
+          "category": "other",
+          "multiplier": 1
+        }
+      ],
+      "au_terms": {
+        "fee": 0,
+        "own_lounge_access": false
+      }
+    },
+    {
+      "id": "chase_united_club",
+      "name": "United Club",
+      "annual_fee": 695,
+      "currency": "mileageplus",
+      "currency_name": "United miles",
+      "default_point_value": 0.012,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "needs_verification": false,
+      "source_url": "https://creditcards.chase.com/travel-credit-cards/united/club-infinite",
+      "benefits": [
+        {
+          "id": "club_membership",
+          "name": "United Club membership",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "default_value": 750,
+          "notes": "Primary cardholder only; authorized users do not get their own access"
+        },
+        {
+          "id": "all_access_au_passes",
+          "name": "United Club passes for authorized user (All Access)",
+          "type": "perk",
+          "cadence": "per_anniversary",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "default_value": 236,
+          "conditional": true,
+          "condition": "United Club All Access, unlocked by $50,000 of calendar-year spend or United Premier Gold status or higher, plus an authorized user on the account. Four one-time passes are gifted each account anniversary. Premier Gold or better in the household's statuses qualifies by itself; toggle it on for the spend route.",
+          "notes": "Four one-time passes; the authorized user can use them travelling alone",
+          "requires_status": {
+            "program_id": "united_mileageplus",
+            "tier_id": "gold"
+          }
+        },
+        {
+          "id": "hotel_credit",
+          "name": "United Hotels credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 200,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "statement_match": [
+            "RENOWNED.*CREDIT",
+            "HOTEL CREDIT"
+          ],
+          "notes": "Up to $200 each anniversary year on prepaid stays through United Hotels (Renowned Hotels and Resorts)."
+        },
+        {
+          "id": "instacart_credit",
+          "name": "Instacart credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 20,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": true,
+          "applies_to": "primary",
+          "statement_match": [
+            "INSTACART.*CREDIT"
+          ],
+          "notes": "Two $10 credits a month, $240 a year, through 12/31/2027."
+        },
+        {
+          "id": "rideshare_credit",
+          "name": "Rideshare credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 12,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": true,
+          "applies_to": "primary",
+          "statement_match": [
+            "RIDESHARE.*CREDIT"
+          ],
+          "notes": "$12 a month January to November and $18 in December, $150 a calendar year, after enrollment."
+        },
+        {
+          "id": "avis_budget_credit",
+          "name": "Avis / Budget credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 100,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "statement_match": [
+            "AVIS",
+            "BUDGET"
+          ],
+          "notes": "Up to $100 each anniversary year ($50 a rental, two rentals), paid as United TravelBank cash."
+        },
+        {
+          "id": "jsx_credit",
+          "name": "JSX credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 200,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "statement_match": [
+            "JSX.*CREDIT"
+          ],
+          "notes": "Up to $200 each anniversary year on flights booked directly with JSX."
+        },
+        {
+          "id": "global_entry",
+          "name": "Global Entry / TSA PreCheck credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "notes": "Up to $120 once every four years, and one Global Entry fee is all a person pays, however many cards offer it: valued at $30 a year for the household and split between the cards that carry it. A fee reimbursed on a statement still counts as captured.",
+          "statement_match": [
+            "GLOBAL ENTRY",
+            "TSA PRE"
+          ],
+          "default_value": 30,
+          "shared_key": "global_entry"
+        },
+        {
+          "id": "inflight_rebate",
+          "name": "25% back on United inflight and club purchases",
+          "type": "rebate",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary",
+          "notes": "Statement credit for food, drinks and Wi-Fi on United-operated flights and premium drinks in United Club. Uncapped, so nothing to forfeit; the credit posts under the primary account.",
+          "statement_match": [
+            "UA INFLIGHT",
+            "INFLIGHT.*CREDIT",
+            "INCLUB CREDIT"
+          ]
+        },
+        {
+          "id": "free_checked_bags",
+          "name": "United first and second checked bags free",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "applies_to": "primary_and_au",
+          "default_value": 160,
+          "shared_key": "united_checked_bags"
+        },
+        {
+          "id": "award_discounts",
+          "name": "Award flight discounts",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Up to two 10,000-mile discounts a year, one per $20,000 spent."
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 90000,
+          "unit": "miles",
+          "applies_to": "primary",
+          "expires_days_after_open": 90,
+          "spend_required": 5000
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "brand_airline",
+          "multiplier": 5,
+          "notes": "The card's share on United flights (11X total with the 6X MileagePlus members earn) and on all other eligible United purchases"
+        },
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 5,
+          "notes": "Hotel stays booked through Renowned Hotels and Resorts"
+        },
+        {
+          "category": "travel",
+          "multiplier": 2,
+          "notes": "All other travel: airfare, trains, transit, cruises, hotels, car rentals, rideshare and tolls"
+        },
+        {
+          "category": "dining",
+          "multiplier": 2,
+          "notes": "Including eligible delivery services"
+        },
+        {
+          "category": "other",
+          "multiplier": 1
+        }
+      ],
+      "au_terms": {
+        "fee": 0,
+        "own_lounge_access": false,
+        "notes": "Authorized users do NOT get their own United Club access"
+      }
+    },
+    {
+      "id": "chase_sapphire_preferred",
+      "name": "Sapphire Preferred",
+      "annual_fee": 95,
+      "currency": "points",
+      "currency_name": "Ultimate Rewards points",
+      "default_point_value": 0.01,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "source_url": "https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred",
+      "needs_verification": false,
+      "benefits": [
+        {
+          "id": "hotel_credit",
+          "name": "Chase Travel hotel credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 100,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "HOTEL CREDIT"
+          ],
+          "notes": "Up to $100 each account anniversary year on hotel stays booked through Chase Travel."
+        },
+        {
+          "id": "doordash_credit",
+          "name": "DoorDash promo credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "DOORDASH.*CREDIT"
+          ],
+          "notes": "A $10 promo each month on non-restaurant orders for DashPass members, through 12/31/2027. A promo, not a statement credit: tick off by hand."
+        },
+        {
+          "id": "global_entry",
+          "name": "Global Entry / TSA PreCheck credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "GLOBAL ENTRY",
+            "TSA PRE"
+          ],
+          "notes": "Up to $120 once every four years, and one Global Entry fee is all a person pays, however many cards offer it: valued at $30 a year for the household and split between the cards that carry it. A fee reimbursed on a statement still counts as captured.",
+          "default_value": 30,
+          "shared_key": "global_entry"
+        },
+        {
+          "id": "dashpass",
+          "name": "DashPass membership",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Twelve months free after activation."
+        },
+        {
+          "id": "apple_tv",
+          "name": "Apple TV+",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "At least twelve months, activated by 12/31/2026."
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 75000,
+          "unit": "points",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "spend_required": 5000,
+          "expires_days_after_open": 90
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 5,
+          "notes": "Purchases through Chase Travel; the first $100 of Chase Travel hotel purchases each year is covered by the hotel credit and earns nothing"
+        },
+        {
+          "category": "dining",
+          "multiplier": 3,
+          "notes": "Restaurants, takeout and eligible delivery services"
+        },
+        {
+          "category": "gas",
+          "multiplier": 3,
+          "notes": "Gas stations and electric vehicle charging"
+        },
+        {
+          "category": "streaming",
+          "multiplier": 3,
+          "notes": "Select streaming services"
+        },
+        {
+          "category": "groceries",
+          "multiplier": 3,
+          "notes": "Online grocery only, excluding Target, Walmart and wholesale clubs"
+        },
+        {
+          "category": "travel",
+          "multiplier": 2,
+          "notes": "The travel category, other than Chase Travel purchases"
+        },
+        {
+          "category": "transit",
+          "multiplier": 5,
+          "notes": "Lyft rides only, through September 30, 2027"
+        },
+        {
+          "category": "other",
+          "multiplier": 1
+        }
+      ],
+      "au_terms": {
+        "fee": 0.0,
+        "own_lounge_access": false
+      }
+    },
+    {
+      "id": "chase_united_quest",
+      "name": "United Quest",
+      "annual_fee": 350,
+      "currency": "miles",
+      "currency_name": "United miles",
+      "default_point_value": 0.012,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "source_url": "https://creditcards.chase.com/travel-credit-cards/united/united-quest",
+      "needs_verification": false,
+      "benefits": [
+        {
+          "id": "travel_credit",
+          "name": "United travel credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 200,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "TRAVELBANK",
+            "UNITED TRAVEL CREDIT"
+          ],
+          "notes": "$200 each anniversary year, paid as TravelBank cash. Statement wording unverified."
+        },
+        {
+          "id": "hotel_credit",
+          "name": "United Hotels credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 150,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "RENOWNED.*CREDIT",
+            "HOTEL CREDIT"
+          ],
+          "notes": "Up to $150 each anniversary year on prepaid stays through United Hotels (Renowned Hotels and Resorts)."
+        },
+        {
+          "id": "rideshare_credit",
+          "name": "Rideshare credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 100,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "RIDESHARE.*CREDIT"
+          ],
+          "notes": "Up to $100 a calendar year after enrollment, paid monthly."
+        },
+        {
+          "id": "instacart_credit",
+          "name": "Instacart credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 15,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "INSTACART.*CREDIT"
+          ],
+          "notes": "$10 plus $5 a month, $180 a calendar year, through 12/31/2027."
+        },
+        {
+          "id": "jsx_credit",
+          "name": "JSX credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 150,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "JSX.*CREDIT"
+          ],
+          "notes": "Up to $150 each anniversary year on flights booked directly with JSX."
+        },
+        {
+          "id": "avis_budget_credit",
+          "name": "Avis / Budget credit",
+          "type": "statement_credit",
+          "cadence": "annual",
+          "amount": 80,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "AVIS",
+            "BUDGET"
+          ],
+          "notes": "Up to $80 each anniversary year, paid as United TravelBank cash."
+        },
+        {
+          "id": "global_entry",
+          "name": "Global Entry / TSA PreCheck credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "GLOBAL ENTRY",
+            "TSA PRE"
+          ],
+          "notes": "Up to $120 once every four years, and one Global Entry fee is all a person pays, however many cards offer it: valued at $30 a year for the household and split between the cards that carry it. A fee reimbursed on a statement still counts as captured.",
+          "default_value": 30,
+          "shared_key": "global_entry"
+        },
+        {
+          "id": "inflight_rebate",
+          "name": "25% back on United inflight and club purchases",
+          "type": "rebate",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "UA INFLIGHT",
+            "INFLIGHT.*CREDIT",
+            "INCLUB CREDIT"
+          ]
+        },
+        {
+          "id": "award_discount",
+          "name": "10,000-mile award flight discount",
+          "type": "perk",
+          "cadence": "per_anniversary",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "One each anniversary year; a second after $20,000 spend in a calendar year."
+        },
+        {
+          "id": "economy_plus_upgrades",
+          "name": "Two global Economy Plus upgrades",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "After $40,000 spend in a calendar year.",
+          "conditional": true,
+          "condition": "Spend $40,000 on the card in the calendar year."
+        },
+        {
+          "id": "free_checked_bags",
+          "name": "United first and second checked bags free",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Primary cardmember and one companion.",
+          "shared_key": "united_checked_bags"
+        },
+        {
+          "id": "pqp_bonus",
+          "name": "1,000 Premier qualifying points",
+          "type": "earning",
+          "cadence": "annual",
+          "amount": 1000,
+          "unit": "points",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Each year within eight weeks of 1 February."
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 70000,
+          "unit": "points",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "spend_required": 4000,
+          "expires_days_after_open": 90,
+          "notes": "60,000 miles plus 500 PQP after $4,000 in three months, and 10,000 miles for adding an authorized user."
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "brand_airline",
+          "multiplier": 4,
+          "notes": "The card's share on United flights (10X total with the 6X MileagePlus members earn) and on all other eligible United purchases"
+        },
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 5,
+          "notes": "Hotel stays prepaid through Renowned Hotels and Resorts via Chase Travel"
+        },
+        {
+          "category": "travel",
+          "multiplier": 2,
+          "notes": "All other travel: airfare, trains, transit, cruises, hotels, car rentals, rideshare and tolls"
+        },
+        {
+          "category": "dining",
+          "multiplier": 2,
+          "notes": "Including eligible delivery services"
+        },
+        {
+          "category": "streaming",
+          "multiplier": 2,
+          "notes": "Select streaming services"
+        },
+        {
+          "category": "other",
+          "multiplier": 1
+        }
+      ],
+      "au_terms": {
+        "fee": 0.0,
+        "own_lounge_access": false
+      }
+    },
+    {
+      "id": "chase_southwest_priority",
+      "name": "Southwest Rapid Rewards Priority",
+      "annual_fee": 229,
+      "currency": "points",
+      "currency_name": "Rapid Rewards points",
+      "default_point_value": 0.014,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "source_url": "https://creditcards.chase.com/travel-credit-cards/southwest/priority",
+      "needs_verification": false,
+      "benefits": [
+        {
+          "id": "anniversary_points",
+          "name": "Anniversary points",
+          "type": "earning",
+          "cadence": "per_anniversary",
+          "amount": 7500,
+          "unit": "points",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary"
+        },
+        {
+          "id": "companion_pass_boost",
+          "name": "10,000 Companion Pass qualifying points boost",
+          "type": "perk",
+          "cadence": "per_anniversary",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Counts toward Companion Pass only, not redeemable points."
+        },
+        {
+          "id": "preferred_seat",
+          "name": "Complimentary Preferred seat at booking",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Plus an Extra Legroom upgrade within 48 hours of departure and Group 5 boarding."
+        },
+        {
+          "id": "free_checked_bag",
+          "name": "Southwest first checked bag free",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "Cardholder and up to eight passengers on the same reservation.",
+          "shared_key": "southwest_checked_bag"
+        },
+        {
+          "id": "inflight_rebate",
+          "name": "25% back on inflight purchases",
+          "type": "rebate",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "INFLIGHT"
+          ]
+        },
+        {
+          "id": "doordash_credit",
+          "name": "DoorDash non-restaurant credit",
+          "type": "statement_credit",
+          "cadence": "quarterly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "DOORDASH.*CREDIT"
+          ],
+          "notes": "Up to $10 a quarter on non-restaurant orders; DashPass free for twelve months."
+        },
+        {
+          "id": "instacart_credit",
+          "name": "Instacart credit",
+          "type": "statement_credit",
+          "cadence": "monthly",
+          "amount": 10,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "INSTACART.*CREDIT"
+          ],
+          "notes": "After three free months of Instacart+."
+        },
+        {
+          "id": "alist_spend",
+          "name": "Tier qualifying points from spend",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "2,500 tier qualifying points per $5,000 spent in a calendar year."
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 60000,
+          "unit": "points",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "spend_required": 2000,
+          "expires_days_after_open": 90
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "brand_airline",
+          "multiplier": 4,
+          "notes": "Southwest Airlines purchases: flights, inflight, gift cards and Getaways packages; cruises and cargo excluded"
+        },
+        {
+          "category": "gas",
+          "multiplier": 2,
+          "notes": "Gas stations"
+        },
+        {
+          "category": "dining",
+          "multiplier": 2,
+          "notes": "Restaurants"
+        },
+        {
+          "category": "transit",
+          "multiplier": 5,
+          "notes": "Lyft purchases only, through December 31, 2027"
+        },
+        {
+          "category": "other",
+          "multiplier": 1
+        }
+      ],
+      "au_terms": {
+        "fee": 0.0,
+        "own_lounge_access": false
+      }
+    }
+  ]
+}

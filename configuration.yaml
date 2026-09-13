@@ -19,6 +19,7 @@ frontend:
   extra_module_url:
     - /hacsfiles/Bubble-Card/bubble-pop-up-fix.js
     - /hacsfiles/material-you-utilities/material-you-utilities.min.js
+    - /cardperks/static/fonts.js
 
 automation: !include automations.yaml
 script: !include scripts.yaml
@@ -51,6 +52,21 @@ mqtt:
       icon: mdi:car-sports
 
 template:
+  - switch:
+      - name: "Follow-Me Lighting"
+        unique_id: follow_me_lighting_switch
+        icon: mdi:walk
+        # Watch-friendly proxy: Wear OS favorites can't show automation entities,
+        # so this switch mirrors/controls the automation's enabled state.
+        state: "{{ is_state('automation.follow_me_lighting_brian', 'on') }}"
+        turn_on:
+          - action: automation.turn_on
+            target:
+              entity_id: automation.follow_me_lighting_brian
+        turn_off:
+          - action: automation.turn_off
+            target:
+              entity_id: automation.follow_me_lighting_brian
   - binary_sensor:
       - name: "MA Queue Active"
         unique_id: ma_queue_active
@@ -583,6 +599,115 @@ template:
         device_class: occupancy
         state: "on"
         auto_off: "00:01:00"
+  - sensor:
+      - name: "Shadowfax Home Charging Energy"
+        unique_id: shadowfax_home_charging_energy
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:ev-station
+        # Rivian's own charging sensors (charging_speed, charging_energy_delivered,
+        # charging_time_elapsed, ...) NEVER report a numeric value for this vehicle -
+        # verified 2026-07-26: 26/26 recorded states were unknown/unavailable even
+        # while binary_sensor.shadowfax_charging_status was on. So home-charging
+        # energy is derived from SoC delta x pack capacity / 0.90 AC efficiency,
+        # accumulated by automation.shadowfax_home_charging_accumulate.
+        state: "{{ states('input_number.shadowfax_home_charging_total_kwh') | float(0) | round(3) }}"
+        availability: "{{ states('input_number.shadowfax_home_charging_total_kwh') not in ['unknown', 'unavailable'] }}"
+  - sensor:
+      - name: "HVAC Power"
+        unique_id: hvac_power_estimate
+        unit_of_measurement: "kW"
+        device_class: power
+        state_class: measurement
+        icon: mdi:hvac
+        # Estimated, not measured. 1.45 kW per compressor, from the MEDIAN of 731
+        # natural on/off transitions mined from 7 days of recorder history on
+        # 2026-07-31 (upstairs n=294 median 1444 W, main_floor n=437 median 1447 W;
+        # IQR ~1300-1675 W both, i.e. fixed-speed units, not variable capacity).
+        # Median rather than mean because the Airbnb dryer contaminates some steps.
+        # Blower-only ("fan") periods are NOT counted - measured under ~200 W and
+        # never resolved above noise - so this reads slightly LOW.
+        # HEATING IS GAS: this counts only cooling, so it correctly reads ~0 in winter.
+        # It does miss the blower during heat cycles (few hundred W) - same low bias.
+        state: >
+          {{ ((1.45 if is_state_attr('climate.upstairs_thermostat', 'hvac_action', 'cooling') else 0)
+            + (1.45 if is_state_attr('climate.main_floor', 'hvac_action', 'cooling') else 0)) | round(3) }}
+        availability: >
+          {{ states('climate.upstairs_thermostat') not in ['unknown','unavailable']
+             and states('climate.main_floor') not in ['unknown','unavailable'] }}
+  - sensor:
+      - name: "Shadowfax Speed (driving)"
+        unique_id: shadowfax_speed_driving
+        unit_of_measurement: "mph"
+        device_class: speed
+        state_class: measurement
+        icon: mdi:speedometer
+        # The raw sensor.shadowfax_speed writes ~14.4k rows/day and 93.7% of those
+        # are while the car is PARKED (measured 2026-07-31: 94,426 of 100,805 rows
+        # over 7 days, with the car in use only 5.1% of the time). This gated copy
+        # pins to 0 when parked so the recorder only sees real driving data, and
+        # the raw sensor is excluded from the recorder.
+        state: >
+          {% if is_state('binary_sensor.shadowfax_in_use_state', 'on') %}
+            {{ states('sensor.shadowfax_speed') | float(0) | round(1) }}
+          {% else %}0{% endif %}
+        availability: "{{ states('sensor.shadowfax_speed') not in ['unknown','unavailable'] }}"
+  - sensor:
+      - name: "Home Power"
+        unique_id: home_power_total
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        icon: mdi:home-lightning-bolt
+        # Total house draw = solar production + grid demand.
+        # The Xcel demand sensor is SIGNED (negative = exporting), so this sum is
+        # the true consumption regardless of which way the meter is spinning.
+        # NOTE: includes the downstairs Airbnb unit - it shares the meter and has
+        # no separate monitoring.
+        state: >
+          {{ ((states('sensor.envoy_202504003929_current_power_production') | float(0)) * 1000
+             + (states('sensor.xcel_itron_5_instantaneous_demand_value') | float(0))) | round(0) }}
+        availability: >
+          {{ states('sensor.envoy_202504003929_current_power_production') not in ['unknown','unavailable']
+             and states('sensor.xcel_itron_5_instantaneous_demand_value') not in ['unknown','unavailable'] }}
+  - trigger:
+      - trigger: state
+        entity_id: sensor.envoy_202504003929_energy_production_today
+    sensor:
+      - name: "Solar Production Today (guarded)"
+        unique_id: solar_production_today_guarded
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:solar-power-variant
+        # DELTA ACCUMULATOR guard for the Envoy production sensor, which has
+        # twice injected phantom MWh by reporting its lifetime total in the
+        # daily field (2026-05-08, 2026-07-31) - and since 07-31 has STOPPED
+        # resetting at midnight entirely (it is now effectively a lifetime
+        # counter). Absolute values are therefore untrustworthy in both
+        # directions; only the increments are real. This sensor adds each
+        # positive delta below 10 kWh (physical max is ~6.2 kWh/h at full
+        # clip) and ignores everything else: upward jumps of thousands are
+        # rejected, resets add nothing. Monotonic forever.
+        # KNOWN LIMIT: if HA is down >~90 min in peak sun, the single catch-up
+        # delta on reconnect may exceed 10 kWh and be rejected (undercount).
+        # The Energy dashboard reads THIS sensor, not the raw one.
+        state: >
+          {% set acc = this.state | float(0) if this is defined else 0 %}
+          {% set prev = trigger.from_state.state | float(none) if trigger.from_state is not none else none %}
+          {% set cur = trigger.to_state.state | float(none) if trigger.to_state is not none else none %}
+          {% if prev is none or cur is none %}
+            {{ acc | round(3) }}
+          {% else %}
+            {% set d = cur - prev %}
+            {% if 0 < d < 10 %}{{ (acc + d) | round(3) }}{% else %}{{ acc | round(3) }}{% endif %}
+          {% endif %}
+
+
+
+
+
 
 
 input_boolean:
@@ -591,6 +716,12 @@ input_boolean:
   airbnb_guest_downstairs:
     name: Airbnb Guest Downstairs
     icon: mdi:door-open
+
+  # Shadow of what LLM Vision *thinks*, written unconditionally so the
+  # vision path can be compared against the lock path over a booking or two.
+  airbnb_guest_vision_says:
+    name: Airbnb Guest (Vision opinion)
+    icon: mdi:eye
 
   # ---- Modes (whole-house) ----
   guest_mode:
@@ -675,6 +806,37 @@ input_boolean:
 
 
 input_number:
+  shadowfax_charge_session_max_soc:
+    name: "Shadowfax Charge Session Max SoC"
+    # Highest SoC seen so far in the OPEN session. -1 = no session.
+    # Energy is credited only for SoC ABOVE this high-water mark, which is what
+    # makes the accumulator immune to the sensor's sawtooth (dips credit nothing).
+    min: -1
+    max: 100
+    step: 0.1
+    unit_of_measurement: "%"
+    icon: mdi:ev-station
+    mode: box
+
+  shadowfax_charge_session_start_soc:
+    name: "Shadowfax Charge Session Start SoC"
+    # -1 = no session open. Set when charging starts at home, cleared when it ends.
+    min: -1
+    max: 100
+    step: 0.1
+    unit_of_measurement: "%"
+    icon: mdi:ev-station
+    mode: box
+
+  shadowfax_home_charging_total_kwh:
+    name: "Shadowfax Home Charging Total"
+    min: 0
+    max: 1000000
+    step: 0.001
+    unit_of_measurement: "kWh"
+    icon: mdi:ev-station
+    mode: box
+
   shadowfax_trip_start_odometer:
     name: "Shadowfax Trip Start Odometer"
     min: 0
@@ -750,12 +912,37 @@ input_datetime:
     icon: mdi:door-open
 
 shell_command:
+  # Release deleted blocks back to the LVM thin pool on the Proxmox host. Without
+  # this the thin volume only grows: on 2026-07-25 it held 189 GiB allocated for
+  # 56 GiB of real data, which made the nightly backup a 152 GB / 81-minute job
+  # onto an SMR drive. MUST NOT overlap the 04:00 backup -- discards issued while
+  # vzdump holds the disk are silently dropped, and ext4 then marks those groups
+  # already-trimmed so later runs do nothing until the next reboot.
+  fstrim_data: fstrim -v /config
   cleanup_recordings: find /media/recordings -type f -name '*.mp4' -mtime +15 -delete
   save_last_recording: 'mkdir -p /media/saved && f=$(ls -t /media/recordings/{{ camera }}/*.mp4 2>/dev/null | head -1) && cp "$f" "/media/saved/{{ camera }}_$(basename $f)"'
   keep_streams_alive: /config/scripts/keep_streams_alive.sh
   airbnb_ring_clip: sh /config/scripts/airbnb_ring_clip.sh
+  # 3rd arg = max staleness in seconds of the newest footage before the script refuses
+  # and deletes its output (so video_analyzer fails and the automation aborts rather
+  # than analyzing footage from minutes ago during a Nest stream stall). Default 150.
+  check_clip: sh /config/scripts/check_clip.sh {{ cam }} {{ seconds | default(60) }} {{ max_stale | default(150) }}
+  # Same extractor, but writes a saved 15-day event clip to an explicit path under
+  # /media/recordings/<cam>/. Replaces camera.record for the three cameras that have a
+  # continuous buffer - camera.record only managed 1 saved clip from 10 side_door motion
+  # events on 2026-07-26, and its lookback is a no-op on these go2rtc cameras.
+  event_clip: sh /config/scripts/check_clip.sh {{ cam }} {{ seconds | default(60) }} {{ max_stale | default(150) }} '{{ out }}'
+  # Trim the dead lead-in off a saved clip. Capture is deliberately wide (Nest event
+  # latency measured 15-43s), so a typical clip opens with ~25-35s of empty walkway.
+  # Detects motion by frame-differencing; if it finds nothing the clip is left whole.
+  trim_clip: sh /config/scripts/trim_clip.sh '{{ f }}' {{ pad | default(2) }} {{ min_len | default(8) }}
+  # Copy an LLM Vision key-frame into the public www folder so persistent
+  # notifications can embed it (/media/local needs a signed URL that markdown img
+  # can't provide). Random per-event token keeps the /local URL unguessable since
+  # www is unauthenticated and reachable via ha.northwoodscre.com; old ones pruned.
+  cache_snapshot: sh -c 'mkdir -p /config/www/notif; find /config/www/notif -name "{{ name }}_*.jpg" -mmin +1440 -delete 2>/dev/null; cp "{{ src }}" "/config/www/notif/{{ name }}_{{ token }}.jpg"'
   clip_frames: sh -c 'rm -f /config/www/clip_*.jpg; ffmpeg -y -ss {{ ss | default(0) }} -i "{{ f }}" -vf "fps=1,scale=320:-1,tile=8x8" -frames:v 1 /config/www/clip_sheet.jpg -loglevel error'
-  ring_frame: sh -c 'f=$(ls -t /media/recordings/ring/{{ cam }}/*.mp4 | head -1); ffmpeg -y -sseof -5 -i "$f" -frames:v 1 /config/www/ring_frame.jpg -loglevel error; echo "$f" > /config/www/ring_frame.txt'
+  ring_frame: sh -c 'f=$(ls -t /media/recordings/continuous/{{ cam }}/*.mp4 | head -1); ffmpeg -y -sseof -5 -i "$f" -frames:v 1 /config/www/ring_frame.jpg -loglevel error; echo "$f" > /config/www/ring_frame.txt'
   archive_recordings: sh /config/scripts/archive_recordings.sh
   fix_recording: nohup sh /config/scripts/fix_recording.sh '{{ f }}' >/dev/null 2>&1 &
   batch_fix_recordings: nohup sh /config/scripts/batch_fix_recordings.sh >/dev/null 2>&1 &
@@ -836,8 +1023,15 @@ panel_custom:
     module_url: /hacsfiles/material-you-utilities/material-you-utilities.min.js
     
 recorder:
-  purge_keep_days: 7
+  purge_keep_days: 30
   exclude:
+    entities:
+      - sensor.android_notification_phone_active_notification_count  # attrs >16KB, recorder refuses them anyway
+      - media_player.office  # HASS.Agent desktop, ~41k rows/day even while PAUSED (republishes on interval)
+      - media_player.br_desktop  # HASS.Agent desktop, ~19k rows/day, same behaviour
+      - sensor.shadowfax_speed  # 93.7% of its 14.4k rows/day are while PARKED; use sensor.shadowfax_speed_driving
+      - sensor.shadowfax_bearing        # compass heading, ~14.4k rows/day, never used
+      - sensor.shadowfax_altitude       # ~14.4k rows/day, never used
     domains:
       - update        # 123 update trackers, no history value
       - button
@@ -848,7 +1042,15 @@ recorder:
       - sensor.sun_next_*
       - sensor.*_lqi              # zigbee mesh noise
       - sensor.*_rssi
+      - sensor.shadowfax_bluetooth_module_failure_status_*  # constant "dtc_not_set", ~4-6k rows/day each
+      - sensor.system_monitor_*_pressure_*                  # 7 entities x ~5k rows/day, no diagnostic value kept
+      - sensor.xcel_itron_5_*_timeperiodstart               # bare timestamps, ~10.7k rows/day each
 
 # and make the quieter logging permanent (already active until restart):
 logger:
   default: warning
+  logs:
+    # nest_legacy dumps multi-line trait diffs on every poll (~2k lines/day)
+    custom_components.nest_legacy.pynest: error
+    custom_components.nest_legacy.coordinator: error  # camera-event poll hits dead legacy gRPC endpoint (2026-07-24)
+    google_nest_sdm.event_media: error  # 400 INVALID_ARGUMENT event-media pre-fetch noise (2026-07-24)

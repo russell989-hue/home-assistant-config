@@ -1,9 +1,7 @@
 """Switch platform for Nest devices."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, override
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.const import EntityCategory
@@ -16,6 +14,7 @@ from .pynest.models import (
     NestCamera,
     NestDevice,
     NestDoorbell,
+    NestHeatLink,
     NestLock,
     NestProtect,
     NestTempSensor,
@@ -115,7 +114,7 @@ _DESCRIPTIONS: tuple[NestSwitchEntityDescription, ...] = (
         key="video_flipped",
         translation_key="image_rotation",
         entity_category=EntityCategory.CONFIG,
-        icon="mdi:rotate-180",
+        icon="mdi:rotate-right",
         device_types=(NestCamera,),
         entity_registry_enabled_default=False,
         unavailable_on_protobuf=True,
@@ -149,6 +148,14 @@ _DESCRIPTIONS: tuple[NestSwitchEntityDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         icon="mdi:water-plus",
         device_types=(NestThermostat,),
+    ),
+    # Heat Link
+    NestSwitchEntityDescription(
+        key="hot_water_away_enabled",
+        translation_key="home_away_assist",
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:home-export-outline",
+        device_types=(NestHeatLink,),
     ),
     # Temp Sensor
     NestSwitchEntityDescription(
@@ -228,15 +235,18 @@ class NestSwitch(NestEntity[NestDevice], SwitchEntity):
         self.entity_description = description
         self._attr_unique_id = f"{device.serial_number}-{description.key}"
 
+    @override
     @property
     def is_on(self) -> bool | None:
         """Return True if entity is on."""
         return getattr(self.device, self.entity_description.key, False)
 
+    @override
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
         await self._set_state(True)
 
+    @override
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
         await self._set_state(False)

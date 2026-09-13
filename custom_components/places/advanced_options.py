@@ -1,8 +1,8 @@
-"""Parser for advanced options in a sensor configuration.
+"""Parser for advanced options in a coordinator configuration.
 
-This module provides functionality to parse complex sensor options
+This module provides functionality to parse complex coordinator options
 that may include brackets, parentheses, and commas, allowing for
-flexible configuration of sensor states.
+flexible configuration of coordinator states.
 """
 
 from __future__ import annotations
@@ -18,29 +18,31 @@ from .const import (
     ATTR_DEVICETRACKER_ZONE_NAME,
     ATTR_PLACE_CATEGORY,
     ATTR_PLACE_TYPE,
+    ATTR_ROUTE_NUMBER,
     ATTR_STREET,
     ATTR_STREET_NUMBER,
-    ATTR_STREET_REF,
     DISPLAY_OPTIONS_MAP,
 )
 
 if TYPE_CHECKING:
-    from .sensor import Places
+    from .coordinator import PlacesUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class AdvancedOptionsParser:
-    """Parse bracketed and filtered display options into a sensor state."""
+    """Parse bracketed and filtered display options into a coordinator state."""
 
-    def __init__(self, sensor: Places, curr_options: str) -> None:
+    def __init__(self, coordinator: PlacesUpdateCoordinator, curr_options: str) -> None:
         """Initialize the advanced-options parser.
 
         Args:
-            sensor: Places sensor that provides attribute access helpers.
-            curr_options: Raw advanced display option expression.
+            coordinator (PlacesUpdateCoordinator):
+                Places coordinator that provides attribute access helpers.
+            curr_options (str):
+                Raw advanced display option expression.
         """
-        self.sensor = sensor
+        self.coordinator = coordinator
         self.curr_options = curr_options
         self.state_list: list = []
         self._street_num_i = -1
@@ -52,7 +54,8 @@ class AdvancedOptionsParser:
         """Parse an option expression and append matching values to ``state_list``.
 
         Args:
-            curr_options: Option expression to parse. When omitted, the parser's
+            curr_options (str | None):
+                Option expression to parse. When omitted, the parser's
                 configured root expression is used and recursion tracking is
                 reset.
         """
@@ -75,15 +78,30 @@ class AdvancedOptionsParser:
             return
         await self.process_single_term(curr_options)
 
+    async def build_next_option(self, next_opt: str | None) -> None:
+        """Continue parsing after a comma-prefixed next expression.
+
+        Args:
+            next_opt (str | None):
+                Remaining option expression, including the leading comma.
+        """
+        if not next_opt or len(next_opt) <= 1 or next_opt[0] != ",":
+            return
+        next_opt = next_opt[1:].strip()
+        if next_opt:
+            await self.build_from_advanced_options(next_opt)
+
     async def do_brackets_and_parens_count_match(self, curr_options: str) -> bool:
         """Check whether an option expression has balanced delimiters.
 
         Args:
-            curr_options: Option expression to inspect.
+            curr_options (str):
+                Option expression to inspect.
 
         Returns:
-            ``True`` when opening and closing brackets and parentheses have the
-            same counts.
+            bool:
+                ``True`` when opening and closing brackets and parentheses have the
+                same counts.
         """
         if curr_options.count("[") != curr_options.count("]"):
             _LOGGER.error("Bracket Count Mismatch: %s", curr_options)
@@ -104,15 +122,21 @@ class AdvancedOptionsParser:
         """Return an option value after applying zone and filter constraints.
 
         Args:
-            opt: Display option name to resolve through ``DISPLAY_OPTIONS_MAP``.
-            incl: Lowercase option values that are allowed.
-            excl: Lowercase option values that are suppressed.
-            incl_attr: Attribute filters that must match before ``opt`` is used.
-            excl_attr: Attribute filters that suppress ``opt`` when matched.
+            opt (str):
+                Display option name to resolve through ``DISPLAY_OPTIONS_MAP``.
+            incl (list | None):
+                Lowercase option values that are allowed.
+            excl (list | None):
+                Lowercase option values that are suppressed.
+            incl_attr (MutableMapping[str, Any] | None):
+                Attribute filters that must match before ``opt`` is used.
+            excl_attr (MutableMapping[str, Any] | None):
+                Attribute filters that suppress ``opt`` when matched.
 
         Returns:
-            Resolved display string, or ``None`` when the option is blank,
-            outside its zone context, or filtered out.
+            str | None:
+                Resolved display string, or ``None`` when the option is blank,
+                outside its zone context, or filtered out.
         """
         incl = [] if incl is None else incl
         excl = [] if excl is None else excl
@@ -120,25 +144,34 @@ class AdvancedOptionsParser:
         excl_attr = {} if excl_attr is None else excl_attr
         if opt:
             opt = str(opt).lower().strip()
-        _LOGGER.debug("(%s) [get_option_state] Option: %s", self.sensor.get_attr(CONF_NAME), opt)
-        out: str | None = self.sensor.get_attr(DISPLAY_OPTIONS_MAP.get(opt))
+        _LOGGER.debug(
+            "(%s) [get_option_state] Option: %s", self.coordinator.get_attr(CONF_NAME), opt
+        )
+        mapped_opt: str | None = DISPLAY_OPTIONS_MAP.get(opt)
+        out: str | None = self.coordinator.get_attr(mapped_opt)
         if (
-            DISPLAY_OPTIONS_MAP.get(opt) in {ATTR_DEVICETRACKER_ZONE, ATTR_DEVICETRACKER_ZONE_NAME}
-            and not await self.sensor.in_zone()
+            mapped_opt in {ATTR_DEVICETRACKER_ZONE, ATTR_DEVICETRACKER_ZONE_NAME}
+            and not await self.coordinator.in_zone()
         ):
             out = None
-        _LOGGER.debug("(%s) [get_option_state] State: %s", self.sensor.get_attr(CONF_NAME), out)
         _LOGGER.debug(
-            "(%s) [get_option_state] incl list: %s", self.sensor.get_attr(CONF_NAME), incl
+            "(%s) [get_option_state] State: %s", self.coordinator.get_attr(CONF_NAME), out
         )
         _LOGGER.debug(
-            "(%s) [get_option_state] excl list: %s", self.sensor.get_attr(CONF_NAME), excl
+            "(%s) [get_option_state] incl list: %s", self.coordinator.get_attr(CONF_NAME), incl
         )
         _LOGGER.debug(
-            "(%s) [get_option_state] incl_attr dict: %s", self.sensor.get_attr(CONF_NAME), incl_attr
+            "(%s) [get_option_state] excl list: %s", self.coordinator.get_attr(CONF_NAME), excl
         )
         _LOGGER.debug(
-            "(%s) [get_option_state] excl_attr dict: %s", self.sensor.get_attr(CONF_NAME), excl_attr
+            "(%s) [get_option_state] incl_attr dict: %s",
+            self.coordinator.get_attr(CONF_NAME),
+            incl_attr,
+        )
+        _LOGGER.debug(
+            "(%s) [get_option_state] excl_attr dict: %s",
+            self.coordinator.get_attr(CONF_NAME),
+            excl_attr,
         )
         if out:
             if (incl and str(out).strip().lower() not in incl) or (
@@ -149,65 +182,63 @@ class AdvancedOptionsParser:
                 for attr, states in incl_attr.items():
                     _LOGGER.debug(
                         "(%s) [get_option_state] incl_attr: %s / State: %s",
-                        self.sensor.get_attr(CONF_NAME),
+                        self.coordinator.get_attr(CONF_NAME),
                         attr,
-                        self.sensor.get_attr(DISPLAY_OPTIONS_MAP.get(attr)),
+                        self.coordinator.get_attr(DISPLAY_OPTIONS_MAP.get(attr)),
                     )
                     _LOGGER.debug(
                         "(%s) [get_option_state] incl_states: %s",
-                        self.sensor.get_attr(CONF_NAME),
+                        self.coordinator.get_attr(CONF_NAME),
                         states,
                     )
                     map_attr: str | None = DISPLAY_OPTIONS_MAP.get(attr)
                     if (
                         not map_attr
-                        or self.sensor.is_attr_blank(map_attr)
-                        or self.sensor.get_attr(map_attr) not in states
+                        or self.coordinator.is_attr_blank(map_attr)
+                        or self.coordinator.get_attr(map_attr) not in states
                     ):
                         out = None
             if excl_attr:
                 for attr, states in excl_attr.items():
                     _LOGGER.debug(
                         "(%s) [get_option_state] excl_attr: %s / State: %s",
-                        self.sensor.get_attr(CONF_NAME),
+                        self.coordinator.get_attr(CONF_NAME),
                         attr,
-                        self.sensor.get_attr(DISPLAY_OPTIONS_MAP.get(attr)),
+                        self.coordinator.get_attr(DISPLAY_OPTIONS_MAP.get(attr)),
                     )
                     _LOGGER.debug(
                         "(%s) [get_option_state] excl_states: %s",
-                        self.sensor.get_attr(CONF_NAME),
+                        self.coordinator.get_attr(CONF_NAME),
                         states,
                     )
-                    if self.sensor.get_attr(DISPLAY_OPTIONS_MAP.get(attr)) in states:
+                    if self.coordinator.get_attr(DISPLAY_OPTIONS_MAP.get(attr)) in states:
                         out = None
             _LOGGER.debug(
                 "(%s) [get_option_state] State after incl/excl: %s",
-                self.sensor.get_attr(CONF_NAME),
+                self.coordinator.get_attr(CONF_NAME),
                 out,
             )
         if out:
-            if out == out.lower() and (
-                DISPLAY_OPTIONS_MAP.get(opt) == ATTR_DEVICETRACKER_ZONE_NAME
-                or DISPLAY_OPTIONS_MAP.get(opt) == ATTR_PLACE_TYPE
-                or DISPLAY_OPTIONS_MAP.get(opt) == ATTR_PLACE_CATEGORY
-            ):
+            out = str(out)
+            if out == out.lower() and mapped_opt in {
+                ATTR_DEVICETRACKER_ZONE_NAME,
+                ATTR_PLACE_TYPE,
+                ATTR_PLACE_CATEGORY,
+            }:
                 out = out.title()
             out = out.strip()
-            if (
-                DISPLAY_OPTIONS_MAP.get(opt) == ATTR_STREET
-                or DISPLAY_OPTIONS_MAP.get(opt) == ATTR_STREET_REF
-            ):
+            if mapped_opt in {ATTR_STREET, ATTR_ROUTE_NUMBER}:
                 self._street_i = self._temp_i
                 # _LOGGER.debug(
                 #     "(%s) [get_option_state] street_i: %s",
-                #     self.sensor.get_attr(CONF_NAME),
+                #     self.coordinator.get_attr(CONF_NAME),
                 #     self._street_i,
                 # )
-            if DISPLAY_OPTIONS_MAP.get(opt) == ATTR_STREET_NUMBER:
+            if mapped_opt == ATTR_STREET_NUMBER:
                 self._street_num_i = self._temp_i
                 # _LOGGER.debug(
                 #     "(%s) [get_option_state] street_num_i: %s",
-                #     self.sensor.get_attr(CONF_NAME),
+                #     self.coordinator.get_attr(CONF_NAME),
                 #     self._street_num_i,
                 # )
             self._temp_i += 1
@@ -218,7 +249,8 @@ class AdvancedOptionsParser:
         """Process the next advanced option segment with filters or fallback text.
 
         Args:
-            curr_options: Remaining option expression containing at least one
+            curr_options (str):
+                Remaining option expression containing at least one
                 bracket, parenthesis, or comma.
         """
         comma_num: int = curr_options.find(",")
@@ -265,10 +297,7 @@ class AdvancedOptionsParser:
                     self.state_list.append(ret_state)
                 elif none_opt:
                     await self.build_from_advanced_options(none_opt.strip())
-            if next_opt and len(next_opt) > 1 and next_opt[0] == ",":
-                next_opt = next_opt[1:]
-                if next_opt:
-                    await self.build_from_advanced_options(next_opt.strip())
+            await self.build_next_option(next_opt)
             return
 
         # Parenthesis is first symbol
@@ -292,16 +321,14 @@ class AdvancedOptionsParser:
                     self.state_list.append(ret_state)
                 elif none_opt:
                     await self.build_from_advanced_options(none_opt.strip())
-            if next_opt and len(next_opt) > 1 and next_opt[0] == ",":
-                next_opt = next_opt[1:]
-                if next_opt:
-                    await self.build_from_advanced_options(next_opt.strip())
+            await self.build_next_option(next_opt)
 
     async def process_only_commas(self, curr_options: str) -> None:
         """Append values for a comma-separated list of simple options.
 
         Args:
-            curr_options: Option names separated by commas.
+            curr_options (str):
+                Option names separated by commas.
         """
         for opt in curr_options.split(","):
             if opt:
@@ -313,7 +340,8 @@ class AdvancedOptionsParser:
         """Append a resolved value for one simple option name.
 
         Args:
-            curr_options: Single display option name.
+            curr_options (str):
+                Single display option name.
         """
         ret_state = await self.get_option_state(curr_options.strip())
         if ret_state:
@@ -323,12 +351,14 @@ class AdvancedOptionsParser:
         """Parse an attribute-scoped include/exclude filter.
 
         Args:
-            item: Filter expression such as ``place_type(cafe,park)`` or
+            item (str):
+                Filter expression such as ``place_type(cafe,park)`` or
                 ``place_type(-,house)``.
 
         Returns:
-            Attribute option name, normalized filter values, and ``True`` for
-            include mode or ``False`` for exclude mode.
+            tuple[str, list[str], bool]:
+                Attribute option name, normalized filter values, and ``True`` for
+                include mode or ``False`` for exclude mode.
         """
         paren_attr = item[: item.find("(")]
         paren_attr_first = True
@@ -352,12 +382,14 @@ class AdvancedOptionsParser:
         """Parse value filters from a parenthesized expression.
 
         Args:
-            curr_options: Expression beginning with ``(``.
+            curr_options (str):
+                Expression beginning with ``(``.
 
         Returns:
-            Included values, excluded values, included attribute filters,
-            excluded attribute filters, and the remaining expression after the
-            closing parenthesis.
+            tuple[list, list, MutableMapping[str, Any], MutableMapping[str, Any], str | None]:
+                Included values, excluded values, included attribute filters,
+                excluded attribute filters, and the remaining expression after the
+                closing parenthesis.
         """
         incl, excl = [], []
         incl_attr, excl_attr = {}, {}
@@ -421,11 +453,13 @@ class AdvancedOptionsParser:
         """Parse a bracketed fallback expression.
 
         Args:
-            curr_options: Expression beginning with ``[``.
+            curr_options (str):
+                Expression beginning with ``[``.
 
         Returns:
-            Fallback option expression to use when the primary option is blank,
-            plus the remaining expression after the closing bracket.
+            tuple[str | None, str | None]:
+                Fallback option expression to use when the primary option is blank,
+                plus the remaining expression after the closing bracket.
         """
         empty_bracket: bool = False
         none_opt: str | None = None
@@ -456,11 +490,12 @@ class AdvancedOptionsParser:
         return none_opt, next_opt
 
     async def compile_state(self) -> str:
-        """Join resolved option values into the final sensor state.
+        """Join resolved option values into the final coordinator state.
 
         Returns:
-            Comma-separated state string, with street number and street joined
-            by a space when they are adjacent.
+            str:
+                Comma-separated state string, with street number and street joined
+                by a space when they are adjacent.
         """
         self._street_num_i += 1
         first = True

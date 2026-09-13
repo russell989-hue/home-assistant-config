@@ -1,7 +1,5 @@
 """PyNest API Client."""
 
-from __future__ import annotations
-
 import asyncio
 import contextlib
 import logging
@@ -22,12 +20,19 @@ from google.protobuf.duration_pb2 import Duration  # pylint: disable=no-name-in-
 from google.protobuf.message import Message
 from google.protobuf.timestamp_pb2 import Timestamp  # pylint: disable=no-name-in-module
 
-from .enums import BucketType, Environment, StructureMode, ThermostatHvacMode
+from .enums import (
+    BucketType,
+    DualFuelBreakpointOverride,
+    Environment,
+    StructureMode,
+    ThermostatHvacMode,
+)
 from .exceptions import (
     BadCredentialsException,
     BadGatewayException,
     EmptyResponseException,
     GatewayTimeoutException,
+    NestServiceException,
     NonRetryablePynestException,
     NotAuthenticatedException,
     PynestException,
@@ -258,6 +263,21 @@ _LABEL_SPECIFIC_TRAITS: frozenset[str] = frozenset(
     }
 )
 
+_DUAL_FUEL_OVERRIDE_MAP: dict[
+    DualFuelBreakpointOverride,
+    nest_hvac_pb2.EquipmentSettingsTrait.DualFuelOverride.ValueType,
+] = {
+    DualFuelBreakpointOverride.NONE: (
+        nest_hvac_pb2.EquipmentSettingsTrait.DualFuelOverride.DUAL_FUEL_OVERRIDE_NONE
+    ),
+    DualFuelBreakpointOverride.ALWAYS_ALTERNATE_HEAT: (
+        nest_hvac_pb2.EquipmentSettingsTrait.DualFuelOverride.DUAL_FUEL_OVERRIDE_ALWAYS_ALT
+    ),
+    DualFuelBreakpointOverride.NEVER_ALTERNATE_HEAT: (
+        nest_hvac_pb2.EquipmentSettingsTrait.DualFuelOverride.DUAL_FUEL_OVERRIDE_ALWAYS_PRIMARY
+    ),
+}
+
 _USER_AGENT = "Nest/5.82.2 (iOScom.nestlabs.jasper.release) os=18.5"
 
 _NEST_ENVIRONMENTS: dict[str, NestEnvironment] = {
@@ -361,6 +381,20 @@ def _get_trait_copy(traits: dict[str, Any] | None, trait_class: type[_T]) -> _T:
     return trait_class()
 
 
+def _is_transient_status(status: int) -> bool:
+    """Return True if an HTTP status is a transport failure, not an auth failure."""
+    return status >= 500 or status in (408, 429)
+
+
+def _transient_exception(status: int, message: str) -> NestServiceException:
+    """Return the service exception matching a transient HTTP status."""
+    if status == 504:
+        return GatewayTimeoutException(message)
+    if status == 502:
+        return BadGatewayException(message)
+    return NestServiceException(message)
+
+
 class NestClient:
     """Interface class for the Nest API."""
 
@@ -385,6 +419,7 @@ class NestClient:
         self._buckets_for_subscription: list[Bucket] = []
         self._resource_types: dict[str, str] = {}
         self._legacy_protobuf_events_warned: bool = False
+        self._protobuf_events_unauthorized: set[str] = set()
 
         self._enable_protobuf_lock = enable_protobuf_lock
         self._enable_protobuf_thermostat = enable_protobuf_thermostat
@@ -429,7 +464,16 @@ class NestClient:
     ) -> NestSession:
         """Authenticate using a legacy Nest access token."""
         try:
-            await self._async_get_camera_session_token(access_token)
+            try:
+                await self._async_get_camera_session_token(access_token)
+            except BadCredentialsException as err:
+                # The camera endpoint rejects accounts that have no cameras even
+                # when the access token is perfectly valid, so this only costs
+                # camera support. The /session call below is the real check.
+                _LOGGER.info(
+                    "No camera session token, continuing without camera support: %s",
+                    err,
+                )
             return await self._async_get_session(access_token)
         except (ClientError, TimeoutError, PynestException) as err:
             _LOGGER.debug(
@@ -508,22 +552,47 @@ class NestClient:
                 data=f"access_token={access_token}",
             ) as response:
                 if not response.ok:
+                    body = await response.text()
+                    if _is_transient_status(response.status):
+                        _LOGGER.info(
+                            "Transient error getting camera session token, will "
+                            "retry. Status: %s, Body: %s",
+                            response.status,
+                            body,
+                        )
+                        raise _transient_exception(
+                            response.status,
+                            f"Failed to get camera session token: {response.status}",
+                        )
                     _LOGGER.error(
                         "Failed to get camera session token. Status: %s, Body: %s",
                         response.status,
-                        await response.text(),
+                        body,
                     )
                     raise BadCredentialsException("Failed to get camera session token")
 
                 login_data = await response.json()
                 if not login_data.get("items"):
+                    # This endpoint answers 200 and reports the real outcome in
+                    # the body, e.g. {"status": 403, "items": [],
+                    # "status_description": "unauthorized"}, so the body status
+                    # gets the same treatment as an HTTP status.
+                    message = login_data.get("status_description", "Unknown")
+                    status = login_data.get("status")
+                    if isinstance(status, int) and _is_transient_status(status):
+                        _LOGGER.info(
+                            "Transient error getting camera session token, will "
+                            "retry. Body: %s",
+                            login_data,
+                        )
+                        raise _transient_exception(
+                            status, f"Failed to get camera session token: {message}"
+                        )
                     _LOGGER.error(
                         "Failed to get camera session token, response indicates error: %s",
                         login_data,
                     )
-                    raise BadCredentialsException(
-                        login_data.get("status_description", "Unknown")
-                    )
+                    raise BadCredentialsException(message)
                 self._camera_session_token = login_data["items"][0]["session_token"]
                 _LOGGER.debug("Successfully obtained legacy camera session token")
         except (KeyError, IndexError, TypeError, ContentTypeError) as err:
@@ -541,14 +610,27 @@ class NestClient:
             headers={"Authorization": f"Basic {token}", "User-Agent": _USER_AGENT},
         ) as response:
             if not response.ok:
+                body = await response.text()
+                message = f"Failed to get session: {response.status}"
+                # A 5xx/408/429 is a server-side failure, not a bad credential.
+                # Raising BadCredentialsException here makes the coordinator
+                # start a reauth flow and stop the subscriber for what is often
+                # a transient blip, even though the stored credentials are
+                # still valid.
+                if _is_transient_status(response.status):
+                    _LOGGER.info(
+                        "Transient error getting session, will retry. "
+                        "Status: %s, Body: %s",
+                        response.status,
+                        body,
+                    )
+                    raise _transient_exception(response.status, message)
                 _LOGGER.error(
                     "Failed to get session. Status: %s, Body: %s",
                     response.status,
-                    await response.text(),
+                    body,
                 )
-                raise BadCredentialsException(
-                    f"Failed to get session: {response.status}"
-                )
+                raise BadCredentialsException(message)
             nest_session_dict = await response.json()
             self._nest_session = NestSession.from_dict(nest_session_dict)
             _LOGGER.debug(
@@ -1984,6 +2066,38 @@ class NestClient:
             )
             await self._async_update_trait_state(req)
 
+        # Handle Dual Fuel
+        if "dual_fuel_breakpoint" in data or "dual_fuel_breakpoint_override" in data:
+            # The whole equipment configuration lives in this trait, so start from
+            # a copy of the current state to avoid clearing unrelated settings.
+            equipment_settings_trait = _get_trait_copy(
+                current_traits, nest_hvac_pb2.EquipmentSettingsTrait
+            )
+            if "dual_fuel_breakpoint" in data:
+                equipment_settings_trait.dualFuelBreakpoint.value = float(
+                    data["dual_fuel_breakpoint"]
+                )
+            if override := data.get("dual_fuel_breakpoint_override"):
+                equipment_settings_trait.dualFuelBreakpointOverride = (
+                    _DUAL_FUEL_OVERRIDE_MAP[DualFuelBreakpointOverride(override)]
+                )
+
+            any_proto = google.protobuf.any_pb2.Any()
+            any_proto.Pack(
+                equipment_settings_trait,
+                type_url_prefix=_NESTLABS_TYPE_URL_PREFIX,
+            )
+
+            req = v1_pb2.TraitUpdateStateRequest(
+                traitRequest=v1_pb2.TraitRequest(
+                    resourceId=device.object_key,
+                    traitLabel="equipment_settings",
+                    requestId=str(uuid.uuid4()),
+                ),
+                state=any_proto,
+            )
+            await self._async_update_trait_state(req)
+
     async def async_set_device_data(
         self,
         device: NestDevice,
@@ -2067,23 +2181,23 @@ class NestClient:
         rcs_trait = _get_trait_copy(
             current_traits, nest_hvac_pb2.RemoteComfortSensingSettingsTrait
         )
-        RcsSourceType = nest_hvac_pb2.RemoteComfortSensingSettingsTrait.RcsSourceType
+        rcs_source_type = nest_hvac_pb2.RemoteComfortSensingSettingsTrait.RcsSourceType
 
         if active:
             # Switch to Single Sensor mode using this sensor ID
             rcs_trait.activeRcsSelection.rcsSourceType = (
-                RcsSourceType.RCS_SOURCE_TYPE_SINGLE_SENSOR
+                rcs_source_type.RCS_SOURCE_TYPE_SINGLE_SENSOR
             )
             rcs_trait.activeRcsSelection.activeRcsSensor.resourceId = device.object_key
         elif (
             rcs_trait.activeRcsSelection.rcsSourceType
-            == RcsSourceType.RCS_SOURCE_TYPE_SINGLE_SENSOR
+            == rcs_source_type.RCS_SOURCE_TYPE_SINGLE_SENSOR
             and rcs_trait.activeRcsSelection.activeRcsSensor.resourceId
             == device.object_key
         ):
             # Only switch back to backplate if THIS sensor is currently the active one
             rcs_trait.activeRcsSelection.rcsSourceType = (
-                RcsSourceType.RCS_SOURCE_TYPE_BACKPLATE
+                rcs_source_type.RCS_SOURCE_TYPE_BACKPLATE
             )
             rcs_trait.activeRcsSelection.ClearField("activeRcsSensor")
         else:
@@ -2218,13 +2332,13 @@ class NestClient:
                 yield None
 
     def _parse_protobuf_camera_event(
-        self, cam_event: Any, EventTypeEnum: Any, events: list[dict[str, Any]]
+        self, cam_event: Any, event_type_enum: Any, events: list[dict[str, Any]]
     ) -> None:
         """Parse a single protobuf camera event."""
         event_types = []
         for t in cam_event.eventType:
             try:
-                t_str = EventTypeEnum.Name(t)
+                t_str = event_type_enum.Name(t)
                 # Map Protobuf enums to legacy API string formats
                 if t_str == "EVENT_UNFAMILIAR_FACE":
                     event_types.append("unfamiliar-face")
@@ -2295,6 +2409,19 @@ class NestClient:
 
         try:
             resp = await self._async_send_command(device, command)
+        except NonRetryablePynestException as err:
+            # Some accounts are not authorized for the camera_observation_history
+            # trait and answer with PERMISSION_DENIED on every poll (see issue #61).
+            # This never recovers, so warn once and stop polling this camera.
+            self._protobuf_events_unauthorized.add(device.object_key)
+            _LOGGER.warning(
+                "Protobuf camera events are not available for %s %s, "
+                "no longer polling it for events: %r",
+                device.location,
+                device.name,
+                err,
+            )
+            return []
         except PynestException as err:
             _LOGGER.warning("Failed to fetch protobuf camera events: %r", err)
             return []
@@ -2302,10 +2429,10 @@ class NestClient:
         events: list[dict[str, Any]] = []
 
         # Aliases for readability based on history_pb2 structure
-        HistoryTrait = nest_history_pb2.CameraObservationHistoryTrait
-        ResponseClass = HistoryTrait.CameraObservationHistoryResponse
+        history_trait = nest_history_pb2.CameraObservationHistoryTrait
+        response_class = history_trait.CameraObservationHistoryResponse
         # EventType is defined inside CameraEventTimeWindow
-        EventTypeEnum = ResponseClass.CameraEventTimeWindow.EventType
+        event_type_enum = response_class.CameraEventTimeWindow.EventType
 
         # Parse Response
         # Structure: SendCommandResponse -> TraitOperation -> Event (Any) -> CameraObservationHistoryResponse
@@ -2315,10 +2442,10 @@ class NestClient:
                     continue
 
                 # Unpack the inner event
-                if not op.event.event.Is(ResponseClass.DESCRIPTOR):
+                if not op.event.event.Is(response_class.DESCRIPTOR):
                     continue
 
-                history_response = ResponseClass()
+                history_response = response_class()
                 op.event.event.Unpack(history_response)
 
                 if not history_response.HasField("cameraEventWindow"):
@@ -2326,7 +2453,9 @@ class NestClient:
 
                 # Iterate through events in the time window
                 for cam_event in history_response.cameraEventWindow.cameraEvent:
-                    self._parse_protobuf_camera_event(cam_event, EventTypeEnum, events)
+                    self._parse_protobuf_camera_event(
+                        cam_event, event_type_enum, events
+                    )
 
         # Sort by start_time descending to match legacy API behavior
         events.sort(key=lambda x: x["start_time"], reverse=True)
@@ -2350,6 +2479,8 @@ class NestClient:
                         "Protobuf camera events are not supported for legacy Nest accounts"
                     )
                     self._legacy_protobuf_events_warned = True
+                return []
+            if device.object_key in self._protobuf_events_unauthorized:
                 return []
             return await self._async_get_protobuf_camera_events(
                 device, start_time, end_time
@@ -2412,7 +2543,7 @@ class NestClient:
             data = await response.json()
             try:
                 return data["items"][0].get("properties", {})
-            except (KeyError, IndexError):
+            except KeyError, IndexError:
                 return {}
 
     def _parse_observe_buffer(self, buffer: bytearray):

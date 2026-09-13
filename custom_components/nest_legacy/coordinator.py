@@ -1,18 +1,17 @@
 """Data update coordinator for the Nest Legacy integration."""
 
-from __future__ import annotations
-
 import asyncio
 from collections import deque
 import logging
 import random
 import time
-from typing import Any
+from typing import Any, override
 
 from aiohttp import ClientError
 from google.protobuf.json_format import MessageToDict
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_ACCESS_TOKEN
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
 from homeassistant.helpers import device_registry as dr
@@ -20,7 +19,6 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
-    CONF_ACCESS_TOKEN,
     CONF_ACCOUNT_TYPE,
     CONF_COOKIES,
     CONF_ENABLE_PROTOBUF_CAMERA,
@@ -157,7 +155,9 @@ class NestCoordinator(DataUpdateCoordinator[dict[str, NestDevice]]):
                 )
             else:
                 raise HomeAssistantError(
-                    f"Unsupported account type in config entry: {account_type}"
+                    translation_domain=DOMAIN,
+                    translation_key="unsupported_account_type",
+                    translation_placeholders={"account_type": str(account_type)},
                 )
 
     async def async_initialize(self) -> None:
@@ -222,7 +222,8 @@ class NestCoordinator(DataUpdateCoordinator[dict[str, NestDevice]]):
                 )
             except (ClientError, TimeoutError, PynestException) as err:
                 raise HomeAssistantError(
-                    "Retry failed after re-authentication"
+                    translation_domain=DOMAIN,
+                    translation_key="command_retry_failed",
                 ) from err
         except (ClientError, TimeoutError, PynestException) as err:
             _LOGGER.error(
@@ -233,7 +234,11 @@ class NestCoordinator(DataUpdateCoordinator[dict[str, NestDevice]]):
                 data,
                 err,
             )
-            raise HomeAssistantError from err
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="set_data_failed",
+                translation_placeholders={"device_name": device.name},
+            ) from err
 
     async def async_send_client_command(
         self,
@@ -255,11 +260,16 @@ class NestCoordinator(DataUpdateCoordinator[dict[str, NestDevice]]):
                 return await method(*args, **kwargs)
             except (ClientError, TimeoutError, PynestException) as err:
                 raise HomeAssistantError(
-                    "Retry failed after re-authentication"
+                    translation_domain=DOMAIN,
+                    translation_key="command_retry_failed",
                 ) from err
         except (ClientError, TimeoutError, PynestException) as err:
             _LOGGER.error("Error calling %s: %r", method_name, err)
-            raise HomeAssistantError from err
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="command_failed",
+                translation_placeholders={"method_name": method_name},
+            ) from err
 
     def get_guests(self) -> dict[str, list[dict[str, Any]]]:
         """Return guests from the raw protobuf data, keyed by structure ID."""
@@ -422,7 +432,7 @@ class NestCoordinator(DataUpdateCoordinator[dict[str, NestDevice]]):
                 self.config_entry.async_start_reauth(self.hass)
                 self.async_stop_subscriber()
                 return
-            except (TimeoutError, EmptyResponseException):
+            except TimeoutError, EmptyResponseException:
                 _LOGGER.debug("Subscriber connection timeout (expected). Reconnecting")
                 failures = 0
                 if not self.subscriber_healthy:
@@ -744,6 +754,7 @@ class NestCoordinator(DataUpdateCoordinator[dict[str, NestDevice]]):
                 err,
             )
 
+    @override
     async def _async_update_data(self) -> dict[str, NestDevice]:
         """Update data via the coordinator.
 

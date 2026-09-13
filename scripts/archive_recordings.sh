@@ -4,7 +4,7 @@
 # Nightly COPY of aging camera EVENT recordings to the Office-PC archive,
 # BEFORE Home Assistant's local retention cleanup (03:00, -mtime +15) deletes them.
 #
-#   Source : /media/recordings/<camera>/*.mp4            (event clips only; ring/ buffer excluded)
+#   Source : /media/recordings/<camera>/*.mp4            (event clips only; continuous/ buffer excluded)
 #   Dest   : /media/ha_recordings_archive/<camera>/...   (CIFS mount ->
 #            \\OFFICE\HA-Recordings -> D:\Home Assistant Recordings, NTFS)
 #
@@ -29,7 +29,7 @@ SENTINEL="$DST/.ha_archive_target"
 LOCAL_LOG="/config/archive_recordings.log"
 ARCHIVE_LOG="$DST/_archive.log"
 AGE_DAYS="+12"                 # find -mtime: 13+ days old
-EXCLUDE_DIR="ring"            # continuous-buffer folder, not event clips
+EXCLUDE_DIR="continuous"            # continuous-buffer folder, not event clips
 
 ts() { date '+%Y-%m-%d %H:%M:%S'; }
 log_local() { echo "$(ts) $1"; echo "$(ts) $1" >> "$LOCAL_LOG" 2>/dev/null; }  # summary/guards/failures

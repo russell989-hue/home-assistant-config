@@ -11,12 +11,25 @@
   "dependencies": [
     "http"
   ],
+  "dhcp": [
+    {
+      "macaddress": "18B430*"
+    },
+    {
+      "macaddress": "641666*"
+    },
+    {
+      "macaddress": "D8EB46*"
+    }
+  ],
   "documentation": "https://github.com/tronikos/nest_legacy",
   "integration_type": "hub",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/tronikos/nest_legacy/issues",
   "requirements": [
+    "bidict>=0.23.1",
+    "googleapis-common-protos>=1.70.0",
     "protobuf>=6.31.1"
   ],
-  "version": "0.3.10"
+  "version": "0.6.0"
 }

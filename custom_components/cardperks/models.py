@@ -1,0 +1,782 @@
+"""Data models for CardPerks. Pure Python, no Home Assistant imports."""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from datetime import date
+from typing import Any
+
+from .const import (
+    PERIODS_PER_YEAR,
+    AppliesTo,
+    BenefitStatus,
+    BenefitType,
+    Cadence,
+    CardStatus,
+    ResetRule,
+    Role,
+    SpendCategory,
+)
+
+# --------------------------------------------------------------------------- catalog
+
+CADENCE_TAGS: dict[Cadence, str] = {
+    Cadence.MONTHLY: "monthly",
+    Cadence.QUARTERLY: "quarterly",
+    Cadence.SEMIANNUAL: "every 6 months",
+    Cadence.ONE_TIME: "one-time",
+    Cadence.PER_ANNIVERSARY: "each anniversary",
+    Cadence.EVERY_FOUR_YEARS: "every 4 years",
+}
+
+
+@dataclass(frozen=True, slots=True)
+class StatusGrant:
+    """Elite status that holding a card confers (Amex Platinum: Hilton Honors Gold)."""
+
+    program: str
+    tier: str
+
+
+@dataclass(frozen=True, slots=True)
+class StatusRequirement:
+    """Elite status that unlocks a conditional benefit: this catalog program, this tier
+    or any higher one (United Club All Access passes need Premier Gold or better)."""
+
+    program_id: str
+    tier_id: str
+
+
+@dataclass(frozen=True, slots=True)
+class Benefit:
+    id: str
+    name: str
+    type: BenefitType
+    cadence: Cadence
+    amount: float | None
+    unit: str
+    reset: ResetRule
+    enrollment_required: bool
+    applies_to: AppliesTo
+    default_value: float | None = None
+    expires_days_after_open: int | None = None
+    spend_required: float | None = None
+    notes: str | None = None
+    statement_match: tuple[str, ...] = ()  # regexes matched against statement descriptions
+    conditional: bool = False  # only some cardholders qualify; off unless enabled per card
+    condition: str | None = None  # human-readable qualification, shown in the card form
+    # Perks and insurance only: the same thing offered by several cards (Priority Pass on
+    # three cards is still one membership). Valued once for the household under this key
+    # and split equally between the active cards that carry it.
+    shared_key: str | None = None
+    # Where the credit can be spent, one short line per merchant or partner, with the
+    # rule that matters ("Peacock: standalone subscriptions only"). Lists like this
+    # change often; keeping them structured makes the change a visible diff.
+    eligible: tuple[str, ...] = ()
+    # Status this benefit confers while the card is held; tracked as a status of its own.
+    grants_status: tuple[StatusGrant, ...] = ()
+    # Conditional benefits only: status that qualifies the holder by itself. Met from the
+    # statuses the household holds, so nobody has to remember to flip the toggle; the
+    # toggle still works for the other routes in (spend thresholds).
+    requires_status: StatusRequirement | None = None
+
+    def applies_to_role(self, role: Role) -> bool:
+        if role is Role.PRIMARY:
+            return True
+        return self.applies_to in (AppliesTo.PRIMARY_AND_AU, AppliesTo.AU_OWN_ALLOTMENT)
+
+    @property
+    def label(self) -> str:
+        """The name, with how often it comes round when that is not yearly.
+
+        "Uber One membership credit (monthly)" tells you at a glance how long you have
+        to use it; yearly benefits carry no tag, since that is the default expectation.
+        This is the name entities and dashboards show.
+        """
+        tag = CADENCE_TAGS.get(self.cadence)
+        if not tag:
+            return self.name
+        if self.name.endswith(")") and "(" in self.name:
+            # "Hotel credit (FHR)" reads better as "(FHR, every 6 months)" than "(FHR) (every 6 months)".
+            return f"{self.name[:-1]}, {tag})"
+        return f"{self.name} ({tag})"
+
+    @property
+    def is_one_time(self) -> bool:
+        return self.cadence is Cadence.ONE_TIME
+
+    @property
+    def is_dollar(self) -> bool:
+        """Whether this benefit is measured in dollars rather than points or miles."""
+        if self.type in (BenefitType.PERK, BenefitType.INSURANCE, BenefitType.REBATE):
+            return True
+        return self.amount is not None and self.unit == "USD"
+
+    @property
+    def is_uncapped(self) -> bool:
+        """A rebate returns a share of whatever you spend.
+
+        There is no pool to draw down, nothing to check off and nothing to forfeit.
+        Statements are its only source of truth, and a year of it is worth whatever it
+        returned.
+        """
+        return self.type is BenefitType.REBATE
+
+    @property
+    def periods_per_year(self) -> float:
+        return PERIODS_PER_YEAR.get(self.cadence, 0)
+
+    def annual_value(self, perk_override: float | None = None) -> float:
+        """What this benefit is worth over a year if fully used."""
+        if not self.is_dollar:
+            return 0.0
+        return round(self.value(perk_override) * (self.periods_per_year or 1), 2)
+
+    def value(self, perk_override: float | None = None) -> float:
+        """Dollar value of one period of this benefit."""
+        if self.amount is not None and self.unit == "USD":
+            return float(self.amount)
+        if perk_override is not None:
+            return float(perk_override)
+        return float(self.default_value or 0.0)
+
+
+@dataclass(frozen=True, slots=True)
+class EarningRate:
+    """Points or miles per dollar in one spend category, in the issuer's own terms."""
+
+    category: SpendCategory
+    multiplier: float
+    notes: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class AuTerms:
+    fee: float = 0.0
+    own_lounge_access: bool = False
+    notes: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Product:
+    id: str
+    issuer: str
+    issuer_name: str
+    name: str
+    annual_fee: float
+    currency: str
+    default_point_value: float
+    currency_name: str  # "Ultimate Rewards points", "United miles": what a multiplier is in
+    reports_to_personal_credit: bool
+    last_verified: date
+    source_url: str
+    benefits: tuple[Benefit, ...]
+    earning_rates: tuple[EarningRate, ...]
+    au_terms: AuTerms
+    needs_verification: bool = False
+    origin: str = "shipped"
+
+    def best_rate(self, category: SpendCategory) -> EarningRate | None:
+        """The highest rate this card pays in a category, falling back to its base rate."""
+        hits = [r for r in self.earning_rates if r.category is category]
+        if not hits and category is not SpendCategory.OTHER:
+            hits = [r for r in self.earning_rates if r.category is SpendCategory.OTHER]
+        return max(hits, key=lambda r: r.multiplier) if hits else None
+
+    def benefit(self, benefit_id: str) -> Benefit | None:
+        for b in self.benefits:
+            if b.id == benefit_id:
+                return b
+        return None
+
+    def benefits_for_role(self, role: Role) -> tuple[Benefit, ...]:
+        return tuple(b for b in self.benefits if b.applies_to_role(role))
+
+    def conditional_benefits(self, role: Role) -> tuple[Benefit, ...]:
+        return tuple(b for b in self.benefits_for_role(role) if b.conditional)
+
+    def benefits_for(self, card: HeldCard) -> tuple[Benefit, ...]:
+        """Benefits active for this specific card: role-eligible, conditionals opted in."""
+        enabled = set(card.enabled_conditional)
+        return tuple(
+            b for b in self.benefits_for_role(card.role) if not b.conditional or b.id in enabled
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class Tier:
+    id: str
+    name: str
+    rank: int  # 1 is the lowest tier
+    qualify: str  # how it is earned, in the program's own terms
+    benefits: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class Program:
+    """A loyalty program and its elite tiers, from the program's own page."""
+
+    id: str
+    name: str
+    kind: str  # airline | hotel | car
+    tier_word: str  # "Premier", "Elite", ...
+    source_url: str
+    last_verified: date
+    qualification: str
+    tiers: tuple[Tier, ...]
+
+    def tier(self, tier_id: str | None) -> Tier | None:
+        return next((t for t in self.tiers if t.id == tier_id), None)
+
+    def next_tier(self, tier_id: str | None) -> Tier | None:
+        cur = self.tier(tier_id)
+        if cur is None:
+            return None
+        return next(
+            (t for t in sorted(self.tiers, key=lambda t: t.rank) if t.rank > cur.rank), None
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogProblem:
+    path: str
+    message: str
+
+
+@dataclass(frozen=True, slots=True)
+class Catalog:
+    products: Mapping[str, Product]
+    programs: Mapping[str, Program] = field(default_factory=dict)
+
+    def by_issuer(self) -> dict[str, list[Product]]:
+        out: dict[str, list[Product]] = {}
+        for p in self.products.values():
+            out.setdefault(p.issuer, []).append(p)
+        for lst in out.values():
+            lst.sort(key=lambda p: p.name)
+        return out
+
+    def issuers(self) -> dict[str, str]:
+        """issuer slug -> display name."""
+        return {p.issuer: p.issuer_name for p in self.products.values()}
+
+    def get(self, product_id: str) -> Product | None:
+        return self.products.get(product_id)
+
+
+# --------------------------------------------------------------------------- config
+
+
+@dataclass(frozen=True, slots=True)
+class Owner:
+    id: str
+    name: str
+
+
+@dataclass(frozen=True, slots=True)
+class HeldCard:
+    id: str
+    owner_id: str
+    product_id: str
+    role: Role
+    title: str
+    parent_card_id: str | None = None
+    open_date: date | None = None
+    fee_month: int | None = None
+    last4: str | None = None
+    nickname: str | None = None
+    close_date: date | None = None
+    notes: str | None = None
+    annual_fee: float | None = None  # overrides the catalog fee (grandfathered pricing)
+    enabled_conditional: tuple[str, ...] = ()  # conditional benefit ids this card qualifies for
+    previous_last4: tuple[str, ...] = ()  # numbers this account had before replacement
+    not_applicable: tuple[str, ...] = ()  # benefit ids that do not apply to this holder
+    color: str | None = None  # seed only; the live value lives in the state document
+    status: CardStatus = CardStatus.ACTIVE  # merged in from the state document
+
+    @property
+    def all_last4(self) -> frozenset[str]:
+        """Every card number this account has had.
+
+        A replaced card (lost, stolen, expired) keeps the same account and benefit
+        periods but gets a new number, and old statements still carry the old one.
+        """
+        return frozenset(x for x in (self.last4, *self.previous_last4) if x)
+
+    def is_active(self, today: date) -> bool:
+        if self.status is not CardStatus.ACTIVE:
+            return False
+        return self.close_date is None or self.close_date >= today
+
+
+@dataclass(frozen=True, slots=True)
+class LoyaltyStatus:
+    """One elite status held by one owner, from a card or earned outright.
+
+    Status both comes from cards and unlocks card benefits, so it is tracked apart from
+    them. `card_id` is set when a held card grants it; then it lasts as long as the card
+    does and `valid_through` is the card's next anniversary. Otherwise the holder entered
+    it, with whatever expiry the program gave.
+    """
+
+    id: str
+    owner_id: str
+    program: str
+    tier: str
+    valid_through: date | None
+    source: str  # "Amex Platinum (Brian | 4003)" or how it was earned
+    card_id: str | None = None
+    notes: str | None = None
+    program_id: str | None = None  # a program in the catalog, when it is one
+    tier_id: str | None = None
+
+
+# --------------------------------------------------------------------------- state
+
+
+@dataclass(slots=True)
+class UsageEvent:
+    date: str
+    amount: float
+    note: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"date": self.date, "amount": self.amount, "note": self.note}
+
+    @classmethod
+    def from_dict(cls, d: Mapping[str, Any]) -> UsageEvent:
+        return cls(date=d["date"], amount=float(d["amount"]), note=d.get("note"))
+
+
+@dataclass(slots=True)
+class BenefitInstance:
+    held_card_id: str
+    benefit_id: str
+    period_start: str
+    period_end: str | None
+    status: BenefitStatus = BenefitStatus.UNUSED
+    amount: float | None = None
+    amount_used: float = 0.0
+    uses: list[UsageEvent] = field(default_factory=list)
+    sticky_na: bool = False
+    updated_at: str | None = None
+
+    @property
+    def key(self) -> str:
+        return instance_key(self.held_card_id, self.benefit_id)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "held_card_id": self.held_card_id,
+            "benefit_id": self.benefit_id,
+            "period_start": self.period_start,
+            "period_end": self.period_end,
+            "status": str(self.status),
+            "amount": self.amount,
+            "amount_used": self.amount_used,
+            "uses": [u.to_dict() for u in self.uses],
+            "sticky_na": self.sticky_na,
+            "updated_at": self.updated_at,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Mapping[str, Any]) -> BenefitInstance:
+        return cls(
+            held_card_id=d["held_card_id"],
+            benefit_id=d["benefit_id"],
+            period_start=d["period_start"],
+            period_end=d.get("period_end"),
+            status=BenefitStatus(d.get("status", "unused")),
+            amount=d.get("amount"),
+            amount_used=float(d.get("amount_used", 0.0)),
+            uses=[UsageEvent.from_dict(u) for u in d.get("uses", [])],
+            sticky_na=bool(d.get("sticky_na", False)),
+            updated_at=d.get("updated_at"),
+        )
+
+
+@dataclass(slots=True)
+class HistoryRecord:
+    held_card_id: str
+    benefit_id: str
+    period_start: str
+    period_end: str | None
+    final_status: str  # BenefitStatus value or "unknown"
+    amount: float | None
+    amount_used: float
+    closed_at: str
+    closed_by: str  # rollover | manual | gap | reanchor | closed_card
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "held_card_id": self.held_card_id,
+            "benefit_id": self.benefit_id,
+            "period_start": self.period_start,
+            "period_end": self.period_end,
+            "final_status": self.final_status,
+            "amount": self.amount,
+            "amount_used": self.amount_used,
+            "closed_at": self.closed_at,
+            "closed_by": self.closed_by,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Mapping[str, Any]) -> HistoryRecord:
+        return cls(
+            held_card_id=d["held_card_id"],
+            benefit_id=d["benefit_id"],
+            period_start=d["period_start"],
+            period_end=d.get("period_end"),
+            final_status=d.get("final_status", "unknown"),
+            amount=d.get("amount"),
+            amount_used=float(d.get("amount_used", 0.0)),
+            closed_at=d["closed_at"],
+            closed_by=d.get("closed_by", "rollover"),
+        )
+
+
+@dataclass(slots=True)
+class SubTracker:
+    required: float
+    spent: float = 0.0
+    deadline: str | None = None
+    entries: list[UsageEvent] = field(default_factory=list)
+    completed_on: str | None = None
+
+    @property
+    def completed(self) -> bool:
+        return self.completed_on is not None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "required": self.required,
+            "spent": self.spent,
+            "deadline": self.deadline,
+            "entries": [e.to_dict() for e in self.entries],
+            "completed_on": self.completed_on,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Mapping[str, Any]) -> SubTracker:
+        return cls(
+            required=float(d["required"]),
+            spent=float(d.get("spent", 0.0)),
+            deadline=d.get("deadline"),
+            entries=[UsageEvent.from_dict(e) for e in d.get("entries", [])],
+            completed_on=d.get("completed_on"),
+        )
+
+
+@dataclass(slots=True)
+class ImportRecord:
+    """One statement upload. Kept so coverage can be explained and re-run."""
+
+    id: str
+    file_hash: str
+    filename: str | None
+    issuer: str
+    held_card_id: str
+    imported_at: str
+    first_date: str | None
+    last_date: str | None
+    rows: int
+    credit_rows: int
+    matched: int
+    applied: float
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "file_hash": self.file_hash,
+            "filename": self.filename,
+            "issuer": self.issuer,
+            "held_card_id": self.held_card_id,
+            "imported_at": self.imported_at,
+            "first_date": self.first_date,
+            "last_date": self.last_date,
+            "rows": self.rows,
+            "credit_rows": self.credit_rows,
+            "matched": self.matched,
+            "applied": self.applied,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Mapping[str, Any]) -> ImportRecord:
+        return cls(
+            id=d["id"],
+            file_hash=d.get("file_hash", ""),
+            filename=d.get("filename"),
+            issuer=d.get("issuer", ""),
+            held_card_id=d["held_card_id"],
+            imported_at=d.get("imported_at", ""),
+            first_date=d.get("first_date"),
+            last_date=d.get("last_date"),
+            rows=int(d.get("rows", 0)),
+            credit_rows=int(d.get("credit_rows", 0)),
+            matched=int(d.get("matched", 0)),
+            applied=float(d.get("applied", 0.0)),
+        )
+
+
+@dataclass(slots=True)
+class StateDocument:
+    """Mutable, persisted state. Serialised to the HA Store."""
+
+    instances: dict[str, BenefitInstance] = field(default_factory=dict)
+    history: list[HistoryRecord] = field(default_factory=list)
+    sub_trackers: dict[str, SubTracker] = field(default_factory=dict)
+    rotating_activations: dict[str, dict[str, dict[str, str]]] = field(default_factory=dict)
+    perk_values: dict[str, dict[str, float]] = field(default_factory=dict)
+    card_colors: dict[str, str] = field(default_factory=dict)
+    card_status: dict[str, str] = field(default_factory=dict)  # card id -> CardStatus
+    # card id -> {"YYYY-MM": import id}: months a statement actually vouches for.
+    coverage: dict[str, dict[str, str]] = field(default_factory=dict)
+    imports: list[ImportRecord] = field(default_factory=list)
+    last_rollover: str | None = None
+    imported_refs: set[str] = field(default_factory=set)  # dedupe keys for statement imports
+    # card id -> ISO date of the newest annual-fee line any statement has shown. An older
+    # file imported later must not overwrite the fee a newer one set.
+    fee_seen: dict[str, str] = field(default_factory=dict)
+    shared_values: dict[str, float] = field(default_factory=dict)  # shared_key -> household $
+    # card id -> {ISO date: amount}: every annual-fee line any statement has shown, so a
+    # cardmember year can say what the card cost that year, not only what it costs now.
+    fees_seen: dict[str, dict[str, float]] = field(default_factory=dict)
+    # the household's own calendar reminders: {uid, date, summary, description}
+    reminders: list[dict[str, Any]] = field(default_factory=list)
+    # every dollar logged against a benefit: {at, on, card_id, benefit_id, amount, source, note}
+    ledger: list[dict[str, Any]] = field(default_factory=list)
+    ledger_window: str = "trailing_12_months"  # the picker on the card pages
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "benefit_instances": {k: v.to_dict() for k, v in self.instances.items()},
+            "history": [h.to_dict() for h in self.history],
+            "sub_trackers": {k: v.to_dict() for k, v in self.sub_trackers.items()},
+            "rotating_activations": self.rotating_activations,
+            "perk_values": self.perk_values,
+            "card_colors": self.card_colors,
+            "card_status": self.card_status,
+            "coverage": self.coverage,
+            "imports": [i.to_dict() for i in self.imports],
+            "last_rollover": self.last_rollover,
+            "imported_refs": sorted(self.imported_refs),
+            "fee_seen": self.fee_seen,
+            "shared_values": self.shared_values,
+            "fees_seen": self.fees_seen,
+            "reminders": self.reminders,
+            "ledger": self.ledger,
+            "ledger_window": self.ledger_window,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Mapping[str, Any] | None) -> StateDocument:
+        if not d:
+            return cls()
+        return cls(
+            instances={
+                k: BenefitInstance.from_dict(v) for k, v in d.get("benefit_instances", {}).items()
+            },
+            history=[HistoryRecord.from_dict(h) for h in d.get("history", [])],
+            sub_trackers={k: SubTracker.from_dict(v) for k, v in d.get("sub_trackers", {}).items()},
+            rotating_activations={
+                k: {q: dict(a) for q, a in v.items()}
+                for k, v in d.get("rotating_activations", {}).items()
+            },
+            perk_values={
+                k: {bk: float(bv) for bk, bv in v.items()}
+                for k, v in d.get("perk_values", {}).items()
+            },
+            card_colors=dict(d.get("card_colors", {})),
+            card_status=dict(d.get("card_status", {})),
+            coverage={k: dict(v) for k, v in d.get("coverage", {}).items()},
+            imports=[ImportRecord.from_dict(i) for i in d.get("imports", [])],
+            last_rollover=d.get("last_rollover"),
+            imported_refs=set(d.get("imported_refs", [])),
+            fee_seen=dict(d.get("fee_seen", {})),
+            shared_values={k: float(v) for k, v in d.get("shared_values", {}).items()},
+            reminders=[dict(r) for r in d.get("reminders", [])],
+            ledger=[dict(r) for r in d.get("ledger", [])],
+            ledger_window=d.get("ledger_window", "trailing_12_months"),
+            fees_seen={
+                k: {dk: float(dv) for dk, dv in v.items()}
+                for k, v in d.get("fees_seen", {}).items()
+            },
+        )
+
+
+def instance_key(held_card_id: str, benefit_id: str) -> str:
+    return f"{held_card_id}:{benefit_id}"
+
+
+# --------------------------------------------------------------------------- snapshot
+
+
+@dataclass(frozen=True, slots=True)
+class ExpiringItem:
+    held_card_id: str
+    card_title: str
+    benefit_id: str
+    benefit_name: str
+    period_end: date
+    remaining: float
+
+
+@dataclass(frozen=True, slots=True)
+class Totals:
+    """Dollars over the trailing twelve months.
+
+    A period that closed unused is money gone, not money pending, so forfeited is
+    tracked separately from what is still capturable. Periods with no usage evidence
+    are counted as unknown rather than assumed lost: gaps backfilled by the rollover,
+    and statement-credit periods no imported statement vouches for.
+    """
+
+    annual_value: float = 0.0
+    captured: float = 0.0
+    forfeited: float = 0.0
+    unknown: float = 0.0
+    open_remaining: float = 0.0
+
+    @property
+    def capture_rate(self) -> float | None:
+        """Share of the annual value actually captured, 0-100."""
+        if self.annual_value <= 0:
+            return None
+        return round(self.captured / self.annual_value * 100, 1)
+
+    def plus(self, other: Totals) -> Totals:
+        return Totals(
+            annual_value=round(self.annual_value + other.annual_value, 2),
+            captured=round(self.captured + other.captured, 2),
+            forfeited=round(self.forfeited + other.forfeited, 2),
+            unknown=round(self.unknown + other.unknown, 2),
+            open_remaining=round(self.open_remaining + other.open_remaining, 2),
+        )
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "annual_value": self.annual_value,
+            "captured_12m": self.captured,
+            "forfeited_12m": self.forfeited,
+            "unknown_12m": self.unknown,
+            "open_remaining": self.open_remaining,
+            "capture_rate": self.capture_rate,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class YearRecord:
+    """One cardmember year of a card: what it cost and what came back.
+
+    Reports what statements prove and nothing else. `fee` is None when no statement
+    showed a fee line in the year; `captured` is the credits recorded in periods that
+    started in the year; `months_covered` out of `months` says how much of the year a
+    statement vouches for, so a thin year is not mistaken for a bad one.
+    """
+
+    start: date
+    end: date
+    fee: float | None
+    captured: float
+    months_covered: int
+    months: int
+    current: bool
+    fee_source: str = "statement"  # statement | estimate (the card's fee today) | none
+    perks_value: float = 0.0  # what the holder says the year's perks were worth to them
+
+    @property
+    def net(self) -> float | None:
+        return None if self.fee is None else round(self.captured - self.fee, 2)
+
+    @property
+    def net_with_perks(self) -> float | None:
+        return None if self.fee is None else round(self.captured + self.perks_value - self.fee, 2)
+
+    @property
+    def verdict(self) -> str:
+        """One line a person can act on. Only a complete, well-covered year gets a real one."""
+        if self.current:
+            return "so far"
+        if self.months_covered < 10 or self.net is None:
+            return "not enough statements"
+        return "earned its keep" if (self.net_with_perks or 0) >= 0 else "did not earn its keep"
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "start": self.start.isoformat(),
+            "end": self.end.isoformat(),
+            "fee": self.fee,
+            "captured": self.captured,
+            "net": self.net,
+            "fee_source": self.fee_source,
+            "perks_value": self.perks_value,
+            "net_with_perks": self.net_with_perks,
+            "verdict": self.verdict,
+            "months_covered": self.months_covered,
+            "months": self.months,
+            "current": self.current,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class CardSummary:
+    held_card_id: str
+    fee_due: date | None
+    fee_within_warning: bool
+    annual_fee: float
+    unused_value: float
+    used_value_12m: float
+    net_value_12m: float
+    expiring: tuple[ExpiringItem, ...]
+    totals: Totals = field(default_factory=Totals)
+    benefit_totals: Mapping[str, Totals] = field(default_factory=dict)
+    # Statement freshness, for cards tracked by upload. None when no statement was ever
+    # imported: a hand-tracked card has nothing to be overdue.
+    last_statement_month: str | None = None  # newest YYYY-MM any statement vouched for
+    expected_statement_month: str | None = None  # newest month a statement could cover
+    statement_months_behind: int = 0
+    statement_due: bool = False
+    years: tuple[YearRecord, ...] = ()  # newest first
+
+
+@dataclass(frozen=True, slots=True)
+class OwnerSummary:
+    owner_id: str
+    totals: Totals
+    annual_fees: float
+    unused_credits: float
+    expiring_7d: tuple[ExpiringItem, ...]
+    expiring_30d: tuple[ExpiringItem, ...]
+    five_24: int
+    five_24_items: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class SharedPerk:
+    """One household-valued perk and how it is split right now."""
+
+    key: str
+    name: str
+    value: float  # the household's number, or the catalog default until one is set
+    per_card: float
+    card_ids: tuple[str, ...]
+    customised: bool
+    default: float | None
+
+
+@dataclass(frozen=True, slots=True)
+class CardPerksData:
+    today: date
+    owners: Mapping[str, Owner]
+    cards: Mapping[str, HeldCard]
+    catalog: Catalog
+    instances: Mapping[str, BenefitInstance]
+    card_summaries: Mapping[str, CardSummary]
+    colors: Mapping[str, str]
+    owner_summaries: Mapping[str, OwnerSummary]
+    sub_trackers: Mapping[str, SubTracker]
+    rotating_activations: Mapping[str, Mapping[str, Mapping[str, str]]]
+    perk_values: Mapping[str, Mapping[str, float]]  # effective: shared splits folded in
+    shared_perks: Mapping[str, SharedPerk] = field(default_factory=dict)
+    statuses: Mapping[str, LoyaltyStatus] = field(default_factory=dict)

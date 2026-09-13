@@ -1,7 +1,18 @@
 #!/bin/sh
 # Keep go2rtc camera streams warm + 24h local ring buffer for door cams.
-#   doorbell/side_door/garage: ~10-min ring segments -> /media/recordings/ring/<cam>/*.mp4
-#   backyard:                  null-sink keep-alive only
+#   doorbell/side_door/garage: ~10-min ring segments -> /media/recordings/continuous/<cam>/*.mp4
+#   backyard:                  NOT touched (see 2026-07-26 note below)
+#
+# 2026-07-26: backyard REMOVED from the warm loop. It is a solar/battery camera and
+#   the __warm loop was reconnecting to it every ~40s around the clock - 887 camera
+#   state flips in 48h against only 10 real motion events in 72h - and mostly failing
+#   ("Invalid data found ... rtsp://127.0.0.1:8554/backyard"), each failed attempt
+#   still waking the camera. That was the dominant battery drain, larger than the
+#   Google notification frequency Brian had already reduced. Nothing needs backyard
+#   warm any more: it has no ring buffer, and its AI automation analyzes the clip
+#   written by "Camera Event Recording" rather than the live stream. go2rtc will
+#   connect on demand when the dashboard tile or camera.record actually needs it.
+#   The __warm worker below is kept (unused) so this is a one-line revert.
 #
 # 2026-07-19 rewrite - fixes the audio-only segments:
 #   go2rtc only sends video to an RTSP consumer starting from the first keyframe
@@ -28,7 +39,7 @@
 
 RTSP_BASE="rtsp://localhost:8554"
 API_BASE="http://localhost:1984"
-RING_DIR="/media/recordings/ring"
+RING_DIR="/media/recordings/continuous"
 SEG_SECS=615          # hard cap per segment attempt
 VERIFY_DEADLINE=55    # no avc1 by this many seconds -> bad attempt
 STALL_SECS=60         # verified file must grow at least once per this window
@@ -170,7 +181,8 @@ sleep 1
 for stream in doorbell side_door garage; do
   nohup sh "$0" __record "$stream" KSA_LOOP 9>&- >/dev/null 2>&1 &
 done
-for stream in backyard; do
-  nohup sh "$0" __warm "$stream" KSA_LOOP 9>&- >/dev/null 2>&1 &
-done
+# backyard deliberately gets NO loop - see the 2026-07-26 note in the header.
+# The pkill sweep above still covers backyard, so restarting this script also
+# tears down any warm loop left over from a previous version. To re-enable:
+#   for stream in backyard; do nohup sh "$0" __warm "$stream" KSA_LOOP 9>&- >/dev/null 2>&1 & done
 nohup sh "$0" __cleanup KSA_LOOP 9>&- >/dev/null 2>&1 &

@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "issuer": "capital_one",
+  "issuer_name": "Capital One",
+  "products": [
+    {
+      "id": "capital_one_venture_x",
+      "name": "Venture X",
+      "annual_fee": 395,
+      "currency": "capital_one_miles",
+      "currency_name": "Capital One miles",
+      "default_point_value": 0.0125,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "needs_verification": false,
+      "source_url": "https://www.capitalone.com/credit-cards/venture-x/",
+      "benefits": [
+        {
+          "id": "travel_credit",
+          "name": "Capital One Travel credit",
+          "type": "statement_credit",
+          "cadence": "per_anniversary",
+          "amount": 300,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "statement_match": [
+            "TRAVEL CREDIT"
+          ],
+          "notes": "Up to $300 a year for bookings through Capital One Travel, applied automatically. Capital One describes it as annual; it has historically reset on the account anniversary."
+        },
+        {
+          "id": "anniversary_miles",
+          "name": "Anniversary bonus miles",
+          "type": "earning",
+          "cadence": "per_anniversary",
+          "amount": 10000,
+          "unit": "miles",
+          "reset": "cardmember_year",
+          "applies_to": "primary"
+        },
+        {
+          "id": "capital_one_lounge",
+          "name": "Capital One Lounge access",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "au_own_allotment",
+          "default_value": 300,
+          "shared_key": "capital_one_lounge"
+        },
+        {
+          "id": "priority_pass",
+          "name": "Priority Pass Select",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": true,
+          "applies_to": "au_own_allotment",
+          "default_value": 200,
+          "shared_key": "priority_pass"
+        },
+        {
+          "id": "global_entry",
+          "name": "Global Entry / TSA PreCheck credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "applies_to": "primary",
+          "notes": "Up to $120 once every four years, and one Global Entry fee is all a person pays, however many cards offer it: valued at $30 a year for the household and split between the cards that carry it. A fee reimbursed on a statement still counts as captured.",
+          "statement_match": [
+            "GLOBAL ENTRY",
+            "TSA PRE"
+          ],
+          "default_value": 30,
+          "shared_key": "global_entry"
+        },
+        {
+          "id": "hertz_presidents_circle",
+          "name": "Hertz Gold Plus Rewards status",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": true,
+          "applies_to": "au_own_allotment",
+          "default_value": 50,
+          "notes": "Capital One now lists a Gold Plus upgrade rather than President's Circle.",
+          "shared_key": "hertz_status",
+          "grants_status": [
+            {
+              "program": "Hertz Gold Plus Rewards",
+              "tier": "Gold Plus"
+            }
+          ]
+        },
+        {
+          "id": "cell_phone_protection",
+          "name": "Cell phone protection",
+          "type": "insurance",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary_and_au",
+          "notes": "Up to $800 per claim when the phone bill is paid with the card.",
+          "shared_key": "cell_phone_protection"
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 75000,
+          "unit": "miles",
+          "applies_to": "primary",
+          "expires_days_after_open": 90,
+          "spend_required": 4000
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 10,
+          "notes": "Hotels and rental cars booked through Capital One Travel"
+        },
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 5,
+          "notes": "Flights and vacation rentals booked through Capital One Travel"
+        },
+        {
+          "category": "entertainment",
+          "multiplier": 5,
+          "notes": "Tickets bought on the Capital One Entertainment platform; presale and venue-specific tickets excluded"
+        },
+        {
+          "category": "other",
+          "multiplier": 2,
+          "notes": "Every purchase, every day"
+        }
+      ],
+      "au_terms": {
+        "fee": 0,
+        "own_lounge_access": false,
+        "notes": "Additional cardholders get Priority Pass, but Capital One Lounge access for them now costs $125 a year each; guests $45 a visit."
+      }
+    },
+    {
+      "id": "capital_one_venture",
+      "name": "Venture Rewards",
+      "annual_fee": 95,
+      "currency": "miles",
+      "currency_name": "Capital One miles",
+      "default_point_value": 0.01,
+      "reports_to_personal_credit": true,
+      "last_verified": "2026-09-06",
+      "source_url": "https://www.capitalone.com/credit-cards/venture/",
+      "needs_verification": false,
+      "benefits": [
+        {
+          "id": "global_entry",
+          "name": "Global Entry / TSA PreCheck credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "GLOBAL ENTRY",
+            "TSA PRE"
+          ],
+          "notes": "Up to $120 once every four years, and one Global Entry fee is all a person pays, however many cards offer it: valued at $30 a year for the household and split between the cards that carry it. A fee reimbursed on a statement still counts as captured.",
+          "default_value": 30,
+          "shared_key": "global_entry"
+        },
+        {
+          "id": "hertz_five_star",
+          "name": "Hertz Five Star status",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "shared_key": "hertz_status",
+          "grants_status": [
+            {
+              "program": "Hertz Gold Plus Rewards",
+              "tier": "Five Star"
+            }
+          ]
+        },
+        {
+          "id": "lifestyle_collection",
+          "name": "Lifestyle Collection $50 experience credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "notes": "$50 per eligible stay at Lifestyle Collection hotels and rentals booked through Capital One Travel."
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 75000,
+          "unit": "points",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "spend_required": 4000,
+          "expires_days_after_open": 90
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 5,
+          "notes": "Hotels, vacation rentals and rental cars booked through Capital One Travel"
+        },
+        {
+          "category": "entertainment",
+          "multiplier": 5,
+          "notes": "Tickets bought on the Capital One Entertainment platform"
+        },
+        {
+          "category": "other",
+          "multiplier": 2,
+          "notes": "Every purchase, every day"
+        }
+      ],
+      "au_terms": {
+        "fee": 0.0,
+        "own_lounge_access": false
+      }
+    },
+    {
+      "id": "capital_one_venture_x_business",
+      "name": "Venture X Business",
+      "annual_fee": 395,
+      "currency": "miles",
+      "currency_name": "Capital One miles",
+      "default_point_value": 0.01,
+      "reports_to_personal_credit": false,
+      "last_verified": "2026-09-06",
+      "source_url": "https://www.capitalone.com/small-business/credit-cards/venture-x-business/",
+      "needs_verification": false,
+      "benefits": [
+        {
+          "id": "travel_credit",
+          "name": "Capital One Business Travel credit",
+          "type": "statement_credit",
+          "cadence": "per_anniversary",
+          "amount": 300,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "TRAVEL CREDIT"
+          ],
+          "notes": "Up to $300 a year for bookings through Capital One Business Travel."
+        },
+        {
+          "id": "anniversary_miles",
+          "name": "Anniversary bonus miles",
+          "type": "earning",
+          "cadence": "per_anniversary",
+          "amount": 10000,
+          "unit": "miles",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary"
+        },
+        {
+          "id": "capital_one_lounge",
+          "name": "Capital One Lounge access",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "shared_key": "capital_one_lounge"
+        },
+        {
+          "id": "priority_pass",
+          "name": "Priority Pass Select",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "shared_key": "priority_pass"
+        },
+        {
+          "id": "global_entry",
+          "name": "Global Entry / TSA PreCheck credit",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "cardmember_year",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "statement_match": [
+            "GLOBAL ENTRY",
+            "TSA PRE"
+          ],
+          "notes": "Up to $120 once every four years, and one Global Entry fee is all a person pays, however many cards offer it: valued at $30 a year for the household and split between the cards that carry it. A fee reimbursed on a statement still counts as captured.",
+          "default_value": 30,
+          "shared_key": "global_entry"
+        },
+        {
+          "id": "hertz_presidents_circle",
+          "name": "Hertz President's Circle status",
+          "type": "perk",
+          "cadence": "annual",
+          "amount": null,
+          "unit": "USD",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "shared_key": "hertz_status",
+          "grants_status": [
+            {
+              "program": "Hertz Gold Plus Rewards",
+              "tier": "President's Circle"
+            }
+          ]
+        },
+        {
+          "id": "sub",
+          "name": "Sign-up bonus",
+          "type": "earning",
+          "cadence": "one_time",
+          "amount": 150000,
+          "unit": "points",
+          "reset": "calendar",
+          "enrollment_required": false,
+          "applies_to": "primary",
+          "spend_required": 30000,
+          "expires_days_after_open": 90
+        }
+      ],
+      "earning_rates": [
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 10,
+          "notes": "Hotels and rental cars booked through Capital One Business Travel"
+        },
+        {
+          "category": "issuer_travel_portal",
+          "multiplier": 5,
+          "notes": "Flights and vacation rentals booked through Capital One Business Travel"
+        },
+        {
+          "category": "other",
+          "multiplier": 2,
+          "notes": "Every purchase, everywhere, no limits or category restrictions"
+        }
+      ],
+      "au_terms": {
+        "fee": 0.0,
+        "own_lounge_access": false,
+        "notes": "Employee cards are free."
+      }
+    }
+  ]
+}

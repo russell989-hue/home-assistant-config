@@ -1,0 +1,169 @@
+all_seats_heat:
+  alias: All Heat
+  sequence:
+  - action: select.select_option
+    target:
+      entity_id:
+      - select.shadowfax_seat_front_left_heat
+      - select.shadowfax_seat_front_right_heat
+      - select.shadowfax_seat_rear_left_heat
+      - select.shadowfax_seat_rear_right_heat
+    data:
+      option: Level_3
+  - action: switch.turn_on
+    target:
+      entity_id: switch.shadowfax_steering_wheel_heat
+all_front_seats_cool:
+  alias: All Cool
+  sequence:
+  - action: select.select_option
+    target:
+      entity_id:
+      - select.shadowfax_seat_front_left_vent
+      - select.shadowfax_seat_front_right_vent
+    data:
+      option: Level_3
+all_seats_off:
+  alias: All Off
+  sequence:
+  - action: climate.turn_off
+    target:
+      entity_id: climate.shadowfax_cabin_climate
+  - action: select.select_option
+    target:
+      entity_id:
+      - select.shadowfax_seat_front_left_heat
+      - select.shadowfax_seat_front_left_vent
+      - select.shadowfax_seat_front_right_heat
+      - select.shadowfax_seat_front_right_vent
+      - select.shadowfax_seat_rear_left_heat
+      - select.shadowfax_seat_rear_right_heat
+    data:
+      option: 'Off'
+  - action: switch.turn_off
+    target:
+      entity_id: switch.shadowfax_steering_wheel_heat
+shadowfax_precondition:
+  alias: Pre-condition Cabin
+  sequence:
+  - action: climate.set_temperature
+    target:
+      entity_id: climate.shadowfax_cabin_climate
+    data:
+      temperature: 70
+  - action: climate.turn_on
+    target:
+      entity_id: climate.shadowfax_cabin_climate
+  - action: script.all_seats_heat
+secure_shadowfax:
+  alias: Secure Shadowfax
+  sequence:
+  - action: lock.lock
+    target:
+      entity_id: lock.shadowfax_closures
+  - action: switch.turn_on
+    target:
+      entity_id: switch.shadowfax_gear_guard_video
+  - action: cover.close_cover
+    target:
+      entity_id: cover.shadowfax_windows
+  - action: cover.close_cover
+    target:
+      entity_id:
+      - cover.shadowfax_front_trunk
+      - cover.shadowfax_liftgate
+save_last_recording:
+  alias: Save Last Recording
+  icon: mdi:content-save
+  fields:
+    camera:
+      description: Camera folder name (doorbell, side_door, garage, alley)
+      example: doorbell
+  sequence:
+  - action: shell_command.save_last_recording
+    data:
+      camera: '{{ camera }}'
+secure_home:
+  alias: Secure Home
+  icon: mdi:shield-home
+  description: Turn off all interior lights (exterior stays on) and lock all doors,
+    with a status notification.
+  sequence:
+  - action: light.turn_off
+    continue_on_error: true
+    data: {}
+    target:
+      entity_id: light.goodnight_light_group
+  - action: switch.turn_off
+    continue_on_error: true
+    target:
+      entity_id:
+      - switch.speakeasy_black_lamp
+      - switch.upstairs_landing_light_switch_relay_1
+  - action: media_player.turn_off
+    continue_on_error: true
+    target:
+      entity_id:
+      - media_player.fire_tv_192_168_68_83
+      - media_player.lg_webos_tv_uq7590pub
+      - media_player.lg_webos_tv_uq7590pub_2
+      - media_player.speakeasy_main_tv
+      - media_player.speakeasy_second_tv
+    data: {}
+  - action: lock.lock
+    continue_on_error: true
+    target:
+      entity_id:
+      - lock.front_door_lock
+      - lock.garage_lock
+      - lock.side_door
+  - delay:
+      seconds: 10
+  - variables:
+      problem_doors: "{% set ns = namespace(items=[]) -%} {% for e in ['lock.front_door_lock','lock.garage_lock','lock.side_door']
+        -%}\n  {% if not is_state(e, 'locked') -%}\n    {% set ns.items = ns.items
+        + [state_attr(e, 'friendly_name') ~ ': ' ~ states(e)] -%}\n  {% endif -%}\n{%
+        endfor -%} {{ ns.items }}"
+      shadowfax_away: '{{ ''zone.garage'' not in (state_attr(''device_tracker.shadowfax_location'',''in_zones'')
+        or []) }}'
+    continue_on_error: true
+  - variables:
+      problem_lights: >-
+        {% set ns = namespace(items=[]) -%}
+        {% set watch = ['light.speakeasy_all_cans', 'light.primary_bed_cans',
+        'light.office_light_switch_relay_1',
+        'light.downstairs_landing_light_panel_relay_1', 'light.dining_cans',
+        'light.front_door_light_switch_relay_1', 'light.living_room'] -%}
+        {% for e in states.light | selectattr('state','eq','on') | list -%}
+        {% if e.entity_id in watch -%}
+        {% set ns.items = ns.items + [e.attributes.friendly_name or e.entity_id] -%}
+        {% endif -%}
+        {% endfor -%}
+        {{ ns.items }}
+      problems: '{% set ns2 = namespace(items=[]) -%} {% for x in problem_doors %}{%
+        set ns2.items = ns2.items + [''Not locked - '' ~ x] %}{% endfor -%} {% for
+        x in problem_lights %}{% set ns2.items = ns2.items + [''Still on - '' ~ x]
+        %}{% endfor -%} {{ ns2.items }}'
+    continue_on_error: true
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ problems | length > 0 }}'
+      sequence:
+      - action: persistent_notification.create
+        data:
+          notification_id: secure_home_issues
+          title: Secure Home - Issues
+          message: 'Secure Home ran at {{ now().strftime(''%-I:%M %p'') }} with problems:
+            {% for p in problems %} - {{ p }}{% endfor %}'
+      - action: notify.mobile_app_brian_s_z_flip_7
+        data:
+          title: Secure Home - Action Needed
+          message: '{{ problems | join('', '') }}.{{ '' Shadowfax is not in the garage.''
+            if shadowfax_away else '''' }}'
+    default:
+    - action: notify.mobile_app_brian_s_z_flip_7
+      data:
+        title: Secure Home
+        message: All interior lights off, all doors locked.{{ ' Shadowfax is not in
+          the garage.' if shadowfax_away else '' }}

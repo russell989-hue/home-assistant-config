@@ -1,4 +1,4 @@
-"""Build simple Places sensor state strings from configured display options."""
+"""Build simple Places coordinator state strings from configured display options."""
 
 from __future__ import annotations
 
@@ -6,10 +6,22 @@ from collections.abc import MutableMapping
 import logging
 from typing import TYPE_CHECKING, Any
 
-from .const import PLACE_NAME_DUPLICATE_LIST
+from .const import (
+    ATTR_DEVICETRACKER_ZONE,
+    ATTR_DEVICETRACKER_ZONE_NAME,
+    ATTR_PLACE_CATEGORY,
+    ATTR_PLACE_NAME,
+    ATTR_PLACE_NEIGHBOURHOOD,
+    ATTR_PLACE_TYPE,
+    ATTR_REGION,
+    ATTR_ROUTE_NUMBER,
+    ATTR_STREET,
+    ATTR_STREET_NUMBER,
+    PLACE_NAME_DUPLICATE_LIST,
+)
 
 if TYPE_CHECKING:
-    from .sensor import Places
+    from .coordinator import PlacesUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,127 +30,155 @@ class BasicOptionsParser:
     """Build display strings that do not require advanced option parsing."""
 
     def __init__(
-        self, sensor: Places, internal_attr: MutableMapping[str, Any], display_options: list[str]
+        self,
+        coordinator: PlacesUpdateCoordinator,
+        internal_attr: MutableMapping[str, Any],
+        display_options: list[str],
     ) -> None:
-        """Initialize the parser with sensor state and selected display options.
+        """Initialize the parser with coordinator state and selected display options.
 
         Args:
-            sensor: Places sensor that provides attribute access helpers.
-            internal_attr: Current sensor attribute mapping used for duplicate
+            coordinator (PlacesUpdateCoordinator):
+                Places coordinator that provides attribute access helpers.
+            internal_attr (MutableMapping[str, Any]):
+                Current coordinator attribute mapping used for duplicate
                 checks.
-            display_options: Ordered user-selected display option names.
+            display_options (list[str]):
+                Ordered user-selected display option names.
         """
-        self.sensor = sensor
+        self.coordinator = coordinator
         self._internal_attr = internal_attr
         self.display_options = display_options
+
+    def _add_to_display(
+        self,
+        user_display: list[str],
+        attr_key: str,
+        option_key: str | None = None,
+        condition: bool = True,
+        require_in_display_options: bool = True,
+    ) -> None:
+        """Append an attribute value when the display rules allow it.
+
+        Args:
+            user_display (list[str]):
+                Mutable list to which the display value is appended.
+            attr_key (str):
+                Attribute name to check and append.
+            option_key (str | None):
+                Display option key that gates inclusion.
+            condition (bool):
+                Additional condition required before adding the value.
+            require_in_display_options (bool):
+                When true, require ``option_key`` to be
+                present in display options.
+        """
+        if (
+            (not require_in_display_options or option_key in self.display_options)
+            and not self.coordinator.is_attr_blank(attr_key)
+            and condition
+        ):
+            user_display.append(self.coordinator.get_attr_safe_str(attr_key))
+
+    def _add_place_to_display(self, user_display: list[str]) -> None:
+        """Append the standard ``place`` components to a display list.
+
+        Args:
+            user_display (list[str]):
+                Mutable list to which the composed place fields are appended.
+        """
+        self._add_to_display(
+            user_display,
+            attr_key=ATTR_PLACE_NAME,
+            condition=self._internal_attr.get(ATTR_PLACE_NAME)
+            != self._internal_attr.get(ATTR_STREET),
+            require_in_display_options=False,
+        )
+        self._add_to_display(
+            user_display,
+            attr_key=ATTR_PLACE_CATEGORY,
+            condition=self.coordinator.get_attr_safe_str(ATTR_PLACE_CATEGORY).lower() != "place",
+            require_in_display_options=False,
+        )
+        self._add_to_display(
+            user_display,
+            attr_key=ATTR_PLACE_TYPE,
+            condition=self.coordinator.get_attr_safe_str(ATTR_PLACE_TYPE).lower() != "yes",
+            require_in_display_options=False,
+        )
+        self._add_to_display(
+            user_display,
+            attr_key=ATTR_PLACE_NEIGHBOURHOOD,
+            require_in_display_options=False,
+        )
+        self._add_to_display(
+            user_display,
+            attr_key=ATTR_STREET_NUMBER,
+            require_in_display_options=False,
+        )
+        self._add_to_display(
+            user_display,
+            attr_key=ATTR_STREET,
+            require_in_display_options=False,
+        )
+
+    def build_place(self) -> str:
+        """Build the standalone standard ``place`` display value.
+
+        Returns:
+            str:
+                Composed place name, classification, neighborhood, and street
+                fields, independent of zone status.
+        """
+        place_display: list[str] = []
+        self._add_place_to_display(place_display)
+        return ", ".join(place_display)
 
     async def build_display(self) -> str:
         """Build a comma-separated state string from basic display options.
 
         Returns:
-            Display state assembled from non-blank attributes allowed by the
-            selected options.
+            str:
+                Display state assembled from non-blank attributes allowed by the
+                selected options.
         """
         user_display: list[str] = []
-
-        def add_to_display(
-            attr_key: str,
-            option_key: str | None = None,
-            condition: bool = True,
-            require_in_display_options: bool = True,
-        ) -> None:
-            """Append an attribute value when the display rules allow it.
-
-            Args:
-                attr_key: Sensor attribute whose string value should be added.
-                option_key: Display option that enables the attribute.
-                condition: Scenario-specific gate for including the value.
-                require_in_display_options: Whether ``option_key`` must be
-                    present in the configured display options.
-            """
-            if (
-                (not require_in_display_options or option_key in self.display_options)
-                and not self.sensor.is_attr_blank(attr_key)
-                and condition
-            ):
-                user_display.append(self.sensor.get_attr_safe_str(attr_key))
+        in_zone = await self.coordinator.in_zone()
 
         # Add basic options
-        add_to_display(option_key="driving", attr_key="driving")
-        add_to_display(
+        self._add_to_display(user_display, "driving", option_key="driving")
+        self._add_to_display(
+            user_display,
+            attr_key=ATTR_DEVICETRACKER_ZONE_NAME,
             option_key="zone_name",
-            attr_key="devicetracker_zone_name",
-            condition=await self.sensor.in_zone()
-            or "do_not_show_not_home" not in self.display_options,
+            condition=in_zone or "do_not_show_not_home" not in self.display_options,
         )
-        add_to_display(
+        self._add_to_display(
+            user_display,
+            attr_key=ATTR_DEVICETRACKER_ZONE,
             option_key="zone",
-            attr_key="devicetracker_zone",
-            condition=await self.sensor.in_zone()
-            or "do_not_show_not_home" not in self.display_options,
+            condition=in_zone or "do_not_show_not_home" not in self.display_options,
         )
-        add_to_display("place_name", "place_name")
+        self._add_to_display(user_display, "place_name", option_key="place_name")
 
         # Handle "place" and its sub-options
         if "place" in self.display_options:
-            add_to_display(
-                attr_key="place_name",
-                condition=self._internal_attr.get("place_name")
-                != self._internal_attr.get("street"),
-                require_in_display_options=False,
-            )
-            add_to_display(
-                attr_key="place_category",
-                condition=self.sensor.get_attr_safe_str("place_category").lower() != "place",
-                require_in_display_options=False,
-            )
-            add_to_display(
-                attr_key="place_type",
-                condition=self.sensor.get_attr_safe_str("place_type").lower() != "yes",
-                require_in_display_options=False,
-            )
-            add_to_display(
-                attr_key="place_neighbourhood",
-                require_in_display_options=False,
-            )
-            add_to_display(
-                attr_key="street_number",
-                require_in_display_options=False,
-            )
-            add_to_display(
-                attr_key="street",
-                require_in_display_options=False,
-            )
+            self._add_place_to_display(user_display)
         else:
-            add_to_display(option_key="street_number", attr_key="street_number")
-            add_to_display(option_key="street", attr_key="street")
+            self._add_to_display(user_display, "street_number", option_key="street_number")
+            self._add_to_display(user_display, "street", option_key="street")
 
         # Add remaining location details
         for option_key, attr_key in {
             "city": "city",
             "county": "county",
-            "state": "region",
-            "region": "region",
+            "state": ATTR_REGION,
+            "region": ATTR_REGION,
             "postal_code": "postal_code",
             "country": "country",
-            "formatted_address": "formatted_address",
+            "osm_formatted_address": "formatted_address",
         }.items():
-            add_to_display(option_key=option_key, attr_key=attr_key)
-
-        # Handle "do_not_reorder" option
-        if "do_not_reorder" in self.display_options:
-            user_display = []
-            self.display_options.remove("do_not_reorder")
-            for option in self.display_options:
-                attr_key = (
-                    "region"
-                    if option == "state"
-                    else "place_neighbourhood"
-                    if option == "place_neighborhood"
-                    else option
-                )
-                if not self.sensor.is_attr_blank(attr_key):
-                    user_display.append(self.sensor.get_attr_safe_str(attr_key))
+            self._add_to_display(user_display, attr_key, option_key=option_key)
 
         return ", ".join(user_display)
 
@@ -146,54 +186,58 @@ class BasicOptionsParser:
         """Build the opinionated ``formatted_place`` display value.
 
         Returns:
-            Human-readable place string with driving, place/street, and locality
-            components collapsed into a single line.
+            str:
+                Human-readable place string with driving, place/street, and locality
+                components collapsed into a single line.
         """
         formatted_place_array: list[str] = []
-        if not await self.sensor.in_zone():
-            if not self.sensor.is_attr_blank(
-                "driving"
-            ) and "driving" in self.sensor.get_attr_safe_list("display_options_list"):
-                formatted_place_array.append(self.sensor.get_attr_safe_str("driving"))
-            use_place_name = self.should_use_place_name(self._internal_attr, self.sensor)
+        if not await self.coordinator.in_zone():
+            if not self.coordinator.is_attr_blank("driving") and "driving" in self.display_options:
+                formatted_place_array.append(self.coordinator.get_attr_safe_str("driving"))
+            use_place_name = self.should_use_place_name(self._internal_attr, self.coordinator)
             if not use_place_name:
-                self.add_type_or_category(formatted_place_array, self._internal_attr, self.sensor)
-                self.add_street_info(formatted_place_array, self._internal_attr, self.sensor)
-                self.add_neighbourhood_if_house(
-                    formatted_place_array, self._internal_attr, self.sensor
-                )
+                self.add_type_or_category(formatted_place_array, self.coordinator)
+                self.add_street_info(formatted_place_array, self.coordinator)
+                self.add_neighbourhood_if_house(formatted_place_array, self.coordinator)
             else:
-                formatted_place_array.append(self.sensor.get_attr_safe_str("place_name").strip())
-            self.add_city_county_state(formatted_place_array, self._internal_attr, self.sensor)
+                formatted_place_array.append(
+                    self.coordinator.get_attr_safe_str("place_name").strip()
+                )
+            self.add_city_county_state(formatted_place_array, self.coordinator)
         else:
             formatted_place_array.append(
-                self.sensor.get_attr_safe_str("devicetracker_zone_name").strip()
+                self.coordinator.get_attr_safe_str(ATTR_DEVICETRACKER_ZONE_NAME).strip()
             )
         formatted_place = ", ".join(item for item in formatted_place_array)
         return formatted_place.replace("\n", " ").replace("  ", " ").strip()
 
     def should_use_place_name(
-        self, internal_attr: MutableMapping[str, Any], sensor: Places
+        self,
+        internal_attr: MutableMapping[str, Any],
+        coordinator: PlacesUpdateCoordinator,
     ) -> bool:
         """Decide whether the OSM place name adds distinct information.
 
         Args:
-            internal_attr: Current sensor attribute mapping.
-            sensor: Places sensor used for blank checks and safe value access.
+            internal_attr (MutableMapping[str, Any]):
+                Current coordinator attribute mapping.
+            coordinator (PlacesUpdateCoordinator):
+                Places coordinator used for blank checks and safe value access.
 
         Returns:
-            ``True`` when ``place_name`` exists and does not duplicate address
-            fields that will already be shown.
+            bool:
+                ``True`` when ``place_name`` exists and does not duplicate address
+                fields that will already be shown.
         """
         use_place_name = True
         sensor_attributes_values = [
-            sensor.get_attr_safe_str(attr)
+            coordinator.get_attr_safe_str(attr)
             for attr in PLACE_NAME_DUPLICATE_LIST
-            if not sensor.is_attr_blank(attr)
+            if not coordinator.is_attr_blank(attr)
         ]
         if (
-            sensor.is_attr_blank("place_name")
-            or internal_attr.get("place_name") in sensor_attributes_values
+            coordinator.is_attr_blank("place_name")
+            or coordinator.get_attr_safe_str("place_name") in sensor_attributes_values
         ):
             use_place_name = False
         _LOGGER.debug("use_place_name: %s", use_place_name)
@@ -202,109 +246,113 @@ class BasicOptionsParser:
     def add_type_or_category(
         self,
         formatted_place_array: list[str],
-        internal_attr: MutableMapping[str, Any],
-        sensor: Places,
+        coordinator: PlacesUpdateCoordinator,
     ) -> None:
         """Append a useful place type or category to a formatted-place list.
 
         Args:
-            formatted_place_array: Mutable output list being assembled.
-            internal_attr: Current sensor attribute mapping.
-            sensor: Places sensor used for blank checks and safe value access.
+            formatted_place_array (list[str]):
+                Mutable output list being assembled.
+            coordinator (PlacesUpdateCoordinator):
+                Places coordinator used for blank checks and safe value access.
         """
         if (
-            not sensor.is_attr_blank("place_type")
-            and sensor.get_attr_safe_str("place_type").lower() != "unclassified"
-            and sensor.get_attr_safe_str("place_category").lower() != "highway"
+            not coordinator.is_attr_blank("place_type")
+            and coordinator.get_attr_safe_str("place_type").lower() != "unclassified"
+            and coordinator.get_attr_safe_str("place_category").lower() != "highway"
         ):
             formatted_place_array.append(
-                sensor.get_attr_safe_str("place_type")
+                coordinator.get_attr_safe_str("place_type")
                 .title()
                 .replace("Proposed", "")
                 .replace("Construction", "")
                 .strip()
             )
         elif (
-            not sensor.is_attr_blank("place_category")
-            and sensor.get_attr_safe_str("place_category").lower() != "highway"
+            not coordinator.is_attr_blank("place_category")
+            and coordinator.get_attr_safe_str("place_category").lower() != "highway"
         ):
-            formatted_place_array.append(sensor.get_attr_safe_str("place_category").title().strip())
+            formatted_place_array.append(
+                coordinator.get_attr_safe_str("place_category").title().strip()
+            )
 
     def add_street_info(
         self,
         formatted_place_array: list[str],
-        internal_attr: MutableMapping[str, Any],
-        sensor: Places,
+        coordinator: PlacesUpdateCoordinator,
     ) -> None:
         """Append street reference or house-number/street details.
 
         Args:
-            formatted_place_array: Mutable output list being assembled.
-            internal_attr: Current sensor attribute mapping.
-            sensor: Places sensor used for blank checks and safe value access.
+            formatted_place_array (list[str]):
+                Mutable output list being assembled.
+            coordinator (PlacesUpdateCoordinator):
+                Places coordinator used for blank checks and safe value access.
         """
         street = None
-        if sensor.is_attr_blank("street") and not sensor.is_attr_blank("street_ref"):
-            street = sensor.get_attr_safe_str("street_ref").strip()
-            _LOGGER.debug("Using street_ref: %s", street)
-        elif not sensor.is_attr_blank("street"):
+        if coordinator.is_attr_blank("street") and not coordinator.is_attr_blank(ATTR_ROUTE_NUMBER):
+            street = coordinator.get_attr_safe_str(ATTR_ROUTE_NUMBER).strip()
+            _LOGGER.debug("Using route_number: %s", street)
+        elif not coordinator.is_attr_blank("street"):
             if (
-                not sensor.is_attr_blank("place_category")
-                and sensor.get_attr_safe_str("place_category").lower() == "highway"
-                and not sensor.is_attr_blank("place_type")
-                and sensor.get_attr_safe_str("place_type").lower() in {"motorway", "trunk"}
-                and not sensor.is_attr_blank("street_ref")
+                not coordinator.is_attr_blank("place_category")
+                and coordinator.get_attr_safe_str("place_category").lower() == "highway"
+                and not coordinator.is_attr_blank("place_type")
+                and coordinator.get_attr_safe_str("place_type").lower() in {"motorway", "trunk"}
+                and not coordinator.is_attr_blank(ATTR_ROUTE_NUMBER)
             ):
-                street = sensor.get_attr_safe_str("street_ref").strip()
-                _LOGGER.debug("Using street_ref: %s", street)
+                street = coordinator.get_attr_safe_str(ATTR_ROUTE_NUMBER).strip()
+                _LOGGER.debug("Using route_number: %s", street)
             else:
-                street = sensor.get_attr_safe_str("street").strip()
+                street = coordinator.get_attr_safe_str("street").strip()
                 _LOGGER.debug("Using street: %s", street)
-        if street and sensor.is_attr_blank("street_number"):
+        if street and coordinator.is_attr_blank("street_number"):
             formatted_place_array.append(street)
-        elif street and not sensor.is_attr_blank("street_number"):
+        elif street and not coordinator.is_attr_blank("street_number"):
             formatted_place_array.append(
-                f"{sensor.get_attr_safe_str('street_number').strip()} {street}"
+                f"{coordinator.get_attr_safe_str('street_number').strip()} {street}"
             )
 
     def add_neighbourhood_if_house(
         self,
         formatted_place_array: list[str],
-        internal_attr: MutableMapping[str, Any],
-        sensor: Places,
+        coordinator: PlacesUpdateCoordinator,
     ) -> None:
         """Append neighbourhood context for house-level places.
 
         Args:
-            formatted_place_array: Mutable output list being assembled.
-            internal_attr: Current sensor attribute mapping.
-            sensor: Places sensor used for blank checks and safe value access.
+            formatted_place_array (list[str]):
+                Mutable output list being assembled.
+            coordinator (PlacesUpdateCoordinator):
+                Places coordinator used for blank checks and safe value access.
         """
         if (
-            not sensor.is_attr_blank("place_type")
-            and sensor.get_attr_safe_str("place_type").lower() == "house"
-            and not sensor.is_attr_blank("place_neighbourhood")
+            not coordinator.is_attr_blank("place_type")
+            and coordinator.get_attr_safe_str("place_type").lower() == "house"
+            and not coordinator.is_attr_blank(ATTR_PLACE_NEIGHBOURHOOD)
         ):
-            formatted_place_array.append(sensor.get_attr_safe_str("place_neighbourhood").strip())
+            formatted_place_array.append(
+                coordinator.get_attr_safe_str(ATTR_PLACE_NEIGHBOURHOOD).strip()
+            )
 
     def add_city_county_state(
         self,
         formatted_place_array: list[str],
-        internal_attr: MutableMapping[str, Any],
-        sensor: Places,
+        coordinator: PlacesUpdateCoordinator,
     ) -> None:
         """Append the best locality and state abbreviation available.
 
         Args:
-            formatted_place_array: Mutable output list being assembled.
-            internal_attr: Current sensor attribute mapping.
-            sensor: Places sensor used for blank checks and safe value access.
+            formatted_place_array (list[str]):
+                Mutable output list being assembled.
+            coordinator (PlacesUpdateCoordinator):
+                Places coordinator used for blank checks and safe value access.
         """
-        if not sensor.is_attr_blank("city_clean"):
-            formatted_place_array.append(sensor.get_attr_safe_str("city_clean").strip())
-        elif not sensor.is_attr_blank("city"):
-            formatted_place_array.append(sensor.get_attr_safe_str("city").strip())
-        elif not sensor.is_attr_blank("county"):
-            formatted_place_array.append(sensor.get_attr_safe_str("county").strip())
-        if not sensor.is_attr_blank("state_abbr"):
-            formatted_place_array.append(sensor.get_attr_safe_str("state_abbr"))
+        if not coordinator.is_attr_blank("city_clean"):
+            formatted_place_array.append(coordinator.get_attr_safe_str("city_clean").strip())
+        elif not coordinator.is_attr_blank("city"):
+            formatted_place_array.append(coordinator.get_attr_safe_str("city").strip())
+        elif not coordinator.is_attr_blank("county"):
+            formatted_place_array.append(coordinator.get_attr_safe_str("county").strip())
+        if not coordinator.is_attr_blank("state_abbr"):
+            formatted_place_array.append(coordinator.get_attr_safe_str("state_abbr"))

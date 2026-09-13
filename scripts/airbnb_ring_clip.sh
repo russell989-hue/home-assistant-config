@@ -5,7 +5,7 @@
 # clips miss fast walkouts - only the continuous ring buffer reliably has them.
 # Handles the segment-rotation edge: if the newest segment is <45s long, prepends
 # the tail of the previous segment.
-d=/media/recordings/ring/side_door
+d=/media/recordings/continuous/side_door
 out=/media/airbnb_check.mp4
 newest=$(ls -t "$d"/*.mp4 2>/dev/null | head -1)
 prev=$(ls -t "$d"/*.mp4 2>/dev/null | head -2 | tail -1)

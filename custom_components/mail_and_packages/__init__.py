@@ -4,7 +4,15 @@ import asyncio
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_RESOURCES
+from homeassistant.const import (
+    CONF_ACCESS_TOKEN,
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_PORT,
+    CONF_RESOURCES,
+    CONF_TOKEN,
+    CONF_USERNAME,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import (
     config_validation as cv,
@@ -30,6 +38,8 @@ from .const import (
     CONF_FORWARDED_EMAILS,
     CONF_GENERIC_CUSTOM_IMG,
     CONF_GENERIC_CUSTOM_IMG_FILE,
+    CONF_HOME_DEPOT_CUSTOM_IMG,
+    CONF_HOME_DEPOT_CUSTOM_IMG_FILE,
     CONF_IMAGE_SECURITY,
     CONF_IMAP_SECURITY,
     CONF_IMAP_TIMEOUT,
@@ -46,6 +56,7 @@ from .const import (
     DEFAULT_AMAZON_DAYS,
     DEFAULT_FEDEX_CUSTOM_IMG_FILE,
     DEFAULT_GENERIC_CUSTOM_IMG_FILE,
+    DEFAULT_HOME_DEPOT_CUSTOM_IMG_FILE,
     DEFAULT_UPS_CUSTOM_IMG_FILE,
     DEFAULT_WALMART_CUSTOM_IMG_FILE,
     DOMAIN,
@@ -109,6 +120,15 @@ _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
+OAUTH_TOKEN_KEYS = {
+    CONF_TOKEN,
+    CONF_ACCESS_TOKEN,
+    "refresh_token",
+    "expires_at",
+    "expires_in",
+    "auth_implementation",
+}
+
 
 async def async_setup(hass: HomeAssistant, config_entry: MailAndPackagesConfigEntry):  # pylint: disable=unused-argument
     """Disallow configuration via YAML."""
@@ -125,29 +145,65 @@ async def async_setup_entry(
         VERSION,
         ISSUE_URL,
     )
-    hass.data.setdefault(DOMAIN, {})
-    updated_config = config_entry.data.copy()
+    # Merge data and options
+    config = {**config_entry.data, **config_entry.options}
 
     # Sort the resources
-    updated_config[CONF_RESOURCES] = sorted(updated_config[CONF_RESOURCES])
-
-    if updated_config != config_entry.data:
-        hass.config_entries.async_update_entry(config_entry, data=updated_config)
-
-    # Variables for data coordinator
-    config = config_entry.data
+    if CONF_RESOURCES in config:
+        sorted_resources = sorted(config[CONF_RESOURCES])
+        if sorted_resources != config[CONF_RESOURCES]:
+            config[CONF_RESOURCES] = sorted_resources
+            if CONF_RESOURCES in config_entry.options:
+                hass.config_entries.async_update_entry(
+                    config_entry,
+                    options={**config_entry.options, CONF_RESOURCES: sorted_resources},
+                )
+            else:
+                hass.config_entries.async_update_entry(
+                    config_entry,
+                    data={**config_entry.data, CONF_RESOURCES: sorted_resources},
+                )
 
     # Setup the data coordinator
     coordinator = MailDataUpdateCoordinator(hass, config, config_entry)
 
-    config_entry.runtime_data = MailAndPackagesData(coordinator=coordinator, cameras=[])
+    last_data = {
+        k: v for k, v in config_entry.data.items() if k not in OAUTH_TOKEN_KEYS
+    }
+    config_entry.runtime_data = MailAndPackagesData(
+        coordinator=coordinator,
+        cameras=[],
+        last_options=dict(config_entry.options),
+        last_data=last_data,
+    )
 
     # Fetch initial data in the background so setup doesn't block
     hass.async_create_task(coordinator.async_refresh())
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
+    config_entry.async_on_unload(config_entry.add_update_listener(update_listener))
+
     return True
+
+
+async def update_listener(
+    hass: HomeAssistant, config_entry: MailAndPackagesConfigEntry
+) -> None:
+    """Update listener."""
+    if config_entry.runtime_data:
+        current_non_oauth_data = {
+            k: v for k, v in config_entry.data.items() if k not in OAUTH_TOKEN_KEYS
+        }
+        if (
+            config_entry.options == config_entry.runtime_data.last_options
+            and current_non_oauth_data == config_entry.runtime_data.last_data
+        ):
+            _LOGGER.debug("Config entry update was token-only refresh; skipping reload")
+            return
+
+    _LOGGER.debug("Attempting to reload sensors from the %s integration", DOMAIN)
+    await hass.config_entries.async_reload(config_entry.entry_id)
 
 
 async def async_remove_config_entry_device(  # pylint: disable-next=unused-argument
@@ -193,14 +249,33 @@ async def async_migrate_entry(hass, config_entry):
 
     _LOGGER.debug("Migrating from version %s", version)
     updated_config = {**config_entry.data}
+    updated_options = {**config_entry.options}
 
     _migrate_legacy_versions(updated_config, version, config_entry)
     _apply_default_config(updated_config)
 
-    if updated_config != config_entry.data:
+    # Ensure non-IMAP options are removed from data and moved to options
+    imap_keys = {
+        CONF_HOST,
+        CONF_PORT,
+        CONF_USERNAME,
+        CONF_PASSWORD,
+        CONF_IMAP_SECURITY,
+        CONF_VERIFY_SSL,
+        CONF_AUTH_TYPE,
+        *OAUTH_TOKEN_KEYS,
+    }
+    for key in list(updated_config.keys()):
+        if key not in imap_keys:
+            val = updated_config.pop(key)
+            if key not in updated_options:
+                updated_options[key] = val
+
+    if updated_config != config_entry.data or updated_options != config_entry.options:
         hass.config_entries.async_update_entry(
             config_entry,
             data=updated_config,
+            options=updated_options,
             version=new_version,
         )
 
@@ -368,3 +443,9 @@ def _apply_walmart_generic_fedex_defaults(updated_config):
         updated_config[CONF_FEDEX_CUSTOM_IMG] = False
     if CONF_FEDEX_CUSTOM_IMG_FILE not in updated_config:
         updated_config[CONF_FEDEX_CUSTOM_IMG_FILE] = DEFAULT_FEDEX_CUSTOM_IMG_FILE
+    if CONF_HOME_DEPOT_CUSTOM_IMG not in updated_config:
+        updated_config[CONF_HOME_DEPOT_CUSTOM_IMG] = False
+    if CONF_HOME_DEPOT_CUSTOM_IMG_FILE not in updated_config:
+        updated_config[CONF_HOME_DEPOT_CUSTOM_IMG_FILE] = (
+            DEFAULT_HOME_DEPOT_CUSTOM_IMG_FILE
+        )

@@ -116,11 +116,10 @@ secure_home:
       entity_id:
       - lock.front_door_lock
       - lock.garage_lock
-      - lock.side_door
   - delay:
       seconds: 10
   - variables:
-      problem_doors: "{% set ns = namespace(items=[]) -%} {% for e in ['lock.front_door_lock','lock.garage_lock','lock.side_door']
+      problem_doors: "{% set ns = namespace(items=[]) -%} {% for e in ['lock.front_door_lock','lock.garage_lock']
         -%}\n  {% if not is_state(e, 'locked') -%}\n    {% set ns.items = ns.items
         + [state_attr(e, 'friendly_name') ~ ': ' ~ states(e)] -%}\n  {% endif -%}\n{%
         endfor -%} {{ ns.items }}"
@@ -128,13 +127,18 @@ secure_home:
         or []) }}'
     continue_on_error: true
   - variables:
-      problem_lights: "{% set ns = namespace(items=[]) -%} {% for e in states.light
-        | selectattr('state','eq','on') | list -%}\n  {% if e.entity_id in [\n    -
-        light.speakeasy_all_cans\n    - light.primary_bed_cans\n    - light.office_light_switch_relay_1\n
-        \   - light.downstairs_landing_light_panel_relay_1\n    - light.dining_cans\n
-        \   - light.front_door_light_switch_relay_1\n    - light.living_room] -%}\n
-        \   {% set ns.items = ns.items + [e.attributes.friendly_name or e.entity_id]
-        -%}\n  {% endif -%}\n{% endfor -%} {{ ns.items }}"
+      problem_lights: >-
+        {% set ns = namespace(items=[]) -%}
+        {% set watch = ['light.speakeasy_all_cans', 'light.primary_bed_cans',
+        'light.office_light_switch_relay_1',
+        'light.downstairs_landing_light_panel_relay_1', 'light.dining_cans',
+        'light.front_door_light_switch_relay_1', 'light.living_room'] -%}
+        {% for e in states.light | selectattr('state','eq','on') | list -%}
+        {% if e.entity_id in watch -%}
+        {% set ns.items = ns.items + [e.attributes.friendly_name or e.entity_id] -%}
+        {% endif -%}
+        {% endfor -%}
+        {{ ns.items }}
       problems: '{% set ns2 = namespace(items=[]) -%} {% for x in problem_doors %}{%
         set ns2.items = ns2.items + [''Not locked - '' ~ x] %}{% endfor -%} {% for
         x in problem_lights %}{% set ns2.items = ns2.items + [''Still on - '' ~ x]

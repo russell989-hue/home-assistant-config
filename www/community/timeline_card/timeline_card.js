@@ -263,6 +263,9 @@ function normalizeEntityEntries(config, hass = null) {
                 if (typeof item.color === "string" && item.color.trim()) {
                     entry.color = item.color.trim();
                 }
+                if (typeof item.icon === "string" && item.icon.trim()) {
+                    entry.icon = item.icon.trim();
+                }
                 return entry;
             }
             return null;
@@ -281,17 +284,41 @@ function normalizeEntityEntries(config, hass = null) {
             }
         });
 
-        for (const entry of entries) {
-            if (!entry.places_entity) {
-                const fallbackPlace = topLevelPlacesMap.get(entry.entity);
-                if (fallbackPlace) {
-                    entry.places_entity = fallbackPlace;
-                }
+        const attributeMatched = new Set(topLevelPlacesMap.values());
+        entries.forEach((entry, index) => {
+            if (entry.places_entity) return;
+            const fallbackPlace = topLevelPlacesMap.get(entry.entity);
+            if (fallbackPlace) {
+                entry.places_entity = fallbackPlace;
+                return;
+            }
+            // Places v3 no longer exposes devicetracker_entityid; fall back to the
+            // documented same-length/order mapping between both lists.
+            if (placeEntityIds.length === entries.length && placeEntityIds[index] && !attributeMatched.has(placeEntityIds[index])) {
+                entry.places_entity = placeEntityIds[index];
+            }
+        });
+    }
+
+    return entries;
+}
+
+function resolvePlaceNameEntity(hass, placeEntityId) {
+    if (!hass || !placeEntityId) return null;
+    if (placeEntityId.endsWith("_place_name")) return null;
+
+    const registry = hass.entities;
+    const deviceId = registry?.[placeEntityId]?.device_id;
+    if (deviceId) {
+        for (const [entityId, entry] of Object.entries(registry)) {
+            if (entityId !== placeEntityId && entry?.device_id === deviceId && entityId.endsWith("_place_name")) {
+                return entityId;
             }
         }
     }
 
-    return entries;
+    const conventionId = `${placeEntityId}_place_name`;
+    return hass.states?.[conventionId] ? conventionId : null;
 }
 
 function formatErrorMessage(err) {
@@ -345,8 +372,11 @@ function clearReverseGeocodingQueue() {
     }
 }
 
-function resolveStaySegments(segments, placeStates, date, osmApiKey, onUpdate) {
-    const placeIntervals = buildPlaceIntervals(placeStates, date);
+function resolveStaySegments(segments, placeStates, placeNameStates, date, osmApiKey, onUpdate) {
+    // Intervals from the Places v3 place_name child sensor take precedence: the main
+    // sensor's state only holds the (less clean) display-options string in v3.
+    const placeNameIntervals = buildIntervals(placeNameStates, date, placeNameSensorDisplayName);
+    const placeIntervals = buildIntervals(placeStates, date, placeDisplayName);
     for (const segment of segments) {
         if (segment.type !== "stay" || segment.zoneName) continue;
         if (segment.placeName && segment.placeName !== LOADING_LOCATION) continue;
@@ -365,10 +395,11 @@ function resolveStaySegments(segments, placeStates, date, osmApiKey, onUpdate) {
         }
 
         // Load from `places`
-        const placeName = pickPlaceName(placeIntervals, segment.start, segment.end);
+        const placeName = pickPlaceName(placeNameIntervals, segment.start, segment.end)
+            || pickPlaceName(placeIntervals, segment.start, segment.end);
         if (placeName) {
             segment.placeName = placeName;
-            segment.reverseGeocoding = {source: "places", name: placeName, intervals: placeIntervals};
+            segment.reverseGeocoding = {source: "places", name: placeName, intervals: [...placeNameIntervals, ...placeIntervals]};
             setPersistentCache(segmentKey, segment.placeName, segment.reverseGeocoding);
             continue;
         }
@@ -460,12 +491,13 @@ async function resolveQueuedRequest(request, sessionAtStart) {
     onUpdate();
 }
 
-function buildPlaceIntervals(placeStates, date) {
+function buildIntervals(states, date, displayNameFn) {
+    if (!Array.isArray(states) || states.length === 0) return [];
     const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
-    return placeStates.map((state, index) => {
-        const next = placeStates[index + 1];
+    return states.map((state, index) => {
+        const next = states[index + 1];
         const end = next ? new Date(next.lu * 1000) : endOfDay;
-        const name = placeDisplayName(state);
+        const name = displayNameFn(state);
         return {
             start: new Date(state.lu * 1000),
             end,
@@ -478,6 +510,12 @@ function placeDisplayName(state) {
     const attrs = state.a || {};
     const formatted_address = attrs.street ? `${attrs.street} ${attrs.street_number || ""}, ${attrs.city}` : null;
     return attrs.place_name || formatted_address || state.s || attrs.formatted_address || null;
+}
+
+function placeNameSensorDisplayName(state) {
+    const value = typeof state.s === "string" ? state.s.trim() : "";
+    if (!value || value === "unknown" || value === "unavailable") return null;
+    return value;
 }
 
 function pickPlaceName(intervals, start, end) {
@@ -920,13 +958,17 @@ async function getSegmentedTracks(date, config, hass, onQueueUpdate) {
             const points = filterSpeedOutliers(rawPoints, config.max_reasonable_speed_kmh);
 
             const placeEntityId = entry.places_entity || null;
-            const placeStates = placeEntityId ? await fetchEntityHistory(hass, placeEntityId, date) : [];
-
+            // Places v3 moved place_name from a state attribute to a separate child sensor
+            const placeNameEntityId = resolvePlaceNameEntity(hass, placeEntityId);
             const activityEntityId = entry.activity_entity || null;
-            const activityStates = activityEntityId ? await fetchEntityHistory(hass, activityEntityId, date) : [];
+            const [placeStates, placeNameStates, activityStates] = await Promise.all([
+                placeEntityId ? fetchEntityHistory(hass, placeEntityId, date) : [],
+                placeNameEntityId ? fetchEntityHistory(hass, placeNameEntityId, date) : [],
+                activityEntityId ? fetchEntityHistory(hass, activityEntityId, date) : [],
+            ]);
 
             const baseSegments = segmentTimeline(points, config, zones);
-            resolveStaySegments(baseSegments, placeStates, date, config.osm_api_key, onQueueUpdate);
+            resolveStaySegments(baseSegments, placeStates, placeNameStates, date, config.osm_api_key, onQueueUpdate);
             const segments = resolveActivities(baseSegments, activityStates, date, config.activity_icon_map, zones);
             return {entityId, placeEntityId, activityEntityId, points, segments};
         }),
@@ -15742,6 +15784,13 @@ function createEntityIcon(location) {
         icon.src = location.picture;
         icon.alt = location.name;
         icon.setAttribute("style", "height: 42px; width: 42px; border-radius: 50%; object-fit: cover;");
+    } else if (location.icon) {
+        icon = document.createElement("ha-icon");
+        icon.setAttribute("icon", location.icon);
+        icon.setAttribute(
+            "style",
+            "height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; color: white; --mdc-icon-size: 26px;",
+        );
     } else {
         const getAbbreviation = (name) => {
             const words = name.split(" ");
@@ -16401,14 +16450,16 @@ class TimelineCard extends HTMLElement {
             .map(({entity: entityId}, index) => {
                 const state = this._hass?.states?.[entityId];
                 const picture = state?.attributes?.entity_picture;
+                const entityDef = this._config.entity[index];
+                const icon = entityDef?.icon || state?.attributes?.icon || "mdi:account-circle";
                 const name = state?.attributes?.friendly_name || entityId;
                 const escapedName = escapeHtml(name);
                 const escapedPicture = escapeHtml(picture || "");
-                const entityDef = this._config.entity[index];
+                const escapedIcon = escapeHtml(icon);
                 const trackColor = getTrackColor(index, this._config?.colors, entityDef?.color);
                 return `
               <button type="button" style="--entity-track-color:${trackColor};" class="entity-chip ${index === this._activeEntityIndex ? "active" : ""}" data-action="select-entity" data-entity-index="${index}">
-                ${picture ? `<img src="${escapedPicture}" alt="${escapedName}">` : '<ha-icon class="entity-avatar-icon" icon="mdi:account-circle"></ha-icon>'}
+                ${picture ? `<img src="${escapedPicture}" alt="${escapedName}">` : `<ha-icon class="entity-avatar-icon" icon="${escapedIcon}"></ha-icon>`}
                 <span>${escapedName}</span>
               </button>
             `;
@@ -16559,6 +16610,7 @@ class TimelineCard extends HTMLElement {
                 return {
                     point: [lat, lon],
                     picture: state?.attributes?.entity_picture || null,
+                    icon: this._config.entity[index]?.icon || state?.attributes?.icon || null,
                     name: state?.attributes?.friendly_name || entityId,
                     color: getTrackColor(index, this._config?.colors, this._config.entity[index]?.color),
                     isActive: index === this._activeEntityIndex,

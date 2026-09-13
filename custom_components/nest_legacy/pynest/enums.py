@@ -2,7 +2,7 @@
 
 from enum import StrEnum, unique
 import logging
-from typing import Any
+from typing import Any, override
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,8 +45,9 @@ class BucketType(StrEnum):
 
     UNKNOWN = "unknown"
 
+    @override
     @classmethod
-    def _missing_(cls: type["BucketType"], value: Any) -> "BucketType":
+    def _missing_(cls: type[BucketType], value: Any) -> BucketType:
         _LOGGER.warning("Unsupported value %s has been returned for %s", value, cls)
         return cls.UNKNOWN
 
@@ -78,6 +79,23 @@ class ThermostatHvacState(StrEnum):
 
 
 @unique
+class ThermostatHvacStage(StrEnum):
+    """Nest Thermostat HVAC stages."""
+
+    OFF = "off"
+    COOL_STAGE_1 = "cool_stage_1"
+    COOL_STAGE_2 = "cool_stage_2"
+    COOL_STAGE_3 = "cool_stage_3"
+    HEAT_STAGE_1 = "heat_stage_1"
+    HEAT_STAGE_2 = "heat_stage_2"
+    HEAT_STAGE_3 = "heat_stage_3"
+    ALTERNATE_HEAT_STAGE_1 = "alternate_heat_stage_1"
+    ALTERNATE_HEAT_STAGE_2 = "alternate_heat_stage_2"
+    AUXILIARY_HEAT = "auxiliary_heat"
+    EMERGENCY_HEAT = "emergency_heat"
+
+
+@unique
 class ThermostatHvacMode(StrEnum):
     """Nest Thermostat HVAC modes."""
 
@@ -85,6 +103,15 @@ class ThermostatHvacMode(StrEnum):
     COOL = "cool"
     HEAT = "heat"
     RANGE = "range"  # heat-cool
+
+
+@unique
+class DualFuelBreakpointOverride(StrEnum):
+    """Nest Thermostat dual fuel breakpoint overrides."""
+
+    NONE = "none"
+    ALWAYS_ALTERNATE_HEAT = "always_alternate_heat"
+    NEVER_ALTERNATE_HEAT = "never_alternate_heat"
 
 
 @unique

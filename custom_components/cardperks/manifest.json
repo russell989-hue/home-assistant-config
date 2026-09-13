@@ -1,0 +1,21 @@
+{
+  "domain": "cardperks",
+  "name": "CardPerks",
+  "codeowners": [
+    "@russell989-hue"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "file_upload",
+    "http"
+  ],
+  "documentation": "https://github.com/russell989-hue/cardperks",
+  "integration_type": "hub",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/russell989-hue/cardperks/issues",
+  "requirements": [
+    "openpyxl>=3.1"
+  ],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}

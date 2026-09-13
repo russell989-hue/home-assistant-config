@@ -1,12 +1,14 @@
 """Services for the Nest Legacy integration."""
 
-from __future__ import annotations
-
 from typing import Any
 
 from google.protobuf.json_format import MessageToDict
 import voluptuous as vol
 
+from homeassistant.components.climate import (
+    DOMAIN as CLIMATE_DOMAIN,
+    ClimateEntityFeature,
+)
 from homeassistant.core import (
     HomeAssistant,
     ServiceCall,
@@ -14,7 +16,11 @@ from homeassistant.core import (
     SupportsResponse,
 )
 from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import config_validation as cv, device_registry as dr
+from homeassistant.helpers import (
+    config_validation as cv,
+    device_registry as dr,
+    service,
+)
 
 from .const import DOMAIN
 from .coordinator import NestCoordinator
@@ -37,20 +43,29 @@ def async_setup_services(hass: HomeAssistant) -> None:
         if not config_entry_id:
             entries = hass.config_entries.async_entries(DOMAIN)
             if not entries:
-                raise ServiceValidationError("No Nest Legacy integration found")
+                raise ServiceValidationError(
+                    translation_domain=DOMAIN, translation_key="no_config_entry"
+                )
             if len(entries) > 1:
                 raise ServiceValidationError(
-                    "Multiple Nest Legacy integrations found, please specify config_entry_id"
+                    translation_domain=DOMAIN,
+                    translation_key="multiple_config_entries",
                 )
             entry = entries[0]
         else:
             entry = hass.config_entries.async_get_entry(config_entry_id)
 
         if not entry:
-            raise ServiceValidationError(f"Config entry '{config_entry_id}' not found")
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="config_entry_not_found",
+                translation_placeholders={"config_entry_id": str(config_entry_id)},
+            )
 
         if not hasattr(entry, "runtime_data") or not entry.runtime_data:
-            raise ServiceValidationError("Nest Legacy integration not ready")
+            raise ServiceValidationError(
+                translation_domain=DOMAIN, translation_key="integration_not_ready"
+            )
         return entry.runtime_data
 
     def _get_serial_from_ha_device(ha_device_id: str) -> str:
@@ -59,7 +74,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
         device_entry = device_registry.async_get(ha_device_id)
         if not device_entry:
             raise ServiceValidationError(
-                f"Device ID '{ha_device_id}' not found in registry"
+                translation_domain=DOMAIN,
+                translation_key="device_not_found",
+                translation_placeholders={"device_id": ha_device_id},
             )
 
         for domain, identifier in device_entry.identifiers:
@@ -67,7 +84,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 return identifier
 
         raise ServiceValidationError(
-            f"Device '{ha_device_id}' is not a Nest Legacy device"
+            translation_domain=DOMAIN,
+            translation_key="device_not_nest_legacy",
+            translation_placeholders={"device_id": ha_device_id},
         )
 
     async def async_list_guests(call: ServiceCall) -> ServiceResponse:
@@ -234,4 +253,16 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 vol.Required("user_id"): cv.string,
             }
         ),
+    )
+
+    service.async_register_platform_entity_service(
+        hass,
+        DOMAIN,
+        "set_fan_timer",
+        entity_domain=CLIMATE_DOMAIN,
+        schema={
+            vol.Required("duration"): cv.time_period,
+        },
+        func="async_set_fan_timer",
+        required_features=[ClimateEntityFeature.FAN_MODE],
     )

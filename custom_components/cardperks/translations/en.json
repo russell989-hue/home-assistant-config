@@ -1,0 +1,554 @@
+{
+  "title": "CardPerks",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up CardPerks",
+        "description": "Name the household and add the first card owner. More owners and cards are added from the integration page afterwards.",
+        "data": {
+          "household_name": "Household name",
+          "first_owner": "First owner"
+        }
+      }
+    },
+    "error": {
+      "name_required": "Enter a name."
+    },
+    "abort": {
+      "single_instance_allowed": "CardPerks is already set up. Add owners and cards from its integration page."
+    }
+  },
+  "config_subentries": {
+    "owner": {
+      "title": "Owner",
+      "entry_type": "Owner",
+      "initiate_flow": {
+        "user": "Add owner",
+        "reconfigure": "Rename owner"
+      },
+      "step": {
+        "user": {
+          "title": "Add owner",
+          "data": {
+            "name": "Name"
+          }
+        },
+        "reconfigure": {
+          "title": "Rename owner",
+          "data": {
+            "name": "Name"
+          }
+        }
+      },
+      "error": {
+        "name_required": "Enter a name.",
+        "already_configured": "An owner with that name already exists."
+      },
+      "abort": {
+        "already_configured": "An owner with that name already exists.",
+        "reconfigure_successful": "Owner updated."
+      }
+    },
+    "import": {
+      "title": "Import cards",
+      "entry_type": "Import",
+      "initiate_flow": {
+        "user": "Import cards from CSV"
+      },
+      "step": {
+        "user": {
+          "title": "Import cards from CSV",
+          "description": "Upload a .csv file, or paste rows from a spreadsheet, header line included. Columns: `owner`, `product` (name or catalog id), and optionally `issuer`, `role` (primary or au), `parent_owner` or `parent_last4` for authorized users, `open_date`, `fee_month`, `last4`, `nickname`, `annual_fee`, `notes`. Primary cards need an open date or fee month. Existing cards are skipped, never duplicated.\n\nExample:\n```\nowner,issuer,product,role,parent_owner,fee_month,last4,annual_fee\nBrian,Chase,Sapphire Reserve,primary,,February,1234,795\nNick,Chase,United Club,au,Brian,,,\n```",
+          "data": {
+            "file": "CSV file",
+            "csv": "Or paste CSV rows"
+          }
+        }
+      },
+      "error": {
+        "nothing_to_import": "Upload a file or paste some rows."
+      },
+      "abort": {
+        "import_complete": "Import finished.\n\n**Owners created**\n{owners}\n\n**Cards created**\n{cards}\n\n**Skipped**\n{skipped}\n\n**Errors**\n{errors}"
+      }
+    },
+    "statement": {
+      "title": "Import statement",
+      "entry_type": "Statement",
+      "initiate_flow": {
+        "user": "Import statement (Chase / Amex / Capital One CSV)"
+      },
+      "step": {
+        "user": {
+          "title": "Import a statement export",
+          "description": "Upload the raw CSV or Excel file exactly as downloaded from Chase (Activity export), American Express (Download CSV), or Capital One (Download Transactions). Nothing is sent anywhere; the file is read locally, its annual fee line sets the fee month and actual fee, and labelled credit lines (for example `TRAVEL CREDIT $300/YEAR` or `Platinum Resy Credit`) are recorded as benefit usage in the matching period. Re-importing the same file is safe.",
+          "data": {
+            "file": "Statement export (CSV or Excel)"
+          }
+        },
+        "card": {
+          "title": "Which card is this?",
+          "description": "Detected a **{issuer}** export with {rows} rows ({range}), {credits} credit lines, annual fee {fee}. Card numbers in the file: {cards}.",
+          "data": {
+            "card": "Card",
+            "apply_fee": "Set fee month and actual annual fee from the statement",
+            "adopt_last4": "Card numbers in this file that belong to this same account (a replaced card keeps its benefits but changes number)"
+          }
+        },
+        "new_card": {
+          "title": "Add this card",
+          "description": "No matching card is set up yet, so this statement will create one. Detected a **{issuer}** export with {rows} rows ({range}), {credits} credit lines, annual fee {fee}. Card numbers in the file: {cards}.",
+          "data": {
+            "owner_id": "Owner",
+            "product_id": "Card product",
+            "fee_month": "Annual fee month",
+            "last4": "Last four digits",
+            "nickname": "Nickname (optional)"
+          }
+        }
+      },
+      "error": {
+        "nothing_to_import": "Upload a file.",
+        "unrecognised_statement": "That file is not a recognised Chase, American Express, or Capital One export.",
+        "need_anniversary": "Pick the month the annual fee posts.",
+        "invalid_last4": "Last four must be exactly four digits."
+      },
+      "abort": {
+        "no_owners": "Add an owner first, then import a statement.",
+        "statement_complete": "{note}Statement applied to **{card}**.\n\n**Annual fee**: {fee}\n\n**Credits recorded**\n{applied}\n\nAlready imported earlier: {duplicates}\n\n**Credit lines with no matching benefit** (use the `cardperks.add_statement_match` action to pick these up next time)\n{unmatched}"
+      }
+    },
+    "held_card": {
+      "title": "Card",
+      "entry_type": "Card",
+      "initiate_flow": {
+        "user": "Add card",
+        "reconfigure": "Edit card"
+      },
+      "step": {
+        "user": {
+          "title": "Add card",
+          "data": {
+            "owner_id": "Owner",
+            "issuer": "Issuer",
+            "role": "Role"
+          }
+        },
+        "product": {
+          "title": "Which card?",
+          "data": {
+            "product_id": "Card product",
+            "parent_card_id": "Primary card this is an authorized user on"
+          }
+        },
+        "details": {
+          "title": "Card details",
+          "description": "Open date or fee month is needed for anniversary-based benefits. Type dates as YYYY-MM-DD. Last four digits only help tell duplicate products apart; never enter a full card number.\n\n{conditions}",
+          "data": {
+            "open_date": "Open date (YYYY-MM-DD)",
+            "fee_month": "Annual fee month",
+            "last4": "Last four digits (optional)",
+            "previous_last4": "Former last four digits, if this card was replaced (comma separated)",
+            "nickname": "Nickname (optional)",
+            "color": "Colour, used for this card everywhere on your dashboards",
+            "annual_fee": "Annual fee override (optional, if yours differs from the catalog)",
+            "enabled_conditional": "Conditional benefits you qualify for",
+            "not_applicable": "Benefits that do not apply to you (excluded from the totals)",
+            "notes": "Notes (optional)"
+          }
+        },
+        "reconfigure": {
+          "title": "Edit card",
+          "description": "{conditions}",
+          "data": {
+            "open_date": "Open date (YYYY-MM-DD)",
+            "fee_month": "Annual fee month",
+            "last4": "Last four digits (optional)",
+            "previous_last4": "Former last four digits, if this card was replaced (comma separated)",
+            "nickname": "Nickname (optional)",
+            "color": "Colour, used for this card everywhere on your dashboards",
+            "annual_fee": "Annual fee override (optional, if yours differs from the catalog)",
+            "enabled_conditional": "Conditional benefits you qualify for",
+            "not_applicable": "Benefits that do not apply to you (excluded from the totals)",
+            "notes": "Notes (optional)",
+            "close_date": "Close date (YYYY-MM-DD, if closed)"
+          }
+        }
+      },
+      "error": {
+        "need_anniversary": "Enter an open date or a fee month.",
+        "invalid_date": "Enter a date as YYYY-MM-DD (or MM/DD/YYYY).",
+        "invalid_fee": "Annual fee must be a number.",
+        "invalid_last4": "Last four must be exactly four digits.",
+        "no_parent_card": "Add the primary cardholder's card first, then add the authorized user."
+      },
+      "abort": {
+        "no_owners": "Add an owner first.",
+        "no_parent_card": "Add the primary cardholder's card from this issuer first.",
+        "reconfigure_successful": "Card updated."
+      }
+    },
+    "status": {
+      "title": "Elite status",
+      "entry_type": "Status",
+      "initiate_flow": {
+        "user": "Add elite status",
+        "reconfigure": "Edit elite status"
+      },
+      "step": {
+        "user": {
+          "title": "Add elite status",
+          "description": "Status you earned outright (flights, nights, a match). Status a card gives you, such as Hilton Gold from the Amex Platinum, shows up by itself while you hold the card.",
+          "data": {
+            "owner_id": "Owner",
+            "program_id": "Program"
+          }
+        },
+        "details": {
+          "title": "Elite status details",
+          "description": "Your status with {program}.",
+          "data": {
+            "tier_id": "Tier",
+            "program": "Program",
+            "tier": "Tier",
+            "valid_through": "Valid through",
+            "source": "How it was earned",
+            "notes": "Notes"
+          }
+        },
+        "reconfigure": {
+          "title": "Edit elite status",
+          "data": {
+            "owner_id": "Owner",
+            "program_id": "Program"
+          }
+        }
+      },
+      "error": {
+        "program_required": "Enter the program.",
+        "tier_required": "Enter the tier."
+      },
+      "abort": {
+        "no_owners": "Add an owner first.",
+        "reconfigure_successful": "Status updated."
+      }
+    }
+  },
+  "selector": {
+    "role": {
+      "options": {
+        "primary": "Primary cardholder",
+        "authorized_user": "Authorized user"
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "card_status": {
+        "name": "Status",
+        "state": {
+          "active": "Active",
+          "frozen": "Frozen",
+          "cancelled": "Cancelled"
+        }
+      },
+      "ledger_window": {
+        "name": "Ledger window",
+        "state": {
+          "year_to_date": "Year to date",
+          "prior_year": "Prior year",
+          "trailing_12_months": "Trailing 12 months",
+          "all": "All"
+        }
+      }
+    },
+    "sensor": {
+      "benefit_status": {
+        "name": "{benefit} status",
+        "state": {
+          "unused": "Unused",
+          "partial": "Partially used",
+          "used": "Used",
+          "n_a": "Not applicable"
+        }
+      },
+      "benefit_expires": {
+        "name": "{benefit} expires"
+      },
+      "benefit_remaining": {
+        "name": "{benefit} remaining"
+      },
+      "annual_value": {
+        "name": "Annual credit value"
+      },
+      "captured_12m": {
+        "name": "Captured, 12 months"
+      },
+      "forfeited_12m": {
+        "name": "Forfeited, 12 months"
+      },
+      "capture_rate": {
+        "name": "Capture rate"
+      },
+      "coverage_12m": {
+        "name": "Statement coverage"
+      },
+      "fee_due": {
+        "name": "Annual fee due"
+      },
+      "unused_value": {
+        "name": "Unused value"
+      },
+      "net_value_12m": {
+        "name": "Net value (12 months)"
+      },
+      "unused_credits": {
+        "name": "Unused credits"
+      },
+      "expiring_7d": {
+        "name": "Expiring within 7 days"
+      },
+      "expiring_30d": {
+        "name": "Expiring within 30 days"
+      },
+      "five_24": {
+        "name": "5/24 count"
+      },
+      "status": {
+        "name": "{program} status"
+      },
+      "ledger": {
+        "name": "Ledger"
+      }
+    },
+    "button": {
+      "benefit_mark_used": {
+        "name": "Mark {benefit} used"
+      }
+    },
+    "number": {
+      "benefit_used": {
+        "name": "{benefit} used"
+      },
+      "perk_value": {
+        "name": "{benefit} value"
+      },
+      "shared_value": {
+        "name": "{perk} value, all cards"
+      }
+    },
+    "binary_sensor": {
+      "fee_within_45d": {
+        "name": "Fee due within 45 days"
+      },
+      "statement_due": {
+        "name": "Statement upload overdue"
+      }
+    },
+    "calendar": {
+      "calendar": {
+        "name": "Calendar"
+      }
+    }
+  },
+  "services": {
+    "mark_used": {
+      "name": "Mark benefit used",
+      "description": "Record a use of a benefit for the current period. Without an amount, marks the whole benefit used.",
+      "fields": {
+        "amount": {
+          "name": "Amount",
+          "description": "Dollar amount used this time."
+        },
+        "date": {
+          "name": "Date",
+          "description": "When it was used. Defaults to today."
+        },
+        "note": {
+          "name": "Note",
+          "description": "Free-text note."
+        }
+      }
+    },
+    "reset_benefit": {
+      "name": "Reset benefit",
+      "description": "Clear usage for the current period and set the benefit back to unused."
+    },
+    "add_sub_spend": {
+      "name": "Add sign-up bonus spend",
+      "description": "Add spend toward a card's sign-up bonus requirement.",
+      "fields": {
+        "device_id": {
+          "name": "Card",
+          "description": "The card device."
+        },
+        "amount": {
+          "name": "Amount",
+          "description": "Spend to add."
+        },
+        "date": {
+          "name": "Date",
+          "description": "When the spend happened."
+        },
+        "note": {
+          "name": "Note",
+          "description": "Free-text note."
+        }
+      }
+    },
+    "set_perk_value": {
+      "name": "Set perk value",
+      "description": "Assign the annual dollar value you place on a perk (lounge access, status, insurance).",
+      "fields": {
+        "device_id": {
+          "name": "Card",
+          "description": "The card device."
+        },
+        "benefit_id": {
+          "name": "Benefit ID",
+          "description": "Catalog benefit id, e.g. priority_pass."
+        },
+        "value": {
+          "name": "Value",
+          "description": "Annual value in dollars."
+        }
+      }
+    },
+    "import_cards": {
+      "name": "Import cards",
+      "description": "Create owners and cards in bulk from CSV text. Header row required with at least owner and product; optional columns: issuer, role (primary/au), parent_last4 or parent_owner, open_date, fee_month, last4, previous_last4, nickname, color, annual_fee, notes. Rows that already exist are skipped.",
+      "fields": {
+        "csv": {
+          "name": "CSV",
+          "description": "Paste rows from a spreadsheet, including the header line."
+        }
+      }
+    },
+    "activate_rotating_category": {
+      "name": "Activate rotating category",
+      "description": "Record which rotating bonus category was activated for a quarter.",
+      "fields": {
+        "device_id": {
+          "name": "Card",
+          "description": "The card device."
+        },
+        "category": {
+          "name": "Category",
+          "description": "e.g. gas, grocery."
+        },
+        "quarter": {
+          "name": "Quarter",
+          "description": "YYYY-Qn. Defaults to the current quarter."
+        }
+      }
+    },
+    "import_statement": {
+      "name": "Import statement from file",
+      "description": "Read an issuer CSV export already on this Home Assistant box (for example one dropped into config/cardperks/statements/) and apply it to every card it covers. Same result as uploading it in the CardPerks settings. Safe to repeat.",
+      "fields": {
+        "path": {
+          "name": "File path",
+          "description": "Path to the CSV. Relative paths are under the config folder; other folders must be in allowlist_external_dirs."
+        },
+        "device_id": {
+          "name": "Card",
+          "description": "Apply to this card only. Otherwise the cards are picked from the numbers in the file, or the file's issuer if it has exactly one card."
+        },
+        "apply_fee": {
+          "name": "Set fee from statement",
+          "description": "Set the fee month and actual annual fee from the statement's fee line."
+        }
+      }
+    },
+    "add_statement_match": {
+      "name": "Add statement match pattern",
+      "description": "Teach the catalog that a credit line on a statement belongs to a benefit, so the next import records it. Writes the product to config/cardperks/catalog/ with the pattern added and reloads.",
+      "fields": {
+        "device_id": {
+          "name": "Card",
+          "description": "A card of the product to change."
+        },
+        "benefit_id": {
+          "name": "Benefit",
+          "description": "The benefit id the credit line belongs to, as shown in the benefit entities."
+        },
+        "pattern": {
+          "name": "Pattern",
+          "description": "Regular expression matched against the statement description, case-insensitive. Plain text works; a distinctive part of the line is enough."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "not_set_up": {
+      "message": "Set up the CardPerks integration first."
+    },
+    "unknown_status": {
+      "message": "{status} is not one of active, frozen or cancelled."
+    },
+    "unknown_device": {
+      "message": "That device does not exist."
+    },
+    "not_a_card_device": {
+      "message": "That device is not a CardPerks card."
+    },
+    "unknown_card": {
+      "message": "That card is not configured."
+    },
+    "unknown_benefit": {
+      "message": "Benefit {benefit_id} is not in the catalog for this card."
+    },
+    "no_current_period": {
+      "message": "Benefit {benefit_id} has no open period."
+    },
+    "not_a_perk": {
+      "message": "Benefit {benefit_id} is not a perk; its value comes from the catalog."
+    },
+    "statement_path_not_allowed": {
+      "message": "{path} is outside the config folder and not in allowlist_external_dirs."
+    },
+    "statement_file_missing": {
+      "message": "Could not read {path}."
+    },
+    "statement_unrecognised": {
+      "message": "{path} is not a recognised Chase, American Express, or Capital One export."
+    },
+    "statement_no_card": {
+      "message": "Could not tell which card {path} belongs to: it names no card numbers and {issuer} has more than one card set up. Pass a card."
+    },
+    "invalid_pattern": {
+      "message": "{pattern} is not a valid pattern: {error}"
+    },
+    "shared_perk": {
+      "message": "{benefit_id} is shared between cards as {key}. Set its value once on the household's {key} number; it is split equally between the cards that carry it."
+    },
+    "unknown_shared": {
+      "message": "No active card carries a shared perk called {key}."
+    },
+    "not_a_reminder": {
+      "message": "Only reminders you added can be deleted; fee dates and statuses come from the cards. ({uid})"
+    }
+  },
+  "issues": {
+    "stale_catalog": {
+      "title": "Catalog entry for {product} may be out of date",
+      "description": "The benefits for {product} were last verified on {last_verified}. Check the issuer page ({source_url}) and update the catalog or add an override file in `config/cardperks/catalog/`."
+    },
+    "catalog_needs_verification": {
+      "title": "Catalog entries need verification",
+      "description": "These products were drafted from general knowledge and have not been verified against the issuer: {products}. Check each against its issuer page and edit the catalog, or drop a corrected copy in `config/cardperks/catalog/`."
+    },
+    "invalid_override": {
+      "title": "Catalog override file could not be loaded",
+      "description": "The file {path} was skipped: {error}"
+    },
+    "statement_due": {
+      "title": "No recent statement for {card}",
+      "description": "The newest statement imported for {card} covers {last_month}, {months} months behind what could be covered by now. Months without a statement count as unknown rather than captured or forfeited, so this card's totals are drifting. Download the latest export from the issuer and import it (Settings, Integrations, CardPerks, Add statement)."
+    },
+    "fee_differs": {
+      "title": "Annual fee on {card} differs from the catalog",
+      "description": "{card} is set to a ${card_fee} annual fee (from the statement fee line dated {seen}), but the catalog lists {product} at ${catalog_fee}. If the issuer raised the fee, update the catalog entry (or add an override file in config/cardperks/catalog/) so every holder sees the new price. If you are on an older price, leave the card as it is."
+    }
+  }
+}

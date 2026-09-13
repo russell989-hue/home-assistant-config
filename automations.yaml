@@ -191,83 +191,124 @@
   triggers:
   - at: '12:00:00'
     trigger: time
-- action:
-  - data:
-      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
-    service: input_datetime.set_datetime
-    target:
-      entity_id: input_datetime.basement_last_inside_signal
-  alias: 'Basement: Manual lock = guest inside'
-  condition:
-  - condition: state
-    entity_id: calendar.zenobia_airbnb
-    state: 'on'
-  id: f80691550f284240a3ecce6d5eb22c45
+- id: f80691550f284240a3ecce6d5eb22c45
+  alias: 'Airbnb: Lock says guest inside'
+  description: Reworked 2026-07-25. The door lock is now the PRIMARY presence signal
+    and LLM Vision is only a fallback. A guest keypad code (operator format "MM/DD
+    Name", e.g. "07/23 Katie") can only be entered from outside, so it proves arrival.
+    "Manual Lock" is the interior thumbturn, so it proves someone is inside. Both
+    set the boolean and stamp the inside-signal time that the decay automation reads.
   mode: single
-  trigger:
-  - entity_id: sensor.side_door_operator
-    platform: state
-    to: Manual Lock
-- actions:
-  - action: input_datetime.set_datetime
-    data:
-      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
-    target:
-      entity_id: input_datetime.basement_last_outside_signal
-  alias: 'Basement: One touch lock = guest left'
+  triggers:
+  - trigger: state
+    entity_id: sensor.side_door_operator
   conditions:
   - condition: state
     entity_id: calendar.zenobia_airbnb
     state: 'on'
-  id: 56a9a577389244b3a89d33efea82336d
-  mode: single
-  triggers:
-  - entity_id:
-    - sensor.side_door_operator
-    to:
-    - One-Touch Lock
-    trigger: state
-- action:
-  - data:
-      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
-    service: input_datetime.set_datetime
+  - condition: template
+    value_template: '{% set s = trigger.to_state.state if trigger.to_state else ''''
+      %} {{ s == ''Manual Lock'' or (s | regex_match(''^\\d{2}/\\d{2}\\s'')) }}'
+  actions:
+  - action: input_datetime.set_datetime
     target:
       entity_id: input_datetime.basement_last_inside_signal
-  alias: 'Basement: Motion corroborates guest inside'
-  condition:
+    data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.airbnb_guest_downstairs
+- id: 56a9a577389244b3a89d33efea82336d
+  alias: 'Airbnb: Lock says guest left'
+  description: '"One-Touch Lock" is the exterior lock button - a deliberate lock-behind-you,
+    so it means departure. Note it fired exactly ONCE in the 8 weeks to 2026-07-25,
+    so it cannot carry departure on its own; the decay automation does most of that
+    work. "Manual Unlock" is deliberately NOT used here - it only means the door was
+    opened from inside, and guests routinely do that and stay (observed 2026-07-23
+    19:39).'
+  mode: single
+  triggers:
+  - trigger: state
+    entity_id: sensor.side_door_operator
+    to: One-Touch Lock
+  conditions:
   - condition: state
     entity_id: calendar.zenobia_airbnb
     state: 'on'
-  id: 6293266aca9b46568620c131ee4a139a
+  actions:
+  - action: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.basement_last_outside_signal
+    data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.airbnb_guest_downstairs
+- id: 6293266aca9b46568620c131ee4a139a
+  alias: 'Airbnb: Motion corroborates guest inside'
+  description: Downstairs occupancy while booked is independent proof the guest is
+    in. Refreshes the inside-signal stamp so the decay clock restarts.
   mode: single
-  trigger:
-  - entity_id: binary_sensor.downstairs_occupancy
-    platform: state
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.downstairs_occupancy
     to: 'on'
-- action:
+  conditions:
+  - condition: state
+    entity_id: calendar.zenobia_airbnb
+    state: 'on'
+  actions:
+  - action: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.basement_last_inside_signal
+    data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.airbnb_guest_downstairs
+- id: 02c3b822751a4dbeb24246e44f67893d
+  alias: 'Airbnb: Presence decay / booking end'
+  description: Locks prove presence but not absence, so departure is inferred. Clears
+    the guest boolean when there has been no inside signal and no downstairs occupancy
+    for the confidence window - 3h normally, 10h during the 22:00-09:00 sleep window
+    - which is the same decay the old binary_sensor.basement_guest_present template
+    used. Also clears immediately when the booking ends.
+  mode: single
+  triggers:
+  - trigger: time_pattern
+    minutes: /15
+    id: tick
+  - trigger: state
+    entity_id: calendar.zenobia_airbnb
+    to: 'off'
+    id: booking_end
+  conditions: []
+  actions:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.basement_guest_present
-        state: 'on'
+      - condition: trigger
+        id: booking_end
       sequence:
-      - service: input_boolean.turn_on
+      - action: input_boolean.turn_off
         target:
-          entity_id: input_boolean.basement_airbnb_occupancy
+          entity_id: input_boolean.airbnb_guest_downstairs
     - conditions:
       - condition: state
-        entity_id: binary_sensor.basement_guest_present
+        entity_id: input_boolean.airbnb_guest_downstairs
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.downstairs_occupancy
         state: 'off'
+      - condition: template
+        value_template: '{% set hour = now().hour %} {% set window = 10 if (hour >=
+          22 or hour < 9) else 3 %} {% set inside = as_timestamp(states(''input_datetime.basement_last_inside_signal''))
+          | float(0) %} {% set motion = as_timestamp(states.binary_sensor.downstairs_occupancy.last_changed)
+          | float(0) %} {% set newest = [inside, motion] | max %} {{ (as_timestamp(now())
+          - newest) / 3600 > window }}'
       sequence:
-      - service: input_boolean.turn_off
+      - action: input_boolean.turn_off
         target:
-          entity_id: input_boolean.basement_airbnb_occupancy
-  alias: 'Basement: Sync occupancy boolean from smart sensor'
-  id: 02c3b822751a4dbeb24246e44f67893d
-  mode: single
-  trigger:
-  - entity_id: binary_sensor.basement_guest_present
-    platform: state
+          entity_id: input_boolean.airbnb_guest_downstairs
 - actions:
   - action: shell_command.keep_streams_alive
     data: {}
@@ -1190,23 +1231,32 @@
   max_exceeded: silent
 - id: llmvision_doorbell_ai
   alias: AI - Doorbell Motion Summary
+  description: 'Reworked 2026-07-20: SDM motion events arrive 15-25s late, so live
+    stream_analyzer frames showed the empty aftermath. Now waits 20s then analyzes
+    the last ~60s of the doorbell RING BUFFER via video_analyzer, same pattern as
+    the Airbnb side-door automation.'
   triggers:
   - trigger: state
     entity_id:
     - event.doorbell_motion
     - event.doorbell_chime
+    - event.front_door_motion
+    - event.front_door_ding
   conditions:
   - condition: template
     value_template: "{{ this.attributes.last_triggered is none or\n   (now() - this.attributes.last_triggered).total_seconds()
       > 120 }}"
   actions:
-  - action: llmvision.stream_analyzer
+  - delay: 00:00:20
+  - action: shell_command.check_clip
     data:
-      provider: 01KXYBGAGRTST9351Y7WAW94P3
-      image_entity:
-      - camera.doorbell_snapshot
-      duration: 5
-      max_frames: 5
+      cam: doorbell
+      seconds: 70
+  - action: llmvision.video_analyzer
+    data:
+      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
+      video_file: /media/doorbell_check.mp4
+      max_frames: 12
       use_memory: true
       message: 'CAMERA CONTEXT: This is the front door camera of a private Denver
         home. It looks straight down the home''s own front entrance walkway - a narrow
@@ -1218,12 +1268,14 @@
         people moving away are heading out to the street.
 
 
-        Your memory contains a labeled reference photo of this front door walkway
-        in its normal empty state. Compare the live frames with that reference and
-        report only what is NEW or DIFFERENT. Ignore lighting and shadow differences
-        alone. IMPORTANT: a package, box, envelope, or bag left on or near the doormat
-        or walkway that is not in the reference counts as important activity even
-        if no person is visible - report it, e.g. "Package left on the doormat".
+        These frames are from the last ~60 seconds of continuous footage from this
+        camera, captured just after motion was detected. Your memory contains a labeled
+        reference photo of this front door walkway in its normal empty state. Compare
+        the frames with that reference and report only what is NEW or DIFFERENT. Ignore
+        lighting and shadow differences alone. IMPORTANT: a package, box, envelope,
+        or bag left on or near the doormat or walkway that is not in the reference
+        counts as important activity even if no person is visible - report it, e.g.
+        "Package left on the doormat".
 
 
         You are writing a phone notification about front door camera activity. Only
@@ -1242,6 +1294,8 @@
   - variables:
       doorbell_key_frame: '{{ (doorbell_ai.key_frame | default('''')).replace(''/media'',
         ''/media/local'') }}'
+      snap_token: '{{ now().timestamp() | int }}{{ range(100000, 999999) | random
+        }}'
   - condition: template
     value_template: '{{ not (doorbell_ai.response_text | trim | lower).startswith(''no
       activity'') }}'
@@ -1251,19 +1305,30 @@
       message: '{{ doorbell_ai.response_text }}'
       data:
         image: '{{ doorbell_key_frame }}'
-        clickAction: /mobile-test/cameras
-        url: /mobile-test/cameras
+        clickAction: '{{ doorbell_key_frame }}'
+        url: '{{ doorbell_key_frame }}'
         tag: doorbell-ai
         group: cameras
         alert_once: true
         actions:
         - action: URI
-          title: See Snapshot
-          uri: '{{ doorbell_key_frame }}'
+          title: Live View
+          uri: /mobile-test/cameras
+  - action: shell_command.cache_snapshot
+    data:
+      src: '{{ doorbell_ai.key_frame }}'
+      name: doorbell
+      token: '{{ snap_token }}'
   - action: persistent_notification.create
     data:
       title: '{{ doorbell_ai.title | default(''Front Door'', true) }}'
-      message: '{{ doorbell_ai.response_text }} ([view camera](/zenobia-home/camera-doorbell))'
+      message: '{{ doorbell_ai.response_text }}
+
+
+        ![snapshot](/local/notif/doorbell_{{ snap_token }}.jpg)
+
+
+        [View camera](/zenobia-home/camera-doorbell)'
   - if:
     - condition: template
       value_template: '{{ [''package'', ''deliver'', ''parcel'', ''courier'', ''amazon'',
@@ -1308,29 +1373,47 @@
       ~ '' '' ~ (trigger.to_state.attributes[''android.text''] | default(''''))) |
       lower) }}'
   actions:
-  - delay: '00:00:20'
-  - action: shell_command.airbnb_ring_clip
-    data: {}
+  - delay: 00:00:20
+  - action: shell_command.check_clip
+    data:
+      cam: side_door
+      seconds: 55
   - action: llmvision.video_analyzer
     data:
-      provider: 01KXYBGAGRTST9351Y7WAW94P3
-      video_file: /media/airbnb_check.mp4
-      max_frames: 10
-      message: 'CAMERA CONTEXT: This camera watches the side entrance (the Airbnb
-        guest door) of a private Denver home from above. The fenced side yard holds
-        two air-conditioner units on gravel and a basement egress window; a concrete
-        walkway runs along the bottom of the frame to the side door at the right edge.
-        This is private property, not a public alley - refer to it as the side door
+      provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
+      video_file: /media/side_door_check.mp4
+      max_frames: 12
+      message: 'CAMERA CONTEXT: This overhead camera watches the side yard of a private
+        Denver home. A concrete walkway runs along the bottom of the frame; a wooden
+        fence and AC units fill the middle. CRITICAL GEOMETRY: the Airbnb guest door
+        itself is NOT visible in the frame - it sits below the bottom-right corner,
+        reached by a recessed stairwell that appears only as the dark band along the
+        bottom-right edge. Anyone using the door must descend into or climb out of
+        that dark recess. The walkway is a semi-public path: neighbors and passersby
+        regularly walk through without using the door. Refer to it as the side door
         or side walkway.
 
 
-        This is the last ~45 seconds of continuous footage from the Airbnb guest
-        entrance camera after motion was detected. Based on the sequence of frames,
-        determine if a person ENTERED the house (approached and went in through the
-        door) or LEFT the house (came out of the door and walked away). Reply with
-        exactly two lines: line 1 is one word only - ENTERING, LEAVING, or UNCLEAR.
-        Line 2 is one short factual sentence describing what happened. If no person
-        appears in any frame, reply UNCLEAR.'
+        This is the last ~45 seconds of continuous footage after motion was detected.
+        Judge what the person DID across the frame sequence:
+
+        ENTERING = the person moves to the dark recessed entry at the bottom-right
+        and descends or disappears into it (they do not walk out of frame along the
+        walkway).
+
+        LEAVING = the person first appears climbing out of that dark recessed entry,
+        then walks away along the walkway.
+
+        PASSING = the person walks along the walkway and leaves the frame at an edge
+        without stopping at or entering the recessed entry.
+
+        UNCLEAR = no person is visible, or you cannot tell.
+
+        A person standing at the recessed entry, reaching down into it, or lingering
+        over it is USING the door area - classify by their direction of travel, not
+        as PASSING. Reply with exactly two lines: line 1 is one word only - ENTERING,
+        LEAVING, PASSING, or UNCLEAR. Line 2 is one short factual sentence describing
+        what happened.'
       include_filename: false
       max_tokens: 80
       store_in_timeline: true
@@ -1338,11 +1421,15 @@
       generate_title: true
     response_variable: door_ai
   - variables:
+      lock_recent: '{{ (as_timestamp(now()) - as_timestamp(states.sensor.side_door_operator.last_changed))
+        < 180 }}'
       door_ai_key_frame: '{{ (door_ai.key_frame | default('''')).replace(''/media'',
         ''/media/local'') }}'
       door_ai_detail: '{% set lines = door_ai.response_text.split(''\n'') | map(''trim'')
         | reject(''eq'', '''') | list %} {{- (lines[1] if lines | length > 1 else
         '''') | trim }}'
+      snap_token: '{{ now().timestamp() | int }}{{ range(100000, 999999) | random
+        }}'
   - choose:
     - conditions:
       - condition: template
@@ -1351,7 +1438,14 @@
       sequence:
       - action: input_boolean.turn_on
         target:
-          entity_id: input_boolean.airbnb_guest_downstairs
+          entity_id: input_boolean.airbnb_guest_vision_says
+      - if:
+        - condition: template
+          value_template: '{{ not lock_recent }}'
+        then:
+        - action: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.airbnb_guest_downstairs
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
           title: Airbnb - Guest arrived
@@ -1359,15 +1453,30 @@
             the side door.'' }}'
           data:
             image: '{{ door_ai_key_frame }}'
-            clickAction: /airbnb-dashboard
-            url: /airbnb-dashboard
+            clickAction: '{{ door_ai_key_frame }}'
+            url: '{{ door_ai_key_frame }}'
             tag: airbnb-door
             group: cameras
+            actions:
+            - action: URI
+              title: Live View
+              uri: /airbnb-dashboard
+      - action: shell_command.cache_snapshot
+        data:
+          src: '{{ door_ai.key_frame }}'
+          name: side_door
+          token: '{{ snap_token }}'
       - action: persistent_notification.create
         data:
           title: Airbnb - Guest arrived
           message: '{{ door_ai_detail if door_ai_detail else ''Guest entered through
-            the side door.'' }} ([view camera](/zenobia-home/camera-side-door))'
+            the side door.'' }}
+
+
+            ![snapshot](/local/notif/side_door_{{ snap_token }}.jpg)
+
+
+            [View camera](/zenobia-home/camera-side-door)'
     - conditions:
       - condition: template
         value_template: '{{ (door_ai.response_text | trim | upper).startswith(''LEAVING'')
@@ -1375,7 +1484,14 @@
       sequence:
       - action: input_boolean.turn_off
         target:
-          entity_id: input_boolean.airbnb_guest_downstairs
+          entity_id: input_boolean.airbnb_guest_vision_says
+      - if:
+        - condition: template
+          value_template: '{{ not lock_recent }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.airbnb_guest_downstairs
       - action: notify.mobile_app_brian_s_z_flip_7
         data:
           title: Airbnb - Guest left
@@ -1383,19 +1499,46 @@
             the side door.'' }}'
           data:
             image: '{{ door_ai_key_frame }}'
-            clickAction: /airbnb-dashboard
-            url: /airbnb-dashboard
+            clickAction: '{{ door_ai_key_frame }}'
+            url: '{{ door_ai_key_frame }}'
             tag: airbnb-door
             group: cameras
+            actions:
+            - action: URI
+              title: Live View
+              uri: /airbnb-dashboard
+      - action: shell_command.cache_snapshot
+        data:
+          src: '{{ door_ai.key_frame }}'
+          name: side_door
+          token: '{{ snap_token }}'
       - action: persistent_notification.create
         data:
           title: Airbnb - Guest left
           message: '{{ door_ai_detail if door_ai_detail else ''Guest exited through
-            the side door.'' }} ([view camera](/zenobia-home/camera-side-door))'
+            the side door.'' }}
+
+
+            ![snapshot](/local/notif/side_door_{{ snap_token }}.jpg)
+
+
+            [View camera](/zenobia-home/camera-side-door)'
   mode: single
   max_exceeded: silent
 - id: camera_event_recording
   alias: Camera Event Recording (15-day history)
+  description: 'Reworked 2026-07-26. Cameras WITH a continuous buffer (doorbell, side_door,
+    garage) now have their saved clip CUT FROM THAT BUFFER instead of recorded via
+    camera.record. Evidence: on 07-26 side_door saw 10 SDM motion events and camera.record
+    produced 1 clip, while the buffer-sourced AI handled 8 of the same 10 - camera.record
+    must negotiate a second Nest session against an already contended go2rtc stream
+    and usually loses (a manual probe took 50s for an 8s recording). Its lookback
+    is also a no-op here (lookback=20 measured a 0.77s contribution), so clips used
+    to start AFTER the person arrived, given Nest''s 15-25s event latency. Cutting
+    from the buffer gives real lookback: wait 30s, take 60s, yielding roughly T-30s..T+30s.
+    Cameras WITHOUT a buffer (backyard, alley) keep camera.record unchanged. Output
+    path, filename convention and format are identical, so archive_recordings.sh and
+    the Office PC pull are unaffected.'
   mode: parallel
   max: 10
   triggers:
@@ -1425,13 +1568,30 @@
     rec_file: /media/recordings/{{ folder_map[trigger.entity_id] }}/{{ now().strftime('%Y-%m-%d_%H-%M-%S')
       }}.mp4
   actions:
-  - action: camera.record
-    target:
-      entity_id: '{{ cam_map[trigger.entity_id] }}'
-    data:
-      filename: '{{ rec_file }}'
-      duration: 30
-      lookback: 4
+  - choose:
+    - alias: Buffered cameras - cut the saved clip from the continuous ring buffer
+      conditions:
+      - condition: template
+        value_template: '{{ folder_map[trigger.entity_id] in [''doorbell'', ''side_door'',
+          ''garage''] }}'
+      sequence:
+      - delay: 00:00:20
+      - action: shell_command.event_clip
+        data:
+          cam: '{{ folder_map[trigger.entity_id] }}'
+          seconds: 70
+          out: '{{ rec_file }}'
+      - action: shell_command.trim_clip
+        data:
+          f: '{{ rec_file }}'
+    default:
+    - action: camera.record
+      target:
+        entity_id: '{{ cam_map[trigger.entity_id] }}'
+      data:
+        filename: '{{ rec_file }}'
+        duration: 30
+        lookback: 20
   - action: shell_command.fix_recording
     data:
       f: '{{ rec_file }}'
@@ -1548,9 +1708,8 @@
     start_time: '{{ states(''input_datetime.shadowfax_trip_start_time'') }}'
     start_loc: '{{ states(''input_text.shadowfax_trip_start_location'') }}'
     end_loc: '{{ states(''device_tracker.shadowfax_location'') }}'
-    duration_min: '{{ ((now() - strptime(start_time, ''%Y-%m-%d %H:%M:%S'')).total_seconds()
-      / 60) | round(0) if start_time not in [''unknown'',''unavailable'',''''] else
-      0 }}'
+    duration_min: '{{ ((as_timestamp(now()) - as_timestamp(start_time, as_timestamp(now())))
+      / 60) | round(0) }}'
   conditions:
   - condition: template
     value_template: '{{ distance >= 0.3 and duration_min >= 2 }}'
@@ -1614,8 +1773,11 @@
   mode: single
 - id: llmvision_garage_ai
   alias: AI - Garage Camera Events
-  description: Timeline-only AI summary of garage/back-pad motion. Created 2026-07-19;
-    replaces the garage coverage of the never-firing 'AI Camera Events' blueprint.
+  description: 'Timeline-only AI summary of garage/back-pad motion. Created 2026-07-19;
+    replaces the garage coverage of the never-firing ''AI Camera Events'' blueprint.
+    Reworked 2026-07-20: SDM motion events arrive 15-25s late, so live stream_analyzer
+    frames showed the empty aftermath. Now waits 20s then analyzes the last ~60s of
+    the garage RING BUFFER via video_analyzer.'
   triggers:
   - trigger: state
     entity_id:
@@ -1625,13 +1787,16 @@
     value_template: '{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds()
       > 300 }}'
   actions:
-  - action: llmvision.stream_analyzer
+  - delay: 00:00:20
+  - action: shell_command.check_clip
+    data:
+      cam: garage
+      seconds: 70
+  - action: llmvision.video_analyzer
     data:
       provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
-      image_entity:
-      - camera.garage_snapshot
-      duration: 5
-      max_frames: 5
+      video_file: /media/garage_check.mp4
+      max_frames: 12
       use_memory: true
       message: 'CAMERA CONTEXT: This camera watches the back parking pad and garage
         entrance behind a private Denver home. The concrete pad and rear walkway in
@@ -1642,14 +1807,16 @@
         say so and treat that as routine.
 
 
-        Your memory contains a labeled reference photo of this garage back pad in
-        its normal empty state. Compare the live frames with that reference and report
-        only what is NEW or DIFFERENT. Ignore anything already present in the reference
-        (bins, plants, fixtures) and ignore lighting or shadow differences alone.
+        These frames are from the last ~60 seconds of continuous footage from this
+        camera, captured just after motion was detected. Your memory contains a labeled
+        reference photo of this garage back pad in its normal empty state. Compare
+        the frames with that reference and report only what is NEW or DIFFERENT. Ignore
+        anything already present in the reference (bins, plants, fixtures) and ignore
+        lighting or shadow differences alone.
 
 
-        Describe the single most important NEW thing in ONE short sentence (max
-        12 words), starting directly with the subject and action, e.g. "Person taking
+        Describe the single most important NEW thing in ONE short sentence (max 12
+        words), starting directly with the subject and action, e.g. "Person taking
         out the trash", "Car pulling onto the back pad", "Jogger passing through the
         alley". If nothing is new versus the reference, reply exactly: No activity.'
       include_filename: false
@@ -1657,15 +1824,16 @@
       store_in_timeline: true
       expose_images: true
       generate_title: true
+    response_variable: garage_ai
   mode: single
   max_exceeded: silent
 - id: google_home_package_mirror
   alias: Package - Mirror Google Home detection to Nick + persistent
-  description: 'Created 2026-07-19. Google''s package detection is exclusive to the
+  description: Created 2026-07-19. Google's package detection is exclusive to the
     Google Home app (not exposed via the SDM API), so this listens to Google Home
-    notifications arriving on Brian''s Z Flip via the companion app''s Last Notification
+    notifications arriving on Brian's Z Flip via the companion app's Last Notification
     sensor. Requires that sensor to be enabled on the phone with com.google.android.apps.chromecast.app
-    allow-listed.'
+    allow-listed.
   triggers:
   - trigger: state
     entity_id:
@@ -1691,22 +1859,27 @@
         true) }}'
   - action: notify.mobile_app_nick_iphone
     data:
-      title: '📦 {{ gh_title }}'
+      title: "\U0001F4E6 {{ gh_title }}"
       message: '{{ gh_body }}'
       data:
         tag: doorbell-package
         group: cameras
   - action: persistent_notification.create
     data:
-      title: '📦 {{ gh_title }} (Google Home)'
+      title: "\U0001F4E6 {{ gh_title }} (Google Home)"
       message: '{{ gh_body }}'
   mode: single
   max_exceeded: silent
 - id: llmvision_backyard_ai
   alias: AI - Backyard Camera Events
-  description: Timeline-only AI summary of backyard motion. Created 2026-07-19 when
-    the battery cam came back online; uses reference-image comparison like the garage
-    automation.
+  description: 'Timeline-only AI summary of backyard motion. Created 2026-07-19 when
+    the battery cam came back online. Reworked 2026-07-25: stream_analyzer produced
+    ZERO timeline events across 34 motion triggers because the battery cam reports
+    unavailable whenever it is asleep, so there was no live stream to analyze. The
+    "Camera Event Recording" automation does successfully capture a 30s clip for the
+    same events, so this now waits for that clip to finish and analyzes it with video_analyzer.
+    Backyard has no continuous buffer (warm-only in keep_streams_alive), hence the
+    event clip rather than the ring buffer used by the other three cameras.'
   triggers:
   - trigger: state
     entity_id:
@@ -1716,13 +1889,16 @@
     value_template: '{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds()
       > 300 }}'
   actions:
-  - action: llmvision.stream_analyzer
+  - delay: 00:00:45
+  - action: shell_command.check_clip
+    data:
+      cam: backyard
+      seconds: 45
+  - action: llmvision.video_analyzer
     data:
       provider: 01KX6N0GA1SYFVHSKZDJ0S6N8S
-      image_entity:
-      - camera.backyard_snapshot
-      duration: 5
-      max_frames: 5
+      video_file: /media/backyard_check.mp4
+      max_frames: 12
       use_memory: true
       message: 'CAMERA CONTEXT: This camera watches the fenced private backyard of
         a Denver home. The back patio with a sliding glass door, grill and seating
@@ -1732,14 +1908,15 @@
         residents or guests unless clearly climbing the fence or forcing the gate.
 
 
+        These frames are from a ~30 second clip recorded when motion was detected.
         Your memory contains a labeled reference photo of this backyard in its normal
-        empty state. Compare the live frames with that reference and report only what
-        is NEW or DIFFERENT. Ignore lighting and shadow differences alone, and ignore
+        empty state. Compare the frames with that reference and report only what is
+        NEW or DIFFERENT. Ignore lighting and shadow differences alone, and ignore
         furniture that has merely moved position.
 
 
-        Describe the single most important NEW thing in ONE short sentence (max
-        12 words), starting directly with the subject and action, e.g. "Person grilling
+        Describe the single most important NEW thing in ONE short sentence (max 12
+        words), starting directly with the subject and action, e.g. "Person grilling
         on the patio", "Dog running across the lawn", "Person entering through the
         back gate". If nothing is new versus the reference, reply exactly: No activity.'
       include_filename: false
@@ -1747,6 +1924,7 @@
       store_in_timeline: true
       expose_images: true
       generate_title: true
+    response_variable: backyard_ai
   mode: single
   max_exceeded: silent
 - id: shadowfax_per_driver_trail
@@ -1764,18 +1942,336 @@
     attribute: longitude
   conditions:
   - condition: template
-    value_template: >-
-      {{ states('sensor.shadowfax_trip_data') in ['Brian R.', 'Nick C.']
-         and state_attr('sensor.shadowfax_trip_data', 'latitude') is not none }}
+    value_template: "{{ states('sensor.shadowfax_trip_data') in ['Brian R.', 'Nick
+      C.']\n   and state_attr('sensor.shadowfax_trip_data', 'latitude') is not none
+      }}"
   actions:
   - action: mqtt.publish
     data:
-      topic: >-
-        shadowfax/{{ 'brian' if states('sensor.shadowfax_trip_data') == 'Brian R.' else 'nick' }}/attributes
+      topic: shadowfax/{{ 'brian' if states('sensor.shadowfax_trip_data') == 'Brian
+        R.' else 'nick' }}/attributes
       retain: true
-      payload: >-
-        {"latitude": {{ state_attr('sensor.shadowfax_trip_data', 'latitude') }},
-         "longitude": {{ state_attr('sensor.shadowfax_trip_data', 'longitude') }},
-         "gps_accuracy": 0,
-         "speed": {{ state_attr('sensor.shadowfax_trip_data', 'speed') | default(0, true) }},
-         "drive_mode": "{{ state_attr('sensor.shadowfax_trip_data', 'drive_mode') }}"}
+      payload: "{\"latitude\": {{ state_attr('sensor.shadowfax_trip_data', 'latitude')
+        }},\n \"longitude\": {{ state_attr('sensor.shadowfax_trip_data', 'longitude')
+        }},\n \"gps_accuracy\": 0,\n \"speed\": {{ state_attr('sensor.shadowfax_trip_data',
+        'speed') | default(0, true) }},\n \"drive_mode\": \"{{ state_attr('sensor.shadowfax_trip_data',
+        'drive_mode') }}\"}"
+- id: watchdog_z_flip_5_relay_offline
+  alias: Watchdog - Z Flip 5 relay phone offline
+  description: 'Created 2026-07-22: the Google Home notification relay (spare Z Flip
+    5, "Android Notification Phone") silently stopped reporting to HA for ~23h after
+    the 00:53 07-21 restart, killing Airbnb arrival detection. Alerts when the phone
+    has not pushed a battery sensor update for 4 hours. The now() template trigger
+    re-evaluates once per minute and fires once per offline episode.'
+  triggers:
+  - trigger: template
+    value_template: "{{ states.sensor.android_notification_phone_battery_level is
+      not none and\n   (now() - states.sensor.android_notification_phone_battery_level.last_updated).total_seconds()\n
+      \  > 14400 }}"
+  actions:
+  - action: notify.mobile_app_brian_s_z_flip_7
+    data:
+      title: Relay phone offline
+      message: 'The Z Flip 5 notification relay has not reported to HA for over 4
+        hours (last update {{ states.sensor.android_notification_phone_battery_level.last_updated
+        | as_local }}). Airbnb arrival detection via Google Home notifications is
+        down. Check the phone: HA companion app connection, Wi-Fi, and whether it
+        rebooted.'
+      data:
+        tag: relay-watchdog
+        group: watchdog
+  - action: persistent_notification.create
+    data:
+      notification_id: relay_phone_offline
+      title: Relay phone offline
+      message: The Z Flip 5 notification relay has not reported to HA for over 4 hours
+        (last update {{ states.sensor.android_notification_phone_battery_level.last_updated
+        | as_local }}). Airbnb arrival detection via Google Home notifications is
+        down until it reconnects.
+  mode: single
+  max_exceeded: silent
+- id: follow_me_lighting
+  alias: 'Follow-Me Lighting: Brian'
+  description: Turns on the lights in whichever room Bermuda reports Brian entering,
+    and turns off the lights in the room he left (via his phone iBeacon). On/off switch
+    is this automation's own enabled state — put automation.follow_me_lighting_brian
+    on a dashboard and toggle it there; disabling it removes the trigger listener
+    entirely. Primary Bedroom excluded both directions on request (someone else may
+    still be in there).
+  mode: queued
+  triggers:
+  - trigger: state
+    entity_id: sensor.bermuda_e32fc30ca82d44629c46bf6e60ecd734_100_40004_area
+    to:
+  actions:
+  - variables:
+      excluded:
+      - unknown
+      - unavailable
+      - Primary Bedroom
+      to_area: '{{ trigger.to_state.attributes.get(''area_id'') if trigger.to_state
+        is not none and trigger.to_state.state not in excluded else none }}'
+      from_area: '{{ trigger.from_state.attributes.get(''area_id'') if trigger.from_state
+        is not none and trigger.from_state.state not in excluded else none }}'
+  - if: '{{ to_area is not none }}'
+    then:
+    - action: light.turn_on
+      target:
+        area_id: '{{ to_area }}'
+  - if: '{{ from_area is not none }}'
+    then:
+    - action: light.turn_off
+      target:
+        area_id: '{{ from_area }}'
+- id: proxmox_notification_relay
+  alias: Proxmox notification relay
+  description: 'Created 2026-07-25: four consecutive Proxmox backup failures (07-23
+    22:30 through 07-25 00:43) went unnoticed for two days because the host cannot
+    send mail - the ISP blocks outbound port 25, so 22 notification emails sat dead
+    in the postfix queue. Proxmox now POSTs its notifications to this webhook instead
+    of relying on SMTP. Severity arrives as info/notice/warning/error; warning and
+    above also raise a persistent notification. The webhook is local_only and carries
+    a random token, because /api/webhook is externally reachable via ha.northwoodscre.com.'
+  triggers:
+  - trigger: webhook
+    webhook_id: proxmox_hV44yvKsE-wwr0zszM-Oh3Ziu9UuqP1U4ckj0F3gnYk
+    allowed_methods:
+    - POST
+    local_only: true
+  variables:
+    sev: '{{ trigger.json.severity | default(''info'') }}'
+    ptitle: '{{ trigger.json.title | default(''Proxmox notification'') }}'
+    pmsg: '{{ trigger.json.message | default(''(no message body)'') }}'
+  actions:
+  - action: notify.mobile_app_brian_s_z_flip_7
+    data:
+      title: 'Proxmox: {{ ptitle }}'
+      message: '{{ pmsg | truncate(600) }}'
+      data:
+        tag: proxmox-{{ sev }}
+        group: proxmox
+  - if:
+    - condition: template
+      value_template: '{{ sev in [''warning'', ''error''] }}'
+    then:
+    - action: persistent_notification.create
+      data:
+        notification_id: proxmox_{{ sev }}
+        title: 'Proxmox: {{ ptitle }}'
+        message: '{{ pmsg }}'
+  mode: queued
+  max: 10
+- id: fstrim_thin_pool_reclaim
+  alias: Reclaim thin pool (fstrim)
+  description: 'Created 2026-07-25: nothing on this system ever issued TRIM, so the
+    LVM thin volume backing VM 100 had grown to 189 GiB allocated for 56 GiB of real
+    data. That tripled the nightly Proxmox backup (152 GB, 81 minutes) onto an SMR
+    drive already running at roughly twice its rated annual workload; a single fstrim
+    reclaimed ~123 GB. Runs daily at 10:00, deliberately far from the 04:00 backup:
+    discards issued while vzdump holds the disk are silently dropped, and ext4 then
+    marks those block groups already-trimmed, so a later fstrim reports success and
+    reclaims nothing until the next reboot. If allocation ever drifts far above real
+    usage again, check whether this ran during a backup.'
+  triggers:
+  - trigger: time
+    at: '10:00:00'
+  conditions: []
+  actions:
+  - action: shell_command.fstrim_data
+    data: {}
+  mode: single
+  max_exceeded: silent
+- id: watchdog_z_flip_5_relay_recovered
+  alias: Watchdog - Z Flip 5 relay phone recovered
+  description: 'Created 2026-07-25: watchdog_z_flip_5_relay_offline raised a mobile
+    + persistent notification when the relay went quiet, but nothing ever cleared
+    them - the persistent one stayed up indefinitely after the phone came back and
+    had to be dismissed by hand (confirmed: watchdog fired 11:09 MDT 07-25, phone
+    was reporting again while the notification still showed). This clears both when
+    the phone recovers. The trigger is the exact inverse of the offline watchdog''s
+    (< 14400 rather than > 14400): template triggers only fire on a false->true transition,
+    and this template is true during normal operation, so it cannot fire on a reload
+    or on an ordinary short reporting gap - only when the sensor comes back after
+    a real 4h+ outage. Reuses tag relay-watchdog so the recovery push replaces the
+    offline one in the notification shade instead of stacking.'
+  triggers:
+  - trigger: template
+    value_template: "{{ states.sensor.android_notification_phone_battery_level is
+      not none and\n   (now() - states.sensor.android_notification_phone_battery_level.last_updated).total_seconds()\n
+      \  < 14400 }}"
+  actions:
+  - action: persistent_notification.dismiss
+    data:
+      notification_id: relay_phone_offline
+  - action: notify.mobile_app_brian_s_z_flip_7
+    data:
+      title: Relay phone back online
+      message: The Z Flip 5 notification relay is reporting to HA again (battery {{
+        states('sensor.android_notification_phone_battery_level') }}%). Airbnb arrival
+        detection via Google Home notifications is back up.
+      data:
+        tag: relay-watchdog
+        group: watchdog
+  mode: single
+  max_exceeded: silent
+- id: shadowfax_home_charging_accumulate
+  alias: Shadowfax - accumulate home charging energy
+  description: 'Credits home-charging energy LIVE during a session using a high-water
+    mark. Energy is credited ONLY for SoC above the session max, which makes it immune
+    to the sawtooth in sensor.shadowfax_battery_state_of_charge (drops ~0.5% then
+    climbs back every ~1.5 min even parked/unplugged). DO NOT change this to sum positive
+    deltas - that rectifies the noise and invented a phantom 41.343 kWh on 2026-07-27.
+    DO NOT change it to credit only at session end either - that dumps a whole session
+    into one hour bucket. Efficiency divisor 0.87 calibrated 2026-07-30 against the
+    Rivian app: 31.1%->45.7% on a 130.19 kWh pack = 19.008 kWh into the battery vs
+    21.9 kWh reported delivered at the wall = 86.8% efficient.'
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.shadowfax_charging_status
+    from: 'off'
+    to: 'on'
+    id: start
+  - trigger: state
+    entity_id: binary_sensor.shadowfax_charging_status
+    from: 'on'
+    to: 'off'
+    for: 00:02:00
+    id: stop
+  - trigger: state
+    entity_id: sensor.shadowfax_battery_state_of_charge
+    id: progress
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: start
+      - condition: state
+        entity_id: device_tracker.shadowfax_location
+        state:
+        - Garage
+        - home
+      - condition: template
+        value_template: '{{ states(''input_number.shadowfax_charge_session_start_soc'')
+          | float(-1) < 0 }}'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.shadowfax_charge_session_start_soc
+        data:
+          value: '{{ states(''sensor.shadowfax_battery_state_of_charge'') | float(0)
+            | round(1) }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.shadowfax_charge_session_max_soc
+        data:
+          value: '{{ states(''sensor.shadowfax_battery_state_of_charge'') | float(0)
+            | round(1) }}'
+    - conditions:
+      - condition: trigger
+        id: progress
+      - condition: template
+        value_template: '{{ states(''input_number.shadowfax_charge_session_max_soc'')
+          | float(-1) >= 0 }}'
+      - condition: template
+        value_template: '{{ states(''sensor.shadowfax_battery_state_of_charge'') not
+          in [''unknown'',''unavailable''] }}'
+      - condition: template
+        value_template: '{{ ((states(''sensor.shadowfax_battery_state_of_charge'')
+          | float(0)) - (states(''input_number.shadowfax_charge_session_max_soc'')
+          | float(0))) > 0 }}'
+      sequence:
+      - variables:
+          gain: '{{ (states(''sensor.shadowfax_battery_state_of_charge'') | float(0))
+            - (states(''input_number.shadowfax_charge_session_max_soc'') | float(0))
+            }}'
+          cap: '{{ states(''sensor.shadowfax_battery_capacity'') | float(130.19) }}'
+      - condition: template
+        value_template: '{{ gain > 0 and gain < 10 }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.shadowfax_home_charging_total_kwh
+        data:
+          value: '{{ ((states(''input_number.shadowfax_home_charging_total_kwh'')
+            | float(0)) + (gain / 100 * cap / 0.87)) | round(3) }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.shadowfax_charge_session_max_soc
+        data:
+          value: '{{ states(''sensor.shadowfax_battery_state_of_charge'') | float(0)
+            | round(1) }}'
+    - conditions:
+      - condition: trigger
+        id: stop
+      - condition: template
+        value_template: '{{ states(''input_number.shadowfax_charge_session_start_soc'')
+          | float(-1) >= 0 }}'
+      sequence:
+      - action: logbook.log
+        data:
+          name: Shadowfax charging
+          message: session ended {{ states('input_number.shadowfax_charge_session_start_soc')
+            }}% -> {{ states('input_number.shadowfax_charge_session_max_soc') }}%;
+            running total {{ states('input_number.shadowfax_home_charging_total_kwh')
+            }} kWh
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.shadowfax_charge_session_start_soc
+        data:
+          value: -1
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.shadowfax_charge_session_max_soc
+        data:
+          value: -1
+  mode: queued
+  max: 25
+- id: envoy_spike_guard_alert
+  alias: Envoy - spike guard rejection alert
+  description: Fires when the raw Envoy daily-production sensor jumps by more than
+    100 kWh in a single update - the lifetime-in-daily glitch signature (2026-05-08,
+    2026-07-31). The guarded sensor absorbs it silently; this makes sure the device
+    fault itself is not invisible.
+  triggers:
+  - trigger: state
+    entity_id: sensor.envoy_202504003929_energy_production_today
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state is not none and trigger.to_state is not
+      none and trigger.from_state.state not in [''unknown'',''unavailable''] and trigger.to_state.state
+      not in [''unknown'',''unavailable''] and ((trigger.to_state.state | float(0))
+      - (trigger.from_state.state | float(0))) > 100 }}'
+  actions:
+  - action: notify.mobile_app_brian_s_z_flip_7
+    data:
+      title: Envoy glitch caught
+      message: Raw solar sensor jumped {{ ((trigger.to_state.state | float(0)) - (trigger.from_state.state
+        | float(0))) | round(0) }} kWh in one update ({{ trigger.from_state.state
+        }} -> {{ trigger.to_state.state }}). The guarded sensor rejected it; Energy
+        dashboard is unaffected. No action needed - this confirms the guard is working.
+  - action: persistent_notification.create
+    data:
+      title: Envoy spike rejected
+      notification_id: envoy_spike_guard
+      message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }}: raw jumped {{ ((trigger.to_state.state
+        | float(0)) - (trigger.from_state.state | float(0))) | round(0) }} kWh; guard
+        absorbed it.'
+  mode: single
+- id: cardperks_statement_drop_folder
+  alias: 'CardPerks: import statements dropped in the folder'
+  description: Created from the CardPerks statement drop folder blueprint.
+  use_blueprint:
+    path: cardperks/statement_drop_folder.yaml
+    input:
+      folder: /config/cardperks/statements
+      notify: true
+- id: cardperks_daily_digest
+  alias: 'CardPerks: daily digest'
+  description: Created from the CardPerks daily digest blueprint.
+  use_blueprint:
+    path: cardperks/daily_digest.yaml
+    input:
+      notify_service: notify.mobile_app_brian_s_z_flip_7
+      at: 09:00:00
+      days_ahead: 7
+      min_amount: 50
+      calendar: calendar.household_calendar

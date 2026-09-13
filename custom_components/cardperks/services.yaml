@@ -1,0 +1,134 @@
+mark_used:
+  target:
+    entity:
+      integration: cardperks
+      domain: select
+  fields:
+    amount:
+      required: false
+      selector:
+        number:
+          min: 0
+          step: 0.01
+          mode: box
+    date:
+      required: false
+      selector:
+        date:
+    note:
+      required: false
+      selector:
+        text:
+
+reset_benefit:
+  target:
+    entity:
+      integration: cardperks
+      domain: select
+
+add_sub_spend:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: cardperks
+    amount:
+      required: true
+      selector:
+        number:
+          min: 0
+          step: 0.01
+          mode: box
+    date:
+      required: false
+      selector:
+        date:
+    note:
+      required: false
+      selector:
+        text:
+
+set_perk_value:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: cardperks
+    benefit_id:
+      required: true
+      selector:
+        text:
+    value:
+      required: true
+      selector:
+        number:
+          min: 0
+          step: 1
+          mode: box
+
+activate_rotating_category:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: cardperks
+    category:
+      required: true
+      selector:
+        text:
+    quarter:
+      required: false
+      example: "2026-Q3"
+      selector:
+        text:
+
+import_cards:
+  fields:
+    csv:
+      required: true
+      example: |
+        owner,issuer,product,role,parent_last4,open_date,fee_month,last4,nickname
+        Brian,Chase,Sapphire Reserve,primary,,2021-03-15,,1234,
+        Nick,Chase,United Club,au,1234,,,,
+      selector:
+        text:
+          multiline: true
+
+import_statement:
+  fields:
+    path:
+      required: true
+      example: "cardperks/statements/Chase1234_Activity_20260905.csv"
+      selector:
+        text:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: cardperks
+    apply_fee:
+      required: false
+      default: true
+      selector:
+        boolean:
+
+add_statement_match:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: cardperks
+    benefit_id:
+      required: true
+      example: "uber_cash"
+      selector:
+        text:
+    pattern:
+      required: true
+      example: "UBER CASH"
+      selector:
+        text:
